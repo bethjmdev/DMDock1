@@ -1,12 +1,13 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./CampaignView.css";
 
 const CampaignView = () => {
   const navigate = useNavigate();
+  const { campaignId } = useParams();
 
   const buttons = [
-    { title: "Players", path: "/campaign/players" },
+    { title: "Players", path: `/campaigns/${campaignId}/players` },
     { title: "NPC", path: "/campaign/npc" },
     { title: "Weather Generator", path: "/campaign/weather" },
     { title: "Encounter Generator", path: "/campaign/encounter" },

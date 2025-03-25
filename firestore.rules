@@ -19,6 +19,25 @@ service cloud.firestore {
       allow create: if request.auth != null;
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.dmId;
     }
+
+    // Rules for Players collection
+    match /Players/{playerId} {
+      // Allow create if user is authenticated and is the DM of the campaign
+      allow create: if request.auth != null && 
+        request.resource.data.dm == request.auth.uid;
+      
+      // Allow read if user is authenticated and is the DM of the campaign
+      allow read: if request.auth != null && 
+        resource.data.dm == request.auth.uid;
+      
+      // Allow update if user is authenticated and is the DM of the campaign
+      allow update: if request.auth != null && 
+        resource.data.dm == request.auth.uid;
+      
+      // Allow delete if user is authenticated and is the DM of the campaign
+      allow delete: if request.auth != null && 
+        resource.data.dm == request.auth.uid;
+    }
     
     // Default deny for all other collections
     match /{document=**} {
