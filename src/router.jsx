@@ -1,13 +1,15 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./components/auth/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+
 import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
+import AddPlayerForm from "./components/campaign/AddPlayerForm";
 import CampaignControl from "./components/CampaignControl";
 import NewCampaign from "./components/NewCampaign";
 import CampaignView from "./components/CampaignView";
 import Players from "./components/campaign/Players";
-import AddPlayerForm from "./components/campaign/AddPlayerForm";
 import NPC from "./components/campaign/NPC";
 import WeatherGenerator from "./components/campaign/WeatherGenerator";
 import EncounterGenerator from "./components/campaign/EncounterGenerator";
@@ -18,43 +20,12 @@ import DateTracker from "./components/campaign/DateTracker";
 import EncounterList from "./components/campaign/EncounterList";
 import MonsterList from "./components/campaign/MonsterList";
 import Notes from "./components/campaign/Notes";
-import { useAuth } from "./components/auth/AuthContext";
-import Login from "./components/auth/Login";
-import Register from "./components/auth/Register";
-import Dashboard from "./components/dashboard/Dashboard";
-import Campaigns from "./components/campaign/Campaigns";
-import AddCampaignForm from "./components/campaign/AddCampaignForm";
-import Campaign from "./components/campaign/Campaign";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={currentUser ? <Navigate to="/dashboard" /> : <Login />}
-      />
-      <Route
-        path="/register"
-        element={currentUser ? <Navigate to="/dashboard" /> : <Register />}
-      />
-      <Route
-        path="/dashboard"
-        element={currentUser ? <Dashboard /> : <Navigate to="/login" />}
-      />
-      <Route
-        path="/campaigns"
-        element={currentUser ? <Campaigns /> : <Navigate to="/login" />}
-      />
-      <Route
-        path="/campaigns/add"
-        element={currentUser ? <AddCampaignForm /> : <Navigate to="/login" />}
-      />
-      <Route
-        path="/campaigns/:campaignId"
-        element={currentUser ? <Campaign /> : <Navigate to="/login" />}
-      />
       <Route
         path="/campaigns/:campaignId/players"
         element={currentUser ? <Players /> : <Navigate to="/login" />}
@@ -93,6 +64,7 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/campaign/npc"
         element={
@@ -173,6 +145,7 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
+      <Route path="/" element={<Navigate to="/campaigns" replace />} />
     </Routes>
   );
 };
