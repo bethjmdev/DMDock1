@@ -20,6 +20,7 @@ import DateTracker from "./components/campaign/DateTracker";
 import EncounterList from "./components/campaign/EncounterList";
 import MonsterList from "./components/campaign/MonsterList";
 import Notes from "./components/campaign/Notes";
+import EditPlayer from "./components/campaign/EditPlayer";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -144,6 +145,10 @@ const AppRouter = () => {
             <Notes />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/campaigns/:campaignId/players/edit/:playerId"
+        element={<EditPlayer />}
       />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
     </Routes>

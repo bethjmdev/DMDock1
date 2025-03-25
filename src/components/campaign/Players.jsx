@@ -105,6 +105,14 @@ const Players = () => {
                   <span className="font-medium">CHA:</span> {player.charisma}
                 </div>
               </div>
+              <button
+                onClick={() =>
+                  navigate(`/campaigns/${campaignId}/players/edit/${player.id}`)
+                }
+                className="edit-button"
+              >
+                Edit
+              </button>
             </div>
           ))}
         </div>
