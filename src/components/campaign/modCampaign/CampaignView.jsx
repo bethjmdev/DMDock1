@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "./CampaignView.css";
 
@@ -14,6 +14,11 @@ const CampaignView = () => {
 
   console.log(campaignId);
   console.log("campaign from campaign view", campaign);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [month, setMonth] = useState("");
+  const [day, setDay] = useState("");
+  const [year, setYear] = useState("");
 
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
@@ -51,17 +56,46 @@ const CampaignView = () => {
           {campaign.custom_weather === true && campaign.date === null ? (
             <button
               className="select-date-button"
-              onClick={() => {
-                // Add your navigation logic here
-                navigate(`/campaign/${campaignId}/select-date`, {
-                  state: { campaignId, userId, campaign },
-                });
-              }}
+              onClick={() => setShowDatePicker(true)}
             >
               Select Date
             </button>
           ) : null}
         </h1>
+
+        {showDatePicker && (
+          <div className="date-picker-modal">
+            <h2>Select Date</h2>
+            <input
+              type="number"
+              placeholder="Month (1-12)"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Day"
+              value={day}
+              onChange={(e) => setDay(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Year"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+            />
+            <button
+              onClick={() => {
+                console.log(`Selected Date: ${month}/${day}/${year}`);
+                setShowDatePicker(false);
+              }}
+            >
+              Submit Date
+            </button>
+            <button onClick={() => setShowDatePicker(false)}>Cancel</button>
+          </div>
+        )}
+
         <div className="campaign-buttons-grid">
           {buttons.map((button) => (
             <button
