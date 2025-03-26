@@ -143,7 +143,7 @@ const CampaignView = () => {
               Set your campaign calendar and active weather
             </button>
           ) : null}
-          {campaign.custom_weather === true && campaign.date === null ? (
+          {campaign.custom_weather === true && !dateValue ? (
             <button
               className="select-date-button"
               onClick={() => {
