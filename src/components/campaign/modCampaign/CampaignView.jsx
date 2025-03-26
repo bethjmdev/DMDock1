@@ -7,6 +7,10 @@ const CampaignView = () => {
   const { campaignId } = useParams();
   const location = useLocation();
   const campaign = location.state?.campaign;
+  const date = location.state?.date;
+
+  // Assuming you have userId available in this component
+  const userId = "exampleUserId"; // Replace with actual userId logic
 
   console.log(campaignId);
   console.log("campaign from campaign view", campaign);
@@ -35,13 +39,28 @@ const CampaignView = () => {
           {campaign.custom_weather === false ? (
             <button
               className="set-weather-button"
-              onClick={() => navigate(`/campaign/${campaignId}/customcalendar`)}
+              onClick={() =>
+                navigate(`/campaign/${campaignId}/customcalendar`, {
+                  state: { campaignId, userId, campaign },
+                })
+              }
             >
               Set your campaign calendar and active weather
             </button>
-          ) : (
-            <p>Calendar selected successfully</p>
-          )}
+          ) : null}
+          {campaign.custom_weather === true && campaign.date === null ? (
+            <button
+              className="select-date-button"
+              onClick={() => {
+                // Add your navigation logic here
+                navigate(`/campaign/${campaignId}/select-date`, {
+                  state: { campaignId, userId, campaign },
+                });
+              }}
+            >
+              Select Date
+            </button>
+          ) : null}
         </h1>
         <div className="campaign-buttons-grid">
           {buttons.map((button) => (
