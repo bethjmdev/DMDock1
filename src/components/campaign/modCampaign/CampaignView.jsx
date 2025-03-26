@@ -6,6 +6,9 @@ import {
   query,
   where,
   getDocs,
+  doc,
+  updateDoc,
+  getDoc,
 } from "firebase/firestore";
 import "./CampaignView.css";
 
@@ -25,14 +28,17 @@ const CampaignView = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
+  const [specificDay, setSpecificDay] = useState("");
   const [year, setYear] = useState("");
   const [monthNames, setMonthNames] = useState([]);
+  const [dayNames, setDayNames] = useState([]);
+  const [dateValue, setDateValue] = useState(null); // State to hold the date value
 
   // Firestore initialization
   const db = getFirestore();
 
-  // Fetch monthNames from Calendar collection when "Select Date" is clicked
-  const fetchMonthNames = async () => {
+  // Fetch monthNames and dayNames from Calendar collection when "Select Date" is clicked
+  const fetchDateInfo = async () => {
     const q = query(
       collection(db, "Calendar"),
       where("campaignId", "==", campaignId)
@@ -44,11 +50,33 @@ const CampaignView = () => {
         const data = doc.data();
         console.log("Month Names:", data.monthNames);
         setMonthNames(data.monthNames);
+        console.log("Day Names:", data.dayNames);
+        setDayNames(data.dayNames);
       });
     } else {
       console.log("No such document!");
     }
   };
+
+  const fetchDateValue = async () => {
+    const campaignRef = doc(db, "Campaign", campaignId); // Use the correct collection name
+    const docSnap = await getDoc(campaignRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      console.log("Fetched Date:", data.date); // Log the fetched date
+      setDateValue(data.date); // Update the state with the new date value
+    } else {
+      console.log("No such document!");
+    }
+  };
+
+  // Set the date value from the campaign object when the component mounts
+  useEffect(() => {
+    if (campaign.date) {
+      setDateValue(campaign.date); // Set the dateValue from campaign.date if it exists
+    }
+  }, [campaign.date]);
 
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
@@ -63,6 +91,38 @@ const CampaignView = () => {
     { title: "List of Monsters", path: "/campaign/monsters" },
     { title: "Notes", path: "/campaign/notes" },
   ];
+
+  const handleSubmitDate = async () => {
+    const dateObject = {
+      month: month,
+      number_day: specificDay,
+      week_day: day,
+      year: year,
+    };
+
+    const campaignRef = doc(db, "Campaign", campaignId); // Use the correct collection name
+
+    const docSnap = await getDoc(campaignRef);
+    console.log("Campaign Reference:", campaignRef.path);
+    console.log("Document Exists:", docSnap.exists());
+
+    if (!docSnap.exists()) {
+      console.log("No such document!");
+      return;
+    }
+
+    // Update the date field in the Campaign document
+    await updateDoc(campaignRef, {
+      date: dateObject,
+    });
+
+    console.log(`Date saved:`, dateObject);
+
+    // Repull only the date value
+    await fetchDateValue(); // Call the function to fetch the updated date value
+
+    setShowDatePicker(false);
+  };
 
   return (
     <div className="campaign-view-container">
@@ -87,7 +147,7 @@ const CampaignView = () => {
             <button
               className="select-date-button"
               onClick={() => {
-                fetchMonthNames(); // Fetch month names when button is clicked
+                fetchDateInfo();
                 setShowDatePicker(true);
               }}
             >
@@ -99,17 +159,31 @@ const CampaignView = () => {
         {showDatePicker && (
           <div className="date-picker-modal">
             <h2>Select Date</h2>
+            <select value={month} onChange={(e) => setMonth(e.target.value)}>
+              <option value="" disabled>
+                Select Month
+              </option>
+              {monthNames.map((name, index) => (
+                <option key={index} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            <select value={day} onChange={(e) => setDay(e.target.value)}>
+              <option value="" disabled>
+                Select Day of Week
+              </option>
+              {dayNames.map((name, index) => (
+                <option key={index} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
             <input
               type="number"
-              placeholder="Month (1-12)"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Day"
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
+              placeholder="Specific Day Number"
+              value={specificDay}
+              onChange={(e) => setSpecificDay(e.target.value)}
             />
             <input
               type="number"
@@ -117,15 +191,18 @@ const CampaignView = () => {
               value={year}
               onChange={(e) => setYear(e.target.value)}
             />
-            <button
-              onClick={() => {
-                console.log(`Selected Date: ${month}/${day}/${year}`);
-                setShowDatePicker(false);
-              }}
-            >
-              Submit Date
-            </button>
+            <button onClick={handleSubmitDate}>Submit Date</button>
             <button onClick={() => setShowDatePicker(false)}>Cancel</button>
+          </div>
+        )}
+
+        {dateValue && (
+          <div className="date-display">
+            <h2>Current Date:</h2>
+            <p>Month: {dateValue.month}</p>
+            <p>Number Day: {dateValue.number_day}</p>
+            <p>Week Day: {dateValue.week_day}</p>
+            <p>Year: {dateValue.year}</p>
           </div>
         )}
 
