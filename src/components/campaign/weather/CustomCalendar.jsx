@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const CustomCalendar = () => {
   const [months, setMonths] = useState("");
   const [weeks, setWeeks] = useState(""); // New state for weeks
+  const [daysInMonth, setDaysInMonth] = useState(""); // New state for days in a month
   const [days, setDays] = useState("");
   const [monthNames, setMonthNames] = useState(Array(12).fill("")); // Default to 12 empty month names
   const [dayNames, setDayNames] = useState(Array(7).fill("")); // Default to 7 empty day names
@@ -20,6 +21,12 @@ const CustomCalendar = () => {
     const value =
       e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
     setWeeks(value); // Update weeks state
+  };
+
+  const handleDaysInMonthChange = (e) => {
+    const value =
+      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
+    setDaysInMonth(value); // Update days in month state
   };
 
   const handleDaysChange = (e) => {
@@ -81,7 +88,20 @@ const CustomCalendar = () => {
           </label>
         </div>
       )}
-      {weeks !== "" && ( // Conditionally render the days input
+      {weeks !== "" && ( // Conditionally render the days in a month input
+        <div>
+          <label>
+            How many days in a month:
+            <input
+              type="number"
+              value={daysInMonth}
+              onChange={handleDaysInMonthChange}
+              min="0"
+            />
+          </label>
+        </div>
+      )}
+      {daysInMonth !== "" && ( // Conditionally render the days input
         <div>
           <label>
             How many days in a week:
