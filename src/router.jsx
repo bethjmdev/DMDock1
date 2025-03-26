@@ -19,6 +19,10 @@ import NPC from "./components/campaign/pages/NPC";
 import EditNPC from "./components/campaign/npc/EditNPC";
 import AddNPCForm from "./components/campaign/npc/AddNPCForm";
 
+import Monster from "./components/campaign/pages/Monster";
+import EditMonster from "./components/campaign/monster/EditMonster";
+import AddMonsterForm from "./components/campaign/monster/AddMonsterForm";
+
 import WeatherGenerator from "./components/campaign/pages/WeatherGenerator";
 import EncounterGenerator from "./components/campaign/pages/EncounterGenerator";
 import TownGenerator from "./components/campaign/pages/TownGenerator";
@@ -37,6 +41,10 @@ const AppRouter = () => {
       <Route
         path="/campaign/:campaignId/players"
         element={currentUser ? <Players /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/campaign/:campaignId/monsters"
+        element={currentUser ? <Monster /> : <Navigate to="/login" />}
       />
       <Route
         path="/campaign/:campaignId/players/add"
@@ -138,7 +146,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/monsters"
+        path="/campaign/monsterslist"
         element={
           <ProtectedRoute>
             <MonsterList />
@@ -161,10 +169,18 @@ const AppRouter = () => {
         path="/campaign/:campaignId/npcs/edit/:npcId"
         element={<EditNPC />}
       />
+      <Route
+        path="/campaign/:campaignId/monsters/edit/:monsterId"
+        element={<EditMonster />}
+      />
 
       <Route
         path="/campaign/:campaignId/npc/add"
         element={currentUser ? <AddNPCForm /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/campaign/:campaignId/monster/add"
+        element={currentUser ? <AddMonsterForm /> : <Navigate to="/login" />}
       />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
     </Routes>

@@ -14,12 +14,14 @@ const CampaignView = () => {
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
     { title: "NPC", path: `/campaign/${campaignId}/npc` },
-    { title: "Weather Generator", path: "/campaign/weather" },
+    { title: "Monster", path: `/campaign/${campaignId}/monster` },
+
+    // { title: "Weather Generator", path: "/campaign/weather" },
     { title: "Encounter Generator", path: "/campaign/encounter" },
     { title: "Town Generator", path: "/campaign/town" },
     { title: "NPC Generator", path: "/campaign/npc-generator" },
     { title: "Spell Slot Tracker", path: "/campaign/spell-slots" },
-    { title: "Date Tracker", path: "/campaign/date" },
+    { title: "See Calendar", path: "/campaign/date" },
     { title: "Encounter", path: "/campaign/encounter-list" },
     { title: "List of Monsters", path: "/campaign/monsters" },
     { title: "Notes", path: "/campaign/notes" },
