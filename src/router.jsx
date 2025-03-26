@@ -22,6 +22,7 @@ import MonsterList from "./components/campaign/MonsterList";
 import Notes from "./components/campaign/Notes";
 import EditPlayer from "./components/campaign/EditPlayer";
 import AddNPCForm from "./components/campaign/AddNPCForm";
+import EditNPC from "./components/campaign/EditNPC";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -150,6 +151,10 @@ const AppRouter = () => {
       <Route
         path="/campaign/:campaignId/players/edit/:playerId"
         element={<EditPlayer />}
+      />
+      <Route
+        path="/campaign/:campaignId/npcs/edit/:npcId"
+        element={<EditNPC />}
       />
 
       <Route

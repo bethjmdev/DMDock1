@@ -73,13 +73,6 @@ const NPC = () => {
                   <h3 className="text-lg font-semibold text-gray-800">
                     {NPC.name}
                   </h3>
-                  <p className="text-sm text-gray-600">
-                    Occupation: {NPC.occupation}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Description: {NPC.description}
-                  </p>
-                  <p className="text-sm text-gray-600">Notes: {NPC.notes}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-800">
@@ -87,7 +80,14 @@ const NPC = () => {
                   </p>
                 </div>
               </div>
+
               <div className="players-stats">
+                <p className="text-sm text-gray-600">
+                  Occupation: {NPC.occupation}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Description: {NPC.description}
+                </p>
                 <div className="text-gray-800">
                   <span className="font-medium">STR:</span>{" "}
                   {NPC.ability_scores.strength}
@@ -112,6 +112,7 @@ const NPC = () => {
                   <span className="font-medium">CHA:</span>{" "}
                   {NPC.ability_scores.charisma}
                 </div>
+                <p className="text-sm text-gray-600">Notes: {NPC.notes}</p>
               </div>
               <button
                 onClick={() =>
@@ -119,7 +120,7 @@ const NPC = () => {
                 }
                 className="edit-button"
               >
-                Edit
+                Edit / Add Notes
               </button>
             </div>
           ))}
