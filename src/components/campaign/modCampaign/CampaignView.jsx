@@ -1,10 +1,15 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "./CampaignView.css";
 
 const CampaignView = () => {
   const navigate = useNavigate();
   const { campaignId } = useParams();
+  const location = useLocation();
+  const title = location.state?.title;
+
+  console.log(campaignId);
+  console.log(title);
 
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
@@ -20,12 +25,10 @@ const CampaignView = () => {
     { title: "Notes", path: "/campaign/notes" },
   ];
 
-  console.log(campaignId);
-
   return (
     <div className="campaign-view-container">
       <div className="campaign-view-content">
-        <h1 className="campaign-view-title">Campaign Tools</h1>
+        <h1 className="campaign-view-title">{title || "Campaign Tools"}</h1>
         <div className="campaign-buttons-grid">
           {buttons.map((button) => (
             <button

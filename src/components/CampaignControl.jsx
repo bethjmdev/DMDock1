@@ -81,7 +81,11 @@ const CampaignControl = () => {
               <div
                 key={campaign.id}
                 className="campaign-card"
-                onClick={() => navigate(`/campaign/${campaign.id}`)}
+                onClick={() =>
+                  navigate(`/campaign/${campaign.id}`, {
+                    state: { title: campaign.name },
+                  })
+                }
                 style={{ cursor: "pointer" }}
               >
                 <h2>{campaign.name}</h2>
