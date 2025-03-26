@@ -40,7 +40,7 @@ const Players = () => {
   }, [campaignId, currentUser.uid]);
 
   const handleAddPlayer = () => {
-    navigate(`/campaigns/${campaignId}/players/add`);
+    navigate(`/campaign/${campaignId}/players/add`);
   };
 
   if (loading) {
@@ -107,7 +107,7 @@ const Players = () => {
               </div>
               <button
                 onClick={() =>
-                  navigate(`/campaigns/${campaignId}/players/edit/${player.id}`)
+                  navigate(`/campaign/${campaignId}/players/edit/${player.id}`)
                 }
                 className="edit-button"
               >

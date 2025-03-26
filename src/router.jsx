@@ -21,6 +21,7 @@ import EncounterList from "./components/campaign/EncounterList";
 import MonsterList from "./components/campaign/MonsterList";
 import Notes from "./components/campaign/Notes";
 import EditPlayer from "./components/campaign/EditPlayer";
+import AddNPCForm from "./components/campaign/AddNPCForm";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -28,11 +29,11 @@ const AppRouter = () => {
   return (
     <Routes>
       <Route
-        path="/campaigns/:campaignId/players"
+        path="/campaign/:campaignId/players"
         element={currentUser ? <Players /> : <Navigate to="/login" />}
       />
       <Route
-        path="/campaigns/:campaignId/players/add"
+        path="/campaign/:campaignId/players/add"
         element={currentUser ? <AddPlayerForm /> : <Navigate to="/login" />}
       />
       <Route
@@ -67,7 +68,7 @@ const AppRouter = () => {
       />
 
       <Route
-        path="/campaign/npc"
+        path="/campaign/:campaignId/npc"
         element={
           <ProtectedRoute>
             <NPC />
@@ -147,8 +148,13 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaigns/:campaignId/players/edit/:playerId"
+        path="/campaign/:campaignId/players/edit/:playerId"
         element={<EditPlayer />}
+      />
+
+      <Route
+        path="/campaign/:campaignId/npc/add"
+        element={currentUser ? <AddNPCForm /> : <Navigate to="/login" />}
       />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
     </Routes>

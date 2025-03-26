@@ -20,6 +20,13 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.dmId;
     }
 
+    // Rules for NPC collection
+    match /NPC/{npcId} {
+      allow create: if request.auth != null; // Allow any authenticated user to create NPCs
+      allow read: if request.auth != null; // Allow any authenticated user to read NPCs
+      allow update, delete: if request.auth != null && request.resource.data.dmId == request.auth.uid; // Only allow the DM to update or delete their NPCs
+    }
+
     // Rules for Players collection
     match /Players/{playerId} {
       // Allow create if user is authenticated and is the DM of the campaign

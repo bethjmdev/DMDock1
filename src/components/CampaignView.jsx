@@ -7,8 +7,8 @@ const CampaignView = () => {
   const { campaignId } = useParams();
 
   const buttons = [
-    { title: "Players", path: `/campaigns/${campaignId}/players` },
-    { title: "NPC", path: "/campaign/npc" },
+    { title: "Players", path: `/campaign/${campaignId}/players` },
+    { title: "NPC", path: `/campaign/${campaignId}/npc` },
     { title: "Weather Generator", path: "/campaign/weather" },
     { title: "Encounter Generator", path: "/campaign/encounter" },
     { title: "Town Generator", path: "/campaign/town" },
@@ -19,6 +19,8 @@ const CampaignView = () => {
     { title: "List of Monsters", path: "/campaign/monsters" },
     { title: "Notes", path: "/campaign/notes" },
   ];
+
+  console.log(campaignId);
 
   return (
     <div className="campaign-view-container">
