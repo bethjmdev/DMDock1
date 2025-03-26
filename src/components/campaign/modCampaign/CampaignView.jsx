@@ -198,11 +198,10 @@ const CampaignView = () => {
 
         {dateValue && (
           <div className="date-display">
-            <h2>Current Date:</h2>
-            <p>Month: {dateValue.month}</p>
-            <p>Number Day: {dateValue.number_day}</p>
-            <p>Week Day: {dateValue.week_day}</p>
-            <p>Year: {dateValue.year}</p>
+            <p>
+              Today is {dateValue.week_day}, {dateValue.month}{" "}
+              {dateValue.number_day}, {dateValue.year}
+            </p>
           </div>
         )}
 
