@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./auth/AuthContext";
-import { db } from "../firebase";
+import { useAuth } from "../../auth/AuthContext";
+import { db } from "../../../firebase";
 import { collection, addDoc } from "firebase/firestore";
-import "./CampaignControl.css";
+import "../../CampaignControl.css";
 
 const NewCampaign = () => {
   const [campaignName, setCampaignName] = useState("");

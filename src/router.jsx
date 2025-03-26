@@ -5,24 +5,33 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
-import AddPlayerForm from "./components/campaign/AddPlayerForm";
+
+import Players from "./components/campaign/pages/Players";
+import AddPlayerForm from "./components/campaign/player/AddPlayerForm";
+import EditPlayer from "./components/campaign/player/EditPlayer";
+
 import CampaignControl from "./components/CampaignControl";
-import NewCampaign from "./components/NewCampaign";
-import CampaignView from "./components/CampaignView";
-import Players from "./components/campaign/Players";
-import NPC from "./components/campaign/NPC";
-import WeatherGenerator from "./components/campaign/WeatherGenerator";
-import EncounterGenerator from "./components/campaign/EncounterGenerator";
-import TownGenerator from "./components/campaign/TownGenerator";
-import NPCGenerator from "./components/campaign/NPCGenerator";
-import SpellSlotTracker from "./components/campaign/SpellSlotTracker";
-import DateTracker from "./components/campaign/DateTracker";
-import EncounterList from "./components/campaign/EncounterList";
-import MonsterList from "./components/campaign/MonsterList";
-import Notes from "./components/campaign/Notes";
-import EditPlayer from "./components/campaign/EditPlayer";
-import AddNPCForm from "./components/campaign/AddNPCForm";
-import EditNPC from "./components/campaign/EditNPC";
+
+import NewCampaign from "./components/campaign/modCampaign/NewCampaign";
+import CampaignView from "./components/campaign/modCampaign/CampaignView";
+
+import NPC from "./components/campaign/pages/NPC";
+import EditNPC from "./components/campaign/npc/EditNPC";
+import AddNPCForm from "./components/campaign/npc/AddNPCForm";
+
+import Monster from "./components/campaign/pages/Monster";
+import EditMonster from "./components/campaign/monster/EditMonster";
+import AddMonsterForm from "./components/campaign/monster/AddMonsterForm";
+
+import WeatherGenerator from "./components/campaign/pages/WeatherGenerator";
+import EncounterGenerator from "./components/campaign/pages/EncounterGenerator";
+import TownGenerator from "./components/campaign/pages/TownGenerator";
+import NPCGenerator from "./components/campaign/pages/NPCGenerator";
+import SpellSlotTracker from "./components/campaign/pages/SpellSlotTracker";
+import DateTracker from "./components/campaign/pages/DateTracker";
+import EncounterList from "./components/campaign/pages/EncounterList";
+import MonsterList from "./components/campaign/pages/MonsterList";
+import Notes from "./components/campaign/pages/Notes";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -32,6 +41,10 @@ const AppRouter = () => {
       <Route
         path="/campaign/:campaignId/players"
         element={currentUser ? <Players /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/campaign/:campaignId/monsters"
+        element={currentUser ? <Monster /> : <Navigate to="/login" />}
       />
       <Route
         path="/campaign/:campaignId/players/add"
@@ -133,7 +146,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/monsters"
+        path="/campaign/monsterslist"
         element={
           <ProtectedRoute>
             <MonsterList />
@@ -156,10 +169,18 @@ const AppRouter = () => {
         path="/campaign/:campaignId/npcs/edit/:npcId"
         element={<EditNPC />}
       />
+      <Route
+        path="/campaign/:campaignId/monsters/edit/:monsterId"
+        element={<EditMonster />}
+      />
 
       <Route
         path="/campaign/:campaignId/npc/add"
         element={currentUser ? <AddNPCForm /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/campaign/:campaignId/monster/add"
+        element={currentUser ? <AddMonsterForm /> : <Navigate to="/login" />}
       />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
     </Routes>
