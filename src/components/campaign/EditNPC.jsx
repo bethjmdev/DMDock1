@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import "../auth/Auth.css";
@@ -78,6 +78,18 @@ const EditNPC = () => {
       navigate(-1); // Go back to the previous page
     } catch (error) {
       console.error("Error updating npc:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this NPC?")) {
+      try {
+        const npcRef = doc(db, "NPC", npcId);
+        await deleteDoc(npcRef);
+        navigate(-1); // Go back to the previous page
+      } catch (error) {
+        console.error("Error deleting npc:", error);
+      }
     }
   };
 
@@ -247,6 +259,13 @@ const EditNPC = () => {
               style={{ backgroundColor: "var(--dnd-dark)" }}
             >
               Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="auth-button auth-button-danger"
+            >
+              Delete NPC
             </button>
           </div>
         </form>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "../../firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import "../auth/Auth.css";
 
 const EditPlayer = () => {
@@ -46,9 +46,24 @@ const EditPlayer = () => {
     try {
       const playerRef = doc(db, "Players", playerId);
       await updateDoc(playerRef, formData);
-      navigate(`/campaigns/${campaignId}/players`); // Redirect back to players list
+      navigate(`/campaign/${campaignId}/players`); // Redirect back to players list
     } catch (error) {
       console.error("Error updating player:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this player?"
+    );
+    if (!confirmDelete) return; // Exit if the user cancels
+
+    const playerRef = doc(db, "Players", playerId);
+    try {
+      await deleteDoc(playerRef); // Delete the player document
+      navigate(`/campaign/${campaignId}/players`); // Redirect back to players list
+    } catch (error) {
+      console.error("Error deleting player:", error);
     }
   };
 
@@ -117,6 +132,13 @@ const EditPlayer = () => {
             </button>
             <button type="submit" className="auth-button">
               Save Changes
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="auth-button"
+            >
+              Delete Player
             </button>
           </div>
         </form>
