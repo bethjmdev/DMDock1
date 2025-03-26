@@ -194,13 +194,19 @@ const CustomCalendar = () => {
                 <div>
                   <label>
                     Start Month:
-                    <input
-                      type="text"
+                    <select
                       value={seasonDates[index].startMonth}
                       onChange={(e) =>
                         handleSeasonDateChange(index, "startMonth", e)
                       }
-                    />
+                    >
+                      <option value="">Select Month</option>
+                      {monthNames.map((month, monthIndex) => (
+                        <option key={monthIndex} value={month}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <label>
                     Start Day:
@@ -216,13 +222,19 @@ const CustomCalendar = () => {
                   </label>
                   <label>
                     End Month:
-                    <input
-                      type="text"
+                    <select
                       value={seasonDates[index].endMonth}
                       onChange={(e) =>
                         handleSeasonDateChange(index, "endMonth", e)
                       }
-                    />
+                    >
+                      <option value="">Select Month</option>
+                      {monthNames.map((month, monthIndex) => (
+                        <option key={monthIndex} value={month}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <label>
                     End Day:
