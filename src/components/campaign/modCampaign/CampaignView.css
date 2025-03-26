@@ -48,3 +48,14 @@
 .campaign-button:active {
   transform: translateY(0);
 }
+
+.set-weather-button {
+  width: 30rem;
+  height: 4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  text-align: center;
+  font-size: 1rem;
+}

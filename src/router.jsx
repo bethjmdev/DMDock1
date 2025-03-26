@@ -33,6 +33,8 @@ import EncounterList from "./components/campaign/pages/EncounterList";
 import MonsterList from "./components/campaign/pages/MonsterList";
 import Notes from "./components/campaign/pages/Notes";
 
+import CustomCalendar from "./components/campaign/weather/CustomCalendar";
+
 const AppRouter = () => {
   const { currentUser } = useAuth();
 
@@ -89,6 +91,16 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/campaign/:campaignId/customcalendar"
+        element={
+          <ProtectedRoute>
+            <CustomCalendar />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/campaign/weather"
         element={

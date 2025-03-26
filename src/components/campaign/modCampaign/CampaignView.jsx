@@ -6,17 +6,15 @@ const CampaignView = () => {
   const navigate = useNavigate();
   const { campaignId } = useParams();
   const location = useLocation();
-  const title = location.state?.title;
+  const campaign = location.state?.campaign;
 
   console.log(campaignId);
-  console.log(title);
+  console.log("campaign from campaign view", campaign);
 
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
     { title: "NPC", path: `/campaign/${campaignId}/npc` },
     { title: "Monster", path: `/campaign/${campaignId}/monster` },
-
-    // { title: "Weather Generator", path: "/campaign/weather" },
     { title: "Encounter Generator", path: "/campaign/encounter" },
     { title: "Town Generator", path: "/campaign/town" },
     { title: "NPC Generator", path: "/campaign/npc-generator" },
@@ -30,7 +28,21 @@ const CampaignView = () => {
   return (
     <div className="campaign-view-container">
       <div className="campaign-view-content">
-        <h1 className="campaign-view-title">{title || "Campaign Tools"}</h1>
+        <h1 className="campaign-view-title">
+          {campaign.name || "Campaign Tools"}
+          <br />
+          <br />
+          {campaign.custom_weather === false ? (
+            <button
+              className="set-weather-button"
+              onClick={() => navigate(`/campaign/${campaignId}/customcalendar`)}
+            >
+              Set your campaign calendar and active weather
+            </button>
+          ) : (
+            <p>Calendar selected successfully</p>
+          )}
+        </h1>
         <div className="campaign-buttons-grid">
           {buttons.map((button) => (
             <button
