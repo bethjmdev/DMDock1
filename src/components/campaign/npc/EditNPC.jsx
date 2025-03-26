@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
-import "../auth/Auth.css";
+import { useAuth } from "../../auth/AuthContext";
+import "../../auth/Auth.css";
 
 const EditNPC = () => {
   const navigate = useNavigate();

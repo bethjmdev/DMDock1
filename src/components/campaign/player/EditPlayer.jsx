@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import "../auth/Auth.css";
+import "../../auth/Auth.css";
 
 const EditPlayer = () => {
   const navigate = useNavigate();

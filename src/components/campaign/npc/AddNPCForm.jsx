@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
-import "../auth/Auth.css";
+import { useAuth } from "../../auth/AuthContext";
+import "../../auth/Auth.css";
 
 const AddNPCForm = () => {
   const navigate = useNavigate();

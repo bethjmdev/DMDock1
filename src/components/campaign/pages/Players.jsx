@@ -1,126 +1,117 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
-import { db } from "../../firebase";
+import { useAuth } from "../../auth/AuthContext";
+import { db } from "../../../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import "./Players.css";
 
-const NPC = () => {
+const Players = () => {
   const navigate = useNavigate();
   const { campaignId } = useParams();
   const { currentUser } = useAuth();
-  const [NPCs, setNPCs] = useState([]);
+  const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
-  console.log("NPCS", NPCs);
+
   useEffect(() => {
-    const fetchNPCs = async () => {
+    const fetchPlayers = async () => {
       try {
-        const NPCsRef = collection(db, "NPC");
+        const playersRef = collection(db, "Players");
         const q = query(
-          NPCsRef,
+          playersRef,
           where("campaign_id", "==", campaignId),
           where("dm", "==", currentUser.uid)
         );
 
         const querySnapshot = await getDocs(q);
-        const NPCsList = querySnapshot.docs.map((doc) => ({
+        const playersList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        setNPCs(NPCsList);
+        setPlayers(playersList);
       } catch (error) {
-        console.error("Error fetching npc's:", error);
+        console.error("Error fetching players:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNPCs();
+    fetchPlayers();
   }, [campaignId, currentUser.uid]);
 
-  const handleAddNPC = () => {
-    navigate(`/campaign/${campaignId}/npc/add`);
+  const handleAddPlayer = () => {
+    navigate(`/campaign/${campaignId}/players/add`);
   };
 
   if (loading) {
-    return <h2 className="text-gray-800">Loading NPCSs...</h2>;
+    return <h2 className="text-gray-800">Loading Players...</h2>;
   }
 
   return (
     <div className="players-container">
       <div className="players-header">
-        <h2 className="text-2xl font-bold text-gray-800">NPCs</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Players</h2>
         <button
-          onClick={handleAddNPC}
+          onClick={handleAddPlayer}
           className="auth-button text-gray-800"
           style={{ width: "auto", padding: "0.5rem 1rem" }}
         >
-          Add NPC
+          Add Player
         </button>
       </div>
 
-      {NPCs.length === 0 ? (
+      {players.length === 0 ? (
         <p className="text-center text-gray-600">
-          No NPCs found. Add your first NPC!
+          No players found. Add your first player!
         </p>
       ) : (
         <div className="players-grid">
-          {NPCs.map((NPC) => (
-            <div key={NPC.id} className="player-card">
+          {players.map((player) => (
+            <div key={player.id} className="player-card">
               <div className="player-header">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {NPC.name}
+                    {player.character_name}
                   </h3>
+                  <p className="text-sm text-gray-600">
+                    Player: {player.player_name}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-800">
-                    Alignment: {NPC.alignment}
+                    AC: {player.ac}
                   </p>
                 </div>
               </div>
-
-              <div className="players-stats">
-                <p className="text-sm text-gray-600">
-                  Occupation: {NPC.occupation}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Description: {NPC.description}
-                </p>
+              <div className="player-stats">
                 <div className="text-gray-800">
-                  <span className="font-medium">STR:</span>{" "}
-                  {NPC.ability_scores.strength}
+                  <span className="font-medium">STR:</span> {player.strength}
                 </div>
                 <div className="text-gray-800">
-                  <span className="font-medium">DEX:</span>{" "}
-                  {NPC.ability_scores.dexterity}
+                  <span className="font-medium">DEX:</span> {player.dexterity}
                 </div>
                 <div className="text-gray-800">
                   <span className="font-medium">CON:</span>{" "}
-                  {NPC.ability_scores.con}
+                  {player.constitution}
                 </div>
                 <div className="text-gray-800">
                   <span className="font-medium">INT:</span>{" "}
-                  {NPC.ability_scores.intellect}
+                  {player.intelligence}
                 </div>
                 <div className="text-gray-800">
-                  <span className="font-medium">WIS:</span>{" "}
-                  {NPC.ability_scores.wisdom}
+                  <span className="font-medium">WIS:</span> {player.wisdom}
                 </div>
                 <div className="text-gray-800">
-                  <span className="font-medium">CHA:</span>{" "}
-                  {NPC.ability_scores.charisma}
+                  <span className="font-medium">CHA:</span> {player.charisma}
                 </div>
-                <p className="text-sm text-gray-600">Notes: {NPC.notes}</p>
               </div>
               <button
                 onClick={() =>
-                  navigate(`/campaign/${campaignId}/npcs/edit/${NPC.id}`)
+                  navigate(`/campaign/${campaignId}/players/edit/${player.id}`)
                 }
                 className="edit-button"
               >
-                Edit / Add Notes
+                Edit
               </button>
             </div>
           ))}
@@ -130,4 +121,4 @@ const NPC = () => {
   );
 };
 
-export default NPC;
+export default Players;
