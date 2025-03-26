@@ -1,5 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import "./CampaignView.css";
 
 const CampaignView = () => {
@@ -19,6 +26,29 @@ const CampaignView = () => {
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
   const [year, setYear] = useState("");
+  const [monthNames, setMonthNames] = useState([]);
+
+  // Firestore initialization
+  const db = getFirestore();
+
+  // Fetch monthNames from Calendar collection when "Select Date" is clicked
+  const fetchMonthNames = async () => {
+    const q = query(
+      collection(db, "Calendar"),
+      where("campaignId", "==", campaignId)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        console.log("Month Names:", data.monthNames);
+        setMonthNames(data.monthNames);
+      });
+    } else {
+      console.log("No such document!");
+    }
+  };
 
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
@@ -56,7 +86,10 @@ const CampaignView = () => {
           {campaign.custom_weather === true && campaign.date === null ? (
             <button
               className="select-date-button"
-              onClick={() => setShowDatePicker(true)}
+              onClick={() => {
+                fetchMonthNames(); // Fetch month names when button is clicked
+                setShowDatePicker(true);
+              }}
             >
               Select Date
             </button>
