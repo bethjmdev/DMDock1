@@ -9,6 +9,7 @@ const CustomCalendar = () => {
   const [dayNames, setDayNames] = useState(Array(7).fill("")); // Default to 7 empty day names
   const [seasons, setSeasons] = useState(""); // State for number of seasons
   const [seasonNames, setSeasonNames] = useState(Array(4).fill("")); // Default to 4 empty season names
+  const [seasonDates, setSeasonDates] = useState([]); // State for season dates
 
   const handleMonthsChange = (e) => {
     const value =
@@ -53,12 +54,26 @@ const CustomCalendar = () => {
       e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
     setSeasons(value); // Update seasons state
     setSeasonNames(Array(value).fill("")); // Reset season names array based on the number of seasons
+    setSeasonDates(
+      Array.from({ length: value }, () => ({
+        startMonth: "",
+        startDay: "",
+        endMonth: "",
+        endDay: "",
+      }))
+    ); // Reset season dates array
   };
 
   const handleSeasonNameChange = (index, e) => {
     const newSeasonNames = [...seasonNames];
     newSeasonNames[index] = e.target.value; // Update the specific season name
     setSeasonNames(newSeasonNames);
+  };
+
+  const handleSeasonDateChange = (index, field, e) => {
+    const newSeasonDates = [...seasonDates];
+    newSeasonDates[index][field] = e.target.value; // Update the specific date field for the season
+    setSeasonDates(newSeasonDates);
   };
 
   return (
@@ -176,6 +191,52 @@ const CustomCalendar = () => {
                     onChange={(e) => handleSeasonNameChange(index, e)}
                   />
                 </label>
+                <div>
+                  <label>
+                    Start Month:
+                    <input
+                      type="text"
+                      value={seasonDates[index].startMonth}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "startMonth", e)
+                      }
+                    />
+                  </label>
+                  <label>
+                    Start Day:
+                    <input
+                      type="number"
+                      value={seasonDates[index].startDay}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "startDay", e)
+                      }
+                      min="1" // Assuming days are 1-indexed (1-31)
+                      max="31"
+                    />
+                  </label>
+                  <label>
+                    End Month:
+                    <input
+                      type="text"
+                      value={seasonDates[index].endMonth}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "endMonth", e)
+                      }
+                    />
+                  </label>
+                  <label>
+                    End Day:
+                    <input
+                      type="number"
+                      value={seasonDates[index].endDay}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "endDay", e)
+                      }
+                      min="1" // Assuming days are 1-indexed (1-31)
+                      max="31"
+                    />
+                  </label>
+                </div>
               </div>
             ))}
           </div>
