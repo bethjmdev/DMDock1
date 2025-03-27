@@ -28,7 +28,9 @@ const NewCampaign = () => {
         name: campaignName,
         dmId: currentUser.uid,
         createdAt: new Date().toISOString(),
-        status: "active",
+        date: null,
+        weather: null,
+        custom_weather: false,
       };
 
       await addDoc(collection(db, "Campaign"), campaignData);

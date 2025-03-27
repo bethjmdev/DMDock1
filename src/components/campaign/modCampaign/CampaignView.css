@@ -48,3 +48,51 @@
 .campaign-button:active {
   transform: translateY(0);
 }
+
+.set-weather-button {
+  width: 30rem;
+  height: 4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.date-display {
+  display: block;
+  text-align: center;
+}
+
+.next-day-button {
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.next-day-button:hover {
+  background-color: #45a049;
+}
+
+.weather-narrative {
+  margin-top: 10px;
+  font-style: italic;
+  color: #666;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.weather-display {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}

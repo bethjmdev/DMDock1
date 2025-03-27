@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./FloatingNavButton.css"; // Create this CSS file for styling
 
@@ -9,7 +9,7 @@ const FloatingNavButton = () => {
     navigate("/campaigns"); // Use navigate to change routes
   };
 
-  console.log("FloatingNavButton rendered");
+  // console.log("FloatingNavButton rendered");
 
   return (
     <div className="floating-nav-button" onClick={handleClick}>
