@@ -324,7 +324,7 @@ const CampaignView = () => {
     { title: "Players", path: `/campaign/${campaignId}/players` },
     { title: "NPC", path: `/campaign/${campaignId}/npc` },
     { title: "Monster", path: `/campaign/${campaignId}/monster` },
-    { title: "Notes", path: "/campaign/notes" },
+    { title: "Notes", path: `/campaign/${campaignId}/notes` },
     { title: "Spell Slot Tracker", path: "/campaign/spell-slots" },
     { title: "List of Monsters", path: "/campaign/monsters" },
 

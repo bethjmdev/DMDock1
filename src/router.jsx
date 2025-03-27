@@ -32,6 +32,7 @@ import DateTracker from "./components/campaign/pages/DateTracker";
 import EncounterList from "./components/campaign/pages/EncounterList";
 import MonsterList from "./components/campaign/pages/MonsterList";
 import Notes from "./components/campaign/pages/Notes";
+import CreateNote from "./components/campaign/pages/CreateNote";
 
 import CustomCalendar from "./components/campaign/weather/CustomCalendar";
 
@@ -166,10 +167,18 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/notes"
+        path="/campaign/:campaignId/notes"
         element={
           <ProtectedRoute>
             <Notes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/notes/create-note"
+        element={
+          <ProtectedRoute>
+            <CreateNote />
           </ProtectedRoute>
         }
       />
