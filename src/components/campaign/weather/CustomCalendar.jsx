@@ -29,53 +29,167 @@ const CustomCalendar = () => {
   const validateCalendarMath = () => {
     if (!months || !weeks || !daysInMonth || !days) return;
 
-    const totalDaysMethod1 = months * daysInMonth;
-    const totalDaysMethod2 = weeks * days;
+    // Round all inputs to nearest whole number
+    const roundedMonths = Math.round(Number(months));
+    const roundedWeeks = Math.round(Number(weeks));
+    const roundedDaysInMonth = Math.round(Number(daysInMonth));
+    const roundedDays = Math.round(Number(days));
 
-    if (totalDaysMethod1 !== totalDaysMethod2) {
-      // Calculate some suggestions
-      let suggestions = "";
+    const totalDaysMethod1 = roundedMonths * roundedDaysInMonth;
+    const totalDaysMethod2 = roundedWeeks * roundedDays;
 
-      // Suggest adjusting weeks
-      const suggestedWeeks = Math.floor(totalDaysMethod1 / days);
+    // Allow for a difference of up to 2 days
+    const tolerance = 2;
+    const difference = Math.abs(totalDaysMethod1 - totalDaysMethod2);
 
-      // Suggest adjusting days per week
-      const suggestedDaysPerWeek = Math.floor(totalDaysMethod1 / weeks);
+    if (difference > tolerance) {
+      // Calculate suggestions using rounded numbers
+      const suggestedWeeks = Math.round(totalDaysMethod1 / roundedDays);
+      const suggestedDaysPerWeek = Math.round(totalDaysMethod1 / roundedWeeks);
+      const suggestedDaysPerMonth = Math.round(
+        (roundedWeeks * roundedDays) / roundedMonths
+      );
 
-      // Suggest adjusting days per month
-      const suggestedDaysPerMonth = Math.floor((weeks * days) / months);
+      const suggestions = `Here are some ways to make it work:
 
-      suggestions = `Here are some ways to make it work:
+      Option 1: Keep ${roundedMonths} months and ${roundedDaysInMonth} days per month, but change to:
+      - ${suggestedWeeks} weeks with ${roundedDays} days per week
+      (Total days: ${suggestedWeeks * roundedDays})
 
-      Option 1: Keep ${months} months and ${daysInMonth} days per month, but change to:
-      - ${suggestedWeeks} weeks with ${days} days per week
+      Option 2: Keep ${roundedMonths} months and ${roundedWeeks} weeks, but change to:
+      - ${suggestedDaysPerMonth} days per month with ${roundedDays} days per week
+      (Total days: ${roundedMonths * suggestedDaysPerMonth})
 
-      Option 2: Keep ${months} months and ${weeks} weeks, but change to:
-      - ${suggestedDaysPerMonth} days per month with ${days} days per week
-
-      Option 3: Keep ${months} months and ${weeks} weeks, but change to:
-      - ${daysInMonth} days per month with ${suggestedDaysPerWeek} days per week
+      Option 3: Keep ${roundedMonths} months and ${roundedWeeks} weeks, but change to:
+      - ${roundedDaysInMonth} days per month with ${suggestedDaysPerWeek} days per week
+      (Total days: ${roundedMonths * roundedDaysInMonth})
 
       Common calendar examples:
-      • Standard Earth: 12 months × 30.44 days ≈ 52 weeks × 7 days = 365.25 days
+      • Standard Earth: 12 months × 30 days ≈ 52 weeks × 7 days = 364 days
       • Fantasy Example: 10 months × 36 days = 60 weeks × 6 days = 360 days
       • Simple Format: 12 months × 30 days = 60 weeks × 6 days = 360 days`;
 
       setValidationError(
-        `Calendar math doesn't add up:
-        - ${months} months × ${daysInMonth} days = ${totalDaysMethod1} total days
-        - ${weeks} weeks × ${days} days = ${totalDaysMethod2} total days
+        `Calendar math is off by ${difference} days:
+        - ${roundedMonths} months × ${roundedDaysInMonth} days = ${totalDaysMethod1} total days
+        - ${roundedWeeks} weeks × ${roundedDays} days = ${totalDaysMethod2} total days
 
         ${suggestions}`
       );
       setIsFormValid(false);
+    } else if (difference > 0) {
+      // If within tolerance, show a friendly message but allow submission
+      setValidationError(
+        `Note: Your calendar has a small difference of ${difference} days, which is fine:
+        - ${roundedMonths} months × ${roundedDaysInMonth} days = ${totalDaysMethod1} total days
+        - ${roundedWeeks} weeks × ${roundedDays} days = ${totalDaysMethod2} total days
+        
+        This small difference is acceptable - you can proceed with these numbers.`
+      );
+      setIsFormValid(true); // Allow submission despite small difference
     } else {
       setValidationError("");
     }
   };
 
-  // Modify checkFormValidity to include math validation
+  // Add this new validation function
+  const validateSeasonDates = () => {
+    if (!seasonDates.length || !daysInMonth) return "";
+
+    const errors = [];
+    const roundedDaysInMonth = Math.round(Number(daysInMonth));
+    const totalDaysInYear = roundedDaysInMonth * monthNames.length;
+
+    for (let i = 0; i < seasonDates.length; i++) {
+      const season = seasonDates[i];
+      const seasonName = seasonNames[i] || `Season ${i + 1}`;
+
+      // Skip validation if this season's dates aren't fully filled in yet
+      if (
+        !season.startMonth ||
+        !season.startDay ||
+        !season.endMonth ||
+        !season.endDay
+      ) {
+        continue;
+      }
+
+      // Convert dates to day numbers for easier comparison
+      const startMonthIndex = monthNames.indexOf(season.startMonth);
+      const endMonthIndex = monthNames.indexOf(season.endMonth);
+
+      // Only validate if months exist in the calendar
+      if (startMonthIndex !== -1 && endMonthIndex !== -1) {
+        const startDayNum =
+          startMonthIndex * roundedDaysInMonth + Number(season.startDay);
+        const endDayNum =
+          endMonthIndex * roundedDaysInMonth + Number(season.endDay);
+
+        // Check if days are within valid range
+        if (season.startDay > roundedDaysInMonth) {
+          errors.push(
+            `${seasonName}: Start day ${season.startDay} isn't possible - ${season.startMonth} only has ${roundedDaysInMonth} days`
+          );
+        }
+        if (season.endDay > roundedDaysInMonth) {
+          errors.push(
+            `${seasonName}: End day ${season.endDay} isn't possible - ${season.endMonth} only has ${roundedDaysInMonth} days`
+          );
+        }
+
+        // Check for overlaps with other completed seasons
+        for (let j = i + 1; j < seasonDates.length; j++) {
+          const otherSeason = seasonDates[j];
+          const otherSeasonName = seasonNames[j] || `Season ${j + 1}`;
+
+          // Only check if other season is fully filled in
+          if (
+            !otherSeason.startMonth ||
+            !otherSeason.startDay ||
+            !otherSeason.endMonth ||
+            !otherSeason.endDay
+          ) {
+            continue;
+          }
+
+          const otherStartMonthIndex = monthNames.indexOf(
+            otherSeason.startMonth
+          );
+          const otherEndMonthIndex = monthNames.indexOf(otherSeason.endMonth);
+
+          if (otherStartMonthIndex !== -1 && otherEndMonthIndex !== -1) {
+            const otherStartDayNum =
+              otherStartMonthIndex * roundedDaysInMonth +
+              Number(otherSeason.startDay);
+            const otherEndDayNum =
+              otherEndMonthIndex * roundedDaysInMonth +
+              Number(otherSeason.endDay);
+
+            if (
+              !(endDayNum < otherStartDayNum || otherEndDayNum < startDayNum)
+            ) {
+              errors.push(
+                `${seasonName} (${season.startMonth} ${season.startDay} to ${season.endMonth} ${season.endDay}) ` +
+                  `overlaps with ${otherSeasonName} (${otherSeason.startMonth} ${otherSeason.startDay} to ${otherSeason.endMonth} ${otherSeason.endDay})`
+              );
+            }
+          }
+        }
+      }
+    }
+
+    return errors.length ? errors.join("\n\n") : "";
+  };
+
+  // Modify the checkFormValidity function
   const checkFormValidity = () => {
+    // Only validate seasons if all season dates are filled in
+    const allSeasonDatesFilled = seasonDates.every(
+      (date) => date.startMonth && date.startDay && date.endMonth && date.endDay
+    );
+
+    const seasonErrors = allSeasonDatesFilled ? validateSeasonDates() : "";
+
     const allFieldsFilled =
       months &&
       weeks &&
@@ -85,22 +199,22 @@ const CustomCalendar = () => {
       monthNames.every((name) => name) &&
       dayNames.every((name) => name) &&
       seasonNames.every((name) => name) &&
-      seasonDates.every(
-        (date) =>
-          date.startMonth && date.startDay && date.endMonth && date.endDay
-      );
+      allSeasonDatesFilled;
 
-    // Only set form as valid if all fields are filled AND there's no validation error
-    setIsFormValid(allFieldsFilled && !validationError);
+    // Combine calendar math validation with season validation
+    const combinedError = [validationError, seasonErrors]
+      .filter((error) => error)
+      .join("\n\n");
+
+    setValidationError(combinedError);
+
+    // Only set form as valid if all fields are filled AND there are no validation errors
+    setIsFormValid(allFieldsFilled && !combinedError);
   };
 
-  // Add validation check whenever relevant values change
+  // Update the useEffect to include seasonDates in dependencies
   React.useEffect(() => {
     validateCalendarMath();
-  }, [months, weeks, daysInMonth, days]);
-
-  // Call checkFormValidity whenever relevant state changes
-  React.useEffect(() => {
     checkFormValidity();
   }, [
     months,
@@ -158,9 +272,9 @@ const CustomCalendar = () => {
 
   const handleSeasonsChange = (e) => {
     const value =
-      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
-    setSeasons(value); // Update seasons state
-    setSeasonNames(Array(value).fill("")); // Reset season names array based on the number of seasons
+      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0);
+    setSeasons(value);
+    setSeasonNames(Array(value).fill(""));
     setSeasonDates(
       Array.from({ length: value }, () => ({
         startMonth: "",
@@ -168,7 +282,8 @@ const CustomCalendar = () => {
         endMonth: "",
         endDay: "",
       }))
-    ); // Reset season dates array
+    );
+    // Don't call checkFormValidity here - let it be called by the useEffect
   };
 
   const handleSeasonNameChange = (index, e) => {
@@ -179,8 +294,9 @@ const CustomCalendar = () => {
 
   const handleSeasonDateChange = (index, field, e) => {
     const newSeasonDates = [...seasonDates];
-    newSeasonDates[index][field] = e.target.value; // Update the specific date field for the season
+    newSeasonDates[index][field] = e.target.value;
     setSeasonDates(newSeasonDates);
+    checkFormValidity(); // Validate whenever a season date changes
   };
 
   const handleSubmit = async (e) => {
