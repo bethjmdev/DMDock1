@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import { db, auth } from "../../../firebase"; // adjust path as needed
+import "./Notes.css";
 
 const CreateNote = () => {
   const [title, setTitle] = useState("");
@@ -35,54 +36,70 @@ const CreateNote = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Create New Note</h1>
+    <div className="notes-container">
+      <div className="notes-header">
+        <h2 className="text-2xl font-bold text-gray-800">Create New Note</h2>
+        <button
+          onClick={() => navigate(`/campaign/${campaignId}/notes`)}
+          className="auth-button"
+          style={{ width: "auto", padding: "0.5rem 1rem" }}
+        >
+          Back to Notes
+        </button>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1">
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-        </div>
+      <div
+        className="note-card"
+        style={{ maxWidth: "800px", margin: "0 auto" }}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="title" className="form-label">
+              Title
+            </label>
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter note title..."
+              required
+            />
+          </div>
 
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium mb-1">
-            Content
-          </label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full p-2 border rounded-md min-h-[200px]"
-            required
-          />
-        </div>
+          <div>
+            <label htmlFor="content" className="form-label">
+              Content
+            </label>
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Write your note here..."
+              required
+            />
+          </div>
 
-        <div className="flex gap-4">
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save Note"}
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("../")}
-            className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              disabled={saving}
+              className="auth-button"
+              style={{ padding: "0.75rem 2rem" }}
+            >
+              {saving ? "Saving..." : "Save Note"}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/campaign/${campaignId}/notes`)}
+              className="cancel-button"
+              style={{ padding: "0.75rem 2rem" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

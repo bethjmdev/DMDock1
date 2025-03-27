@@ -141,3 +141,102 @@
 .note-content p {
   margin-bottom: 1rem;
 }
+
+/* Add these new styles at the end of your Notes.css file */
+
+.cancel-button {
+  background-color: var(--dnd-accent);
+  color: var(--dnd-light);
+  border: none;
+  border-radius: 4px;
+  font-family: "Cinzel", serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.cancel-button:hover {
+  background-color: var(--dnd-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Style for disabled buttons */
+.auth-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Update the input/textarea styles */
+input,
+textarea {
+  font-family: "Crimson Text", serif;
+  font-size: 1.1rem;
+  color: var(--dnd-dark);
+  background-color: var(--dnd-light);
+  border: 2px solid var(--dnd-gold);
+  border-radius: 8px;
+  padding: 12px 16px;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  resize: vertical;
+}
+
+input:hover,
+textarea:hover {
+  border-color: var(--dnd-accent);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--dnd-red);
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Style for the labels */
+.form-label {
+  font-family: "Cinzel", serif;
+  color: var(--dnd-dark);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Add a parchment-like texture to inputs */
+input,
+textarea {
+  background-image: linear-gradient(
+    to right,
+    rgba(245, 222, 179, 0.1) 0%,
+    rgba(245, 222, 179, 0.1) 100%
+  );
+}
+
+/* Style placeholder text */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(44, 24, 16, 0.5);
+  font-style: italic;
+}
+
+/* Specific style for textarea to make it look more like a scroll */
+textarea {
+  min-height: 300px;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 28px,
+    rgba(139, 0, 0, 0.05) 28px,
+    rgba(139, 0, 0, 0.05) 29px
+  );
+  line-height: 29px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}

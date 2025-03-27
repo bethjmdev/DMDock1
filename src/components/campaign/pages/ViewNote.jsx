@@ -50,7 +50,7 @@ const ViewNote = () => {
         <div className="note-header">
           <div>
             <p className="text-sm text-gray-600">
-              Created: {new Date(note.createdAt).toLocaleDateString()}
+              Created At: {new Date(note.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>
