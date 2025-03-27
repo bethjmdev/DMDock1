@@ -102,7 +102,7 @@ const AppRouter = () => {
       />
 
       <Route
-        path="/campaign/weather"
+        path="/campaign/:campaignId/weather"
         element={
           <ProtectedRoute>
             <WeatherGenerator />

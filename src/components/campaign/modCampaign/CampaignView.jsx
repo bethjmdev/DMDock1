@@ -131,6 +131,7 @@ const CampaignView = () => {
       path: `/campaign/${campaignId}/date`,
       state: { campaignId, date: dateValue, campaign: campaignData },
     },
+    { title: "Weather Generator", path: `/campaign/${campaignId}/weather` },
     { title: "Encounter", path: "/campaign/encounter-list" },
     { title: "List of Monsters", path: "/campaign/monsters" },
     { title: "Notes", path: "/campaign/notes" },

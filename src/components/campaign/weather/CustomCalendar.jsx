@@ -4,6 +4,14 @@ import { db } from "../../../firebase"; // Adjust the import based on your Fireb
 import { collection, addDoc, doc, updateDoc } from "firebase/firestore";
 import { useAuth } from "../../auth/AuthContext"; // Import useAuth
 
+// Add this constant for weather patterns
+const WEATHER_PATTERNS = {
+  COLD: "cold",
+  MODERATE_COLD: "moderate-cold",
+  MODERATE_WARM: "moderate-warm",
+  WARM: "warm",
+};
+
 const CustomCalendar = () => {
   const location = useLocation();
   const navigate = useNavigate(); // Initialize useNavigate
@@ -24,101 +32,163 @@ const CustomCalendar = () => {
   const [seasonDates, setSeasonDates] = useState([]); // State for season dates
   const [isFormValid, setIsFormValid] = useState(false); // State to track form validity
   const [validationError, setValidationError] = useState("");
+  const [calendarMathValid, setCalendarMathValid] = useState(false);
 
   // Function to validate calendar math
   const validateCalendarMath = () => {
-    if (!months || !weeks || !daysInMonth || !days) return;
+    // Check if all values are present and non-zero
+    if (!months || !weeks || !daysInMonth || !days) {
+      setCalendarMathValid(false);
+      return false;
+    }
 
-    // Round all inputs to nearest whole number
+    // Convert to numbers and check if any are zero
     const roundedMonths = Math.round(Number(months));
     const roundedWeeks = Math.round(Number(weeks));
     const roundedDaysInMonth = Math.round(Number(daysInMonth));
     const roundedDays = Math.round(Number(days));
 
+    if (
+      roundedMonths === 0 ||
+      roundedWeeks === 0 ||
+      roundedDaysInMonth === 0 ||
+      roundedDays === 0
+    ) {
+      setCalendarMathValid(false);
+      return false;
+    }
+
     const totalDaysMethod1 = roundedMonths * roundedDaysInMonth;
     const totalDaysMethod2 = roundedWeeks * roundedDays;
 
-    // Allow for a difference of up to 2 days
     const tolerance = 2;
     const difference = Math.abs(totalDaysMethod1 - totalDaysMethod2);
 
     if (difference > tolerance) {
-      // Calculate suggestions using rounded numbers
-      const suggestedWeeks = Math.round(totalDaysMethod1 / roundedDays);
-      const suggestedDaysPerWeek = Math.round(totalDaysMethod1 / roundedWeeks);
-      const suggestedDaysPerMonth = Math.round(
-        (roundedWeeks * roundedDays) / roundedMonths
-      );
+      setCalendarMathValid(false);
+      // Calculate mathematically correct suggestions
+      const totalDays = totalDaysMethod1; // Use months×days_per_month as base
 
-      const suggestions = `Here are some ways to make it work:
+      // If keeping months, calculate other values that work
+      const keepingMonths = {
+        months: roundedMonths,
+        daysInMonth: roundedDaysInMonth,
+        weeks: Math.round(totalDays / roundedDays), // Calculate weeks needed
+        daysInWeek: roundedDays,
+      };
 
-      Option 1: Keep ${roundedMonths} months and ${roundedDaysInMonth} days per month, but change to:
-      - ${suggestedWeeks} weeks with ${roundedDays} days per week
-      (Total days: ${suggestedWeeks * roundedDays})
+      // If keeping weeks, calculate other values that work
+      const keepingWeeks = {
+        months: roundedMonths,
+        daysInMonth: Math.round(totalDaysMethod2 / roundedMonths), // Calculate days per month needed
+        weeks: roundedWeeks,
+        daysInWeek: roundedDays,
+      };
 
-      Option 2: Keep ${roundedMonths} months and ${roundedWeeks} weeks, but change to:
-      - ${suggestedDaysPerMonth} days per month with ${roundedDays} days per week
-      (Total days: ${roundedMonths * suggestedDaysPerMonth})
+      // If keeping days in month, use same calc as keeping months
+      const keepingDaysInMonth = {
+        months: roundedMonths,
+        daysInMonth: roundedDaysInMonth,
+        weeks: Math.round(totalDays / roundedDays),
+        daysInWeek: roundedDays,
+      };
 
-      Option 3: Keep ${roundedMonths} months and ${roundedWeeks} weeks, but change to:
-      - ${roundedDaysInMonth} days per month with ${suggestedDaysPerWeek} days per week
-      (Total days: ${roundedMonths * roundedDaysInMonth})
+      // If keeping days in week, use same calc as keeping weeks
+      const keepingDaysInWeek = {
+        months: roundedMonths,
+        daysInMonth: Math.round(totalDaysMethod2 / roundedMonths),
+        weeks: roundedWeeks,
+        daysInWeek: roundedDays,
+      };
+
+      const suggestions = `Your current calendar:
+      ${roundedMonths} months × ${roundedDaysInMonth} days per month = ${totalDaysMethod1} total days
+      ${roundedWeeks} weeks × ${roundedDays} days per week = ${totalDaysMethod2} total days
+
+      Here are ways to make your calendar work:
+
+      If you keep ${roundedMonths} months in a year:
+      • ${keepingMonths.months} months in a year
+      • ${keepingMonths.weeks} weeks in a year
+      • ${keepingMonths.daysInMonth} days in a month
+      • ${keepingMonths.daysInWeek} days in a week
+      (Total days: ${keepingMonths.months * keepingMonths.daysInMonth})
+
+      If you keep ${roundedWeeks} weeks in a year:
+      • ${keepingWeeks.months} months in a year
+      • ${keepingWeeks.weeks} weeks in a year
+      • ${keepingWeeks.daysInMonth} days in a month
+      • ${keepingWeeks.daysInWeek} days in a week
+      (Total days: ${keepingWeeks.weeks * keepingWeeks.daysInWeek})
+
+      If you keep ${roundedDaysInMonth} days in a month:
+      • ${keepingDaysInMonth.months} months in a year
+      • ${keepingDaysInMonth.weeks} weeks in a year
+      • ${keepingDaysInMonth.daysInMonth} days in a month
+      • ${keepingDaysInMonth.daysInWeek} days in a week
+      (Total days: ${
+        keepingDaysInMonth.months * keepingDaysInMonth.daysInMonth
+      })
+
+      If you keep ${roundedDays} days in a week:
+      • ${keepingDaysInWeek.months} months in a year
+      • ${keepingDaysInWeek.weeks} weeks in a year
+      • ${keepingDaysInWeek.daysInMonth} days in a month
+      • ${keepingDaysInWeek.daysInWeek} days in a week
+      (Total days: ${keepingDaysInWeek.weeks * keepingDaysInWeek.daysInWeek})
 
       Common calendar examples:
-      • Standard Earth: 12 months × 30 days ≈ 52 weeks × 7 days = 364 days
+      • Standard Earth: 12 months × 30 days = 52 weeks × 7 days = 364 days
       • Fantasy Example: 10 months × 36 days = 60 weeks × 6 days = 360 days
       • Simple Format: 12 months × 30 days = 60 weeks × 6 days = 360 days`;
 
       setValidationError(
-        `Calendar math is off by ${difference} days:
-        - ${roundedMonths} months × ${roundedDaysInMonth} days = ${totalDaysMethod1} total days
-        - ${roundedWeeks} weeks × ${roundedDays} days = ${totalDaysMethod2} total days
+        `Calendar math is off by ${difference} days.
 
         ${suggestions}`
       );
       setIsFormValid(false);
-    } else if (difference > 0) {
-      // If within tolerance, show a friendly message but allow submission
-      setValidationError(
-        `Note: Your calendar has a small difference of ${difference} days, which is fine:
-        - ${roundedMonths} months × ${roundedDaysInMonth} days = ${totalDaysMethod1} total days
-        - ${roundedWeeks} weeks × ${roundedDays} days = ${totalDaysMethod2} total days
-        
-        This small difference is acceptable - you can proceed with these numbers.`
-      );
-      setIsFormValid(true); // Allow submission despite small difference
+      return false;
     } else {
-      setValidationError("");
+      // When math is valid, clear the calendar math error
+      setCalendarMathValid(true);
+      // Only clear validation error if it's a calendar math error
+      // (keep any season validation errors)
+      if (validationError && validationError.includes("Calendar math")) {
+        setValidationError("");
+      }
+      return true;
     }
   };
 
-  // Add this new validation function
+  // Add back the season validation
   const validateSeasonDates = () => {
     if (!seasonDates.length || !daysInMonth) return "";
 
     const errors = [];
     const roundedDaysInMonth = Math.round(Number(daysInMonth));
-    const totalDaysInYear = roundedDaysInMonth * monthNames.length;
+
+    // Only validate if all season dates are filled in
+    const allSeasonDatesFilled = seasonDates.every(
+      (date) =>
+        date.startMonth &&
+        date.startDay &&
+        date.endMonth &&
+        date.endDay &&
+        date.weatherPattern
+    );
+
+    if (!allSeasonDatesFilled) return "";
 
     for (let i = 0; i < seasonDates.length; i++) {
       const season = seasonDates[i];
       const seasonName = seasonNames[i] || `Season ${i + 1}`;
 
-      // Skip validation if this season's dates aren't fully filled in yet
-      if (
-        !season.startMonth ||
-        !season.startDay ||
-        !season.endMonth ||
-        !season.endDay
-      ) {
-        continue;
-      }
-
       // Convert dates to day numbers for easier comparison
       const startMonthIndex = monthNames.indexOf(season.startMonth);
       const endMonthIndex = monthNames.indexOf(season.endMonth);
 
-      // Only validate if months exist in the calendar
+      // Validate if months exist in the calendar
       if (startMonthIndex !== -1 && endMonthIndex !== -1) {
         const startDayNum =
           startMonthIndex * roundedDaysInMonth + Number(season.startDay);
@@ -142,16 +212,6 @@ const CustomCalendar = () => {
           const otherSeason = seasonDates[j];
           const otherSeasonName = seasonNames[j] || `Season ${j + 1}`;
 
-          // Only check if other season is fully filled in
-          if (
-            !otherSeason.startMonth ||
-            !otherSeason.startDay ||
-            !otherSeason.endMonth ||
-            !otherSeason.endDay
-          ) {
-            continue;
-          }
-
           const otherStartMonthIndex = monthNames.indexOf(
             otherSeason.startMonth
           );
@@ -165,27 +225,47 @@ const CustomCalendar = () => {
               otherEndMonthIndex * roundedDaysInMonth +
               Number(otherSeason.endDay);
 
+            // Fix overlap detection logic
             if (
-              !(endDayNum < otherStartDayNum || otherEndDayNum < startDayNum)
+              startDayNum <= otherEndDayNum &&
+              endDayNum >= otherStartDayNum
             ) {
-              errors.push(
-                `${seasonName} (${season.startMonth} ${season.startDay} to ${season.endMonth} ${season.endDay}) ` +
-                  `overlaps with ${otherSeasonName} (${otherSeason.startMonth} ${otherSeason.startDay} to ${otherSeason.endMonth} ${otherSeason.endDay})`
-              );
+              // Only add error if there's actually an overlap
+              if (
+                !(endDayNum < otherStartDayNum || startDayNum > otherEndDayNum)
+              ) {
+                errors.push(
+                  `${seasonName} (${season.startMonth} ${season.startDay} to ${season.endMonth} ${season.endDay}) ` +
+                    `overlaps with ${otherSeasonName} (${otherSeason.startMonth} ${otherSeason.startDay} to ${otherSeason.endMonth} ${otherSeason.endDay})`
+                );
+              }
             }
           }
         }
       }
     }
 
+    // Clear any previous error if there are no current errors
+    if (errors.length === 0) {
+      setValidationError("");
+    }
+
     return errors.length ? errors.join("\n\n") : "";
   };
 
-  // Modify the checkFormValidity function
+  // Modify checkFormValidity to handle both validations
   const checkFormValidity = () => {
-    // Only validate seasons if all season dates are filled in
+    // Check calendar math first
+    const calendarMathValid = validateCalendarMath();
+
+    // Only check seasons if calendar math is valid
     const allSeasonDatesFilled = seasonDates.every(
-      (date) => date.startMonth && date.startDay && date.endMonth && date.endDay
+      (date) =>
+        date.startMonth &&
+        date.startDay &&
+        date.endMonth &&
+        date.endDay &&
+        date.weatherPattern
     );
 
     const seasonErrors = allSeasonDatesFilled ? validateSeasonDates() : "";
@@ -201,20 +281,23 @@ const CustomCalendar = () => {
       seasonNames.every((name) => name) &&
       allSeasonDatesFilled;
 
-    // Combine calendar math validation with season validation
-    const combinedError = [validationError, seasonErrors]
-      .filter((error) => error)
-      .join("\n\n");
+    // Only show season errors if calendar math is valid
+    setValidationError(calendarMathValid ? seasonErrors : validationError);
 
-    setValidationError(combinedError);
-
-    // Only set form as valid if all fields are filled AND there are no validation errors
-    setIsFormValid(allFieldsFilled && !combinedError);
+    // Form is only valid if all checks pass
+    setIsFormValid(allFieldsFilled && !seasonErrors && calendarMathValid);
   };
 
-  // Update the useEffect to include seasonDates in dependencies
+  // Keep the handleSeasonDateChange to trigger validation
+  const handleSeasonDateChange = (index, field, e) => {
+    const newSeasonDates = [...seasonDates];
+    newSeasonDates[index][field] = e.target.value;
+    setSeasonDates(newSeasonDates);
+    checkFormValidity(); // This will now check both calendar math and seasons
+  };
+
+  // Keep the existing useEffect for overall validation
   React.useEffect(() => {
-    validateCalendarMath();
     checkFormValidity();
   }, [
     months,
@@ -234,29 +317,40 @@ const CustomCalendar = () => {
 
   const handleMonthsChange = (e) => {
     const value =
-      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
+      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0);
     setMonths(value);
-    setMonthNames(Array(value).fill("")); // Reset month names array based on the number of months
+    setMonthNames(Array(value).fill(""));
+    validateCalendarMath();
   };
 
   const handleWeeksChange = (e) => {
     const value =
-      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
-    setWeeks(value); // Update weeks state
+      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0);
+    setWeeks(value);
+    validateCalendarMath();
   };
 
   const handleDaysInMonthChange = (e) => {
     const value =
-      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
-    setDaysInMonth(value); // Update days in month state
+      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0);
+    setDaysInMonth(value);
+    validateCalendarMath();
   };
 
   const handleDaysChange = (e) => {
     const value =
-      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0); // Allow empty input
+      e.target.value === "" ? "" : Math.max(0, parseInt(e.target.value) || 0);
     setDays(value);
-    setDayNames(Array(value).fill("")); // Reset day names array based on the number of days
+    setDayNames(Array(value).fill(""));
   };
+
+  // Add this new useEffect specifically for calendar math validation
+  React.useEffect(() => {
+    // Only validate if all calendar values are present and non-zero
+    if (months && weeks && daysInMonth && days) {
+      validateCalendarMath();
+    }
+  }, [months, weeks, daysInMonth, days]); // Dependencies are all calendar-related values
 
   const handleMonthNameChange = (index, e) => {
     const newMonthNames = [...monthNames];
@@ -281,9 +375,9 @@ const CustomCalendar = () => {
         startDay: "",
         endMonth: "",
         endDay: "",
+        weatherPattern: "", // Add weather pattern field
       }))
     );
-    // Don't call checkFormValidity here - let it be called by the useEffect
   };
 
   const handleSeasonNameChange = (index, e) => {
@@ -292,11 +386,13 @@ const CustomCalendar = () => {
     setSeasonNames(newSeasonNames);
   };
 
-  const handleSeasonDateChange = (index, field, e) => {
+  const handleWeatherPatternChange = (index, e) => {
     const newSeasonDates = [...seasonDates];
-    newSeasonDates[index][field] = e.target.value;
+    newSeasonDates[index] = {
+      ...newSeasonDates[index],
+      weatherPattern: e.target.value,
+    };
     setSeasonDates(newSeasonDates);
-    checkFormValidity(); // Validate whenever a season date changes
   };
 
   const handleSubmit = async (e) => {
@@ -351,7 +447,7 @@ const CustomCalendar = () => {
             />
           </label>
         </div>
-        {months !== "" && ( // Conditionally render the weeks input
+        {months !== "" && (
           <div>
             <label>
               How many weeks in a year:
@@ -364,7 +460,7 @@ const CustomCalendar = () => {
             </label>
           </div>
         )}
-        {weeks !== "" && ( // Conditionally render the days in a month input
+        {weeks !== "" && (
           <div>
             <label>
               How many days in a month:
@@ -377,7 +473,7 @@ const CustomCalendar = () => {
             </label>
           </div>
         )}
-        {daysInMonth !== "" && ( // Conditionally render the days input
+        {daysInMonth !== "" && (
           <div>
             <label>
               How many days in a week:
@@ -390,7 +486,8 @@ const CustomCalendar = () => {
             </label>
           </div>
         )}
-        {days !== "" && ( // Conditionally render seasons input
+        {/* Only show seasons input if calendar math is valid */}
+        {days !== "" && calendarMathValid && (
           <div>
             <label>
               How many seasons are there in a year:
@@ -403,7 +500,8 @@ const CustomCalendar = () => {
             </label>
           </div>
         )}
-        {seasons !== "" && ( // Conditionally render month names input
+        {/* Only show subsequent sections if calendar math is valid */}
+        {calendarMathValid && seasons !== "" && (
           <div>
             <h2>What are the names of the months:</h2>
             {Array.from({ length: months }, (_, index) => (
@@ -420,103 +518,124 @@ const CustomCalendar = () => {
             ))}
           </div>
         )}
-        {monthNames.every((name) => name) &&
-          days > 0 && ( // Conditionally render day names input
-            <div>
-              <h2>What are the names of the days of the week:</h2>
-              {Array.from({ length: days }, (_, index) => (
-                <div key={index}>
+        {calendarMathValid && monthNames.every((name) => name) && days > 0 && (
+          <div>
+            <h2>What are the names of the days of the week:</h2>
+            {Array.from({ length: days }, (_, index) => (
+              <div key={index}>
+                <label>
+                  Day {index + 1}:
+                  <input
+                    type="text"
+                    value={dayNames[index]}
+                    onChange={(e) => handleDayNameChange(index, e)}
+                  />
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
+        {calendarMathValid && dayNames.every((name) => name) && seasons > 0 && (
+          <div>
+            <h2>What are the names of the seasons and their dates:</h2>
+            {Array.from({ length: seasons }, (_, index) => (
+              <div key={index}>
+                <label>
+                  Season {index + 1}:
+                  <input
+                    type="text"
+                    value={seasonNames[index]}
+                    onChange={(e) => handleSeasonNameChange(index, e)}
+                  />
+                </label>
+                <div>
                   <label>
-                    Day {index + 1}:
+                    Weather Pattern:
+                    <select
+                      value={seasonDates[index]?.weatherPattern || ""}
+                      onChange={(e) => handleWeatherPatternChange(index, e)}
+                    >
+                      <option value="">Select Weather Pattern</option>
+                      <option value={WEATHER_PATTERNS.COLD}>
+                        Cold (like winter)
+                      </option>
+                      <option value={WEATHER_PATTERNS.MODERATE_COLD}>
+                        Moderate Cold (like fall)
+                      </option>
+                      <option value={WEATHER_PATTERNS.MODERATE_WARM}>
+                        Moderate Warm (like spring)
+                      </option>
+                      <option value={WEATHER_PATTERNS.WARM}>
+                        Warm (like summer)
+                      </option>
+                    </select>
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    Start Month:
+                    <select
+                      value={seasonDates[index].startMonth}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "startMonth", e)
+                      }
+                    >
+                      <option value="">Select Month</option>
+                      {monthNames.map((month, monthIndex) => (
+                        <option key={monthIndex} value={month}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <br />
+                  <label>
+                    Start Day:
                     <input
-                      type="text"
-                      value={dayNames[index]}
-                      onChange={(e) => handleDayNameChange(index, e)}
+                      type="number"
+                      value={seasonDates[index].startDay}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "startDay", e)
+                      }
+                      min="1" // Assuming days are 1-indexed (1-31)
+                      max="31"
+                    />
+                  </label>
+                  <br />
+                  <label>
+                    End Month:
+                    <select
+                      value={seasonDates[index].endMonth}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "endMonth", e)
+                      }
+                    >
+                      <option value="">Select Month</option>
+                      {monthNames.map((month, monthIndex) => (
+                        <option key={monthIndex} value={month}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <br />
+                  <label>
+                    End Day:
+                    <input
+                      type="number"
+                      value={seasonDates[index].endDay}
+                      onChange={(e) =>
+                        handleSeasonDateChange(index, "endDay", e)
+                      }
+                      min="1" // Assuming days are 1-indexed (1-31)
+                      max="31"
                     />
                   </label>
                 </div>
-              ))}
-            </div>
-          )}
-        {dayNames.every((name) => name) &&
-          seasons > 0 && ( // Conditionally render season names input
-            <div>
-              <h2>What are the names of the seasons and their dates:</h2>
-              {Array.from({ length: seasons }, (_, index) => (
-                <div key={index}>
-                  <label>
-                    Season {index + 1}:
-                    <input
-                      type="text"
-                      value={seasonNames[index]}
-                      onChange={(e) => handleSeasonNameChange(index, e)}
-                    />
-                  </label>
-                  <div>
-                    <label>
-                      Start Month:
-                      <select
-                        value={seasonDates[index].startMonth}
-                        onChange={(e) =>
-                          handleSeasonDateChange(index, "startMonth", e)
-                        }
-                      >
-                        <option value="">Select Month</option>
-                        {monthNames.map((month, monthIndex) => (
-                          <option key={monthIndex} value={month}>
-                            {month}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <br />
-                    <label>
-                      Start Day:
-                      <input
-                        type="number"
-                        value={seasonDates[index].startDay}
-                        onChange={(e) =>
-                          handleSeasonDateChange(index, "startDay", e)
-                        }
-                        min="1" // Assuming days are 1-indexed (1-31)
-                        max="31"
-                      />
-                    </label>
-                    <br />
-                    <label>
-                      End Month:
-                      <select
-                        value={seasonDates[index].endMonth}
-                        onChange={(e) =>
-                          handleSeasonDateChange(index, "endMonth", e)
-                        }
-                      >
-                        <option value="">Select Month</option>
-                        {monthNames.map((month, monthIndex) => (
-                          <option key={monthIndex} value={month}>
-                            {month}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <br />
-                    <label>
-                      End Day:
-                      <input
-                        type="number"
-                        value={seasonDates[index].endDay}
-                        onChange={(e) =>
-                          handleSeasonDateChange(index, "endDay", e)
-                        }
-                        min="1" // Assuming days are 1-indexed (1-31)
-                        max="31"
-                      />
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
         {validationError && (
           <div
             style={{ color: "red", whiteSpace: "pre-line", margin: "10px 0" }}

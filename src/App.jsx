@@ -5,6 +5,7 @@ import AppRouter from "./router";
 import FloatingNavButton from "./components/FloatingNavButton";
 // import Navbar from "./components/Navbar";
 import "./App.css";
+import WeatherGenerator from "./components/campaign/pages/WeatherGenerator";
 
 function App() {
   return (
