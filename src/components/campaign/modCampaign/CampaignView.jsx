@@ -320,22 +320,24 @@ const CampaignView = () => {
   };
 
   const buttons = [
+    ,
     { title: "Players", path: `/campaign/${campaignId}/players` },
     { title: "NPC", path: `/campaign/${campaignId}/npc` },
     { title: "Monster", path: `/campaign/${campaignId}/monster` },
+    { title: "Notes", path: "/campaign/notes" },
+    { title: "Spell Slot Tracker", path: "/campaign/spell-slots" },
+    { title: "List of Monsters", path: "/campaign/monsters" },
+
     { title: "Encounter Generator", path: "/campaign/encounter" },
     { title: "Town Generator", path: "/campaign/town" },
     { title: "NPC Generator", path: "/campaign/npc-generator" },
-    { title: "Spell Slot Tracker", path: "/campaign/spell-slots" },
     {
       title: "Change Date",
       path: `/campaign/${campaignId}/date`,
       state: { campaignId, date: dateValue, campaign: campaignData },
     },
     // { title: "Weather Generator", path: `/campaign/${campaignId}/weather` },
-    { title: "Encounter", path: "/campaign/encounter-list" },
-    { title: "List of Monsters", path: "/campaign/monsters" },
-    { title: "Notes", path: "/campaign/notes" },
+    // { title: "Encounter", path: "/campaign/encounter-list" },
   ];
 
   const handleSubmitDate = async () => {
