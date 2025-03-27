@@ -332,7 +332,7 @@ const CampaignView = () => {
       path: `/campaign/${campaignId}/date`,
       state: { campaignId, date: dateValue, campaign: campaignData },
     },
-    { title: "Weather Generator", path: `/campaign/${campaignId}/weather` },
+    // { title: "Weather Generator", path: `/campaign/${campaignId}/weather` },
     { title: "Encounter", path: "/campaign/encounter-list" },
     { title: "List of Monsters", path: "/campaign/monsters" },
     { title: "Notes", path: "/campaign/notes" },
@@ -543,7 +543,6 @@ const CampaignView = () => {
               </button>
             )}
 
-            {/* Update weather display */}
             <div className="weather-display">
               <p className="weather-narrative">
                 {campaignData.weather || "No weather data available"}
