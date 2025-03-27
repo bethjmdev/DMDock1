@@ -79,3 +79,17 @@
 .next-day-button:hover {
   background-color: #45a049;
 }
+
+.weather-narrative {
+  margin-top: 10px;
+  font-style: italic;
+  color: #666;
+  line-height: 1.5;
+}
+
+.weather-display {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}

@@ -40,6 +40,10 @@ const CampaignView = () => {
   // Add new state for calendar rules
   const [calendarRules, setCalendarRules] = useState(null);
 
+  // Add new state for weather and seasons
+  const [currentWeather, setCurrentWeather] = useState(null);
+  const [seasonData, setSeasonData] = useState(null);
+
   // Firestore initialization
   const db = getFirestore();
 
@@ -118,6 +122,203 @@ const CampaignView = () => {
     }
   }, [campaignId]);
 
+  // Add function to fetch season data
+  const fetchSeasonData = async () => {
+    const q = query(
+      collection(db, "Calendar"),
+      where("campaignId", "==", campaignId)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const data = querySnapshot.docs[0].data();
+      setSeasonData({
+        seasonNames: data.seasonNames,
+        seasonDates: data.seasonDates,
+      });
+    }
+  };
+
+  // Add this to your existing useEffect that fetches calendar data
+  useEffect(() => {
+    if (campaignId) {
+      fetchDateInfo();
+      fetchSeasonData();
+    }
+  }, [campaignId]);
+
+  // Function to determine which season a date falls into
+  const determineSeasonForDate = (monthName, dayNum) => {
+    if (!seasonData || !calendarRules) return null;
+
+    const monthIndex = calendarRules.monthNames.indexOf(monthName);
+    const daysInMonth = calendarRules.daysInMonth;
+    const totalDayNum = monthIndex * daysInMonth + Number(dayNum);
+
+    return seasonData.seasonDates.find((season, index) => {
+      const startMonthIndex = calendarRules.monthNames.indexOf(
+        season.startMonth
+      );
+      const endMonthIndex = calendarRules.monthNames.indexOf(season.endMonth);
+      const startDayNum =
+        startMonthIndex * daysInMonth + Number(season.startDay);
+      const endDayNum = endMonthIndex * daysInMonth + Number(season.endDay);
+
+      return totalDayNum >= startDayNum && totalDayNum <= endDayNum;
+    });
+  };
+
+  // Function to generate weather based on weather pattern
+  const generateWeather = (weatherPattern) => {
+    // Use exact same temperature ranges
+    const tempRanges = {
+      cold: {
+        extreme: { min: -20, max: 5 },
+        normal: { min: 5, max: 35 },
+      },
+      "moderate-cold": { min: 40, max: 70 },
+      "moderate-warm": { min: 40, max: 65 },
+      warm: { min: 65, max: 90 },
+    };
+
+    // Generate temperature using same logic
+    let temp;
+    if (weatherPattern === "cold") {
+      const isExtremeCold = Math.random() < 0.03;
+      const range = isExtremeCold
+        ? tempRanges.cold.extreme
+        : tempRanges.cold.normal;
+      temp = Math.floor(
+        Math.random() * (range.max - range.min + 1) + range.min
+      );
+    } else {
+      const range = tempRanges[weatherPattern];
+      temp = Math.floor(
+        Math.random() * (range.max - range.min + 1) + range.min
+      );
+    }
+
+    // Generate wind speed with same ranges
+    const windSpeed = Math.floor(Math.random() * 30);
+    const windStrength =
+      windSpeed < 5
+        ? "calm"
+        : windSpeed < 10
+        ? "light breeze"
+        : windSpeed < 20
+        ? "moderate wind"
+        : windSpeed < 30
+        ? "strong wind"
+        : "gale force";
+
+    // Calculate wind chill for cold weather
+    let windChill = null;
+    if (weatherPattern === "cold" && windSpeed > 5) {
+      windChill = Math.round(
+        35.74 +
+          0.6215 * temp -
+          35.75 * Math.pow(windSpeed, 0.16) +
+          0.4275 * temp * Math.pow(windSpeed, 0.16)
+      );
+    }
+
+    // Calculate heat index for warm weather
+    let heatIndex = null;
+    if (weatherPattern === "warm" && temp > 80) {
+      heatIndex = Math.round(temp + 0.5 * (temp - 80));
+    }
+
+    // Generate precipitation with same chances
+    const precipChance = Math.floor(Math.random() * 100);
+    const hasPrecip = precipChance > 70;
+    let precipType = "none";
+    let precipAmount = 0;
+
+    if (hasPrecip) {
+      if (weatherPattern === "cold" && temp <= 32) {
+        precipType = "snow";
+        const snowstormRoll = Math.random();
+        if (snowstormRoll < 0.005) {
+          precipAmount = 60; // 5 feet
+        } else if (snowstormRoll < 0.03) {
+          precipAmount = 36; // 3 feet
+        } else {
+          precipAmount = Math.floor(Math.random() * 12) + 1;
+        }
+      } else if (weatherPattern === "cold" && temp > 32) {
+        precipType = "sleet";
+        precipAmount = (Math.random() * 0.4 + 0.1).toFixed(1);
+      } else {
+        precipType = "rain";
+        precipAmount = (Math.random() * 1.9 + 0.1).toFixed(1);
+      }
+    }
+
+    // Cloud coverage
+    const cloudCoverage = hasPrecip
+      ? Math.floor(Math.random() * 30) + 70
+      : Math.floor(Math.random() * 100);
+
+    // Road conditions
+    let roadConditions = "clear";
+    let whiteout = false;
+
+    if (hasPrecip) {
+      if (precipType === "snow") {
+        roadConditions = "snow-covered";
+        whiteout = Math.random() * 100 < 5;
+      } else if (precipType === "sleet") {
+        roadConditions = "icy";
+      } else {
+        roadConditions = "wet";
+      }
+    }
+
+    // Fog conditions
+    const fogChance =
+      (weatherPattern === "moderate-cold" ||
+        weatherPattern === "moderate-warm") &&
+      hasPrecip
+        ? 70
+        : 30;
+    const hasFog = Math.random() * 100 < fogChance;
+
+    // Thunderstorm chance
+    const thunderstormChance = weatherPattern === "warm" ? 20 : 5;
+    const hasThunderstorm =
+      hasPrecip && Math.random() * 100 < thunderstormChance;
+
+    // Visibility
+    let visibility = "clear";
+    if (hasThunderstorm) {
+      visibility = "very poor (100-500 feet)";
+    } else if (whiteout) {
+      visibility = "zero (whiteout conditions)";
+    } else if (hasFog) {
+      visibility = "poor (500-1000 feet)";
+    } else if (hasPrecip) {
+      visibility = "reduced (1000-3000 feet)";
+    }
+
+    return {
+      temperature: temp,
+      wind: { speed: windSpeed, strength: windStrength },
+      windChill,
+      heatIndex,
+      precipitation: {
+        chance: precipChance,
+        type: precipType,
+        amount: precipAmount,
+      },
+      cloudCoverage,
+      roadConditions,
+      fog: hasFog,
+      whiteout,
+      thunderstorm: hasThunderstorm,
+      visibility,
+    };
+  };
+
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
     { title: "NPC", path: `/campaign/${campaignId}/npc` },
@@ -169,51 +370,93 @@ const CampaignView = () => {
     setShowDatePicker(false);
   };
 
-  // Add function to calculate next day
+  // Modify handleNextDay to include weather storage
   const handleNextDay = async () => {
-    if (!dateValue || !calendarRules) return;
+    if (!dateValue || !calendarRules || !seasonData) return;
 
-    let newDate = { ...dateValue };
-
-    // Get current positions
+    // Calculate next day's date
     let currentMonthIndex = calendarRules.monthNames.indexOf(dateValue.month);
     let currentDayIndex = calendarRules.dayNames.indexOf(dateValue.week_day);
-    let currentDay = parseInt(dateValue.number_day);
-    let currentYear = parseInt(dateValue.year);
+    let nextDay = parseInt(dateValue.number_day) + 1;
+    let nextMonth = dateValue.month;
+    let nextYear = parseInt(dateValue.year);
 
-    // Increment day
-    currentDay++;
-
-    // Move to next day of week
-    currentDayIndex = (currentDayIndex + 1) % calendarRules.dayNames.length;
-
-    // Check if we need to move to next month
-    if (currentDay > calendarRules.daysInMonth) {
-      currentDay = 1;
+    // Handle month/year rollover
+    if (nextDay > calendarRules.daysInMonth) {
+      nextDay = 1;
       currentMonthIndex++;
-
-      // Check if we need to move to next year
       if (currentMonthIndex >= calendarRules.monthNames.length) {
         currentMonthIndex = 0;
-        currentYear++;
+        nextYear++;
       }
+      nextMonth = calendarRules.monthNames[currentMonthIndex];
     }
 
+    // Calculate next day of week
+    currentDayIndex = (currentDayIndex + 1) % calendarRules.dayNames.length;
+
+    // Determine season and generate weather for next day
+    const nextDaySeason = determineSeasonForDate(nextMonth, nextDay);
+    const weatherForNextDay = nextDaySeason
+      ? generateWeather(nextDaySeason.weatherPattern)
+      : null;
+
+    // Create weather narrative string
+    const weatherString = weatherForNextDay
+      ? `The weather is ${weatherForNextDay.temperature}°F` +
+        `${
+          weatherForNextDay.windChill
+            ? ` (feels like ${weatherForNextDay.windChill}°F with wind chill)`
+            : ""
+        }` +
+        `${
+          weatherForNextDay.heatIndex
+            ? ` (feels like ${weatherForNextDay.heatIndex}°F with heat index)`
+            : ""
+        }` +
+        ` with ${weatherForNextDay.wind.strength} winds at ${weatherForNextDay.wind.speed} mph.` +
+        `${
+          weatherForNextDay.precipitation.type !== "none"
+            ? ` There is a ${weatherForNextDay.precipitation.chance}% chance of ${weatherForNextDay.precipitation.type} with expected accumulation of ${weatherForNextDay.precipitation.amount} inches.`
+            : " No precipitation is expected."
+        }` +
+        `${
+          weatherForNextDay.cloudCoverage > 80
+            ? " The sky is heavily overcast"
+            : weatherForNextDay.cloudCoverage > 50
+            ? " The sky is partly cloudy"
+            : " The sky is mostly clear"
+        }` +
+        `${weatherForNextDay.fog ? " with fog present" : ""}.` +
+        `${
+          weatherForNextDay.thunderstorm ? " Thunderstorms are likely." : ""
+        }` +
+        `${
+          weatherForNextDay.whiteout
+            ? " Whiteout conditions are in effect."
+            : ""
+        }` +
+        ` Road conditions are ${weatherForNextDay.roadConditions}` +
+        ` with ${weatherForNextDay.visibility} visibility.`
+      : "";
+
     // Create new date object
-    newDate = {
-      month: calendarRules.monthNames[currentMonthIndex],
-      number_day: currentDay,
+    const newDate = {
+      month: nextMonth,
+      number_day: nextDay,
       week_day: calendarRules.dayNames[currentDayIndex],
-      year: currentYear,
+      year: nextYear,
     };
 
-    // Update in Firestore
+    // Update Firestore with both new date and weather
     const campaignRef = doc(db, "Campaign", campaignId);
     await updateDoc(campaignRef, {
       date: newDate,
+      weather: weatherString, // Save the weather string to Firestore
     });
 
-    // Local state will update through the existing onSnapshot listener
+    // Update local state
+    setCurrentWeather(weatherForNextDay);
   };
 
   return (
@@ -294,14 +537,18 @@ const CampaignView = () => {
               Today is {dateValue.week_day}, {dateValue.month}{" "}
               {dateValue.number_day}, {dateValue.year}
             </p>
-            {calendarRules && ( // Only show button if calendar rules are loaded
-              <button
-                onClick={handleNextDay}
-                className="next-day-button" // Add styling as needed
-              >
+            {calendarRules && (
+              <button onClick={handleNextDay} className="next-day-button">
                 Next Day →
               </button>
             )}
+
+            {/* Update weather display */}
+            <div className="weather-display">
+              <p className="weather-narrative">
+                {campaignData.weather || "No weather data available"}
+              </p>
+            </div>
           </div>
         )}
 
