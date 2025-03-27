@@ -23,8 +23,30 @@ const CustomCalendar = () => {
   const [seasonNames, setSeasonNames] = useState(Array(4).fill("")); // Default to 4 empty season names
   const [seasonDates, setSeasonDates] = useState([]); // State for season dates
   const [isFormValid, setIsFormValid] = useState(false); // State to track form validity
+  const [validationError, setValidationError] = useState("");
 
-  // Function to check if the form is valid
+  // Function to validate calendar math
+  const validateCalendarMath = () => {
+    if (!months || !weeks || !daysInMonth || !days) return;
+
+    const totalDaysMethod1 = months * daysInMonth;
+    const totalDaysMethod2 = weeks * days;
+
+    if (totalDaysMethod1 !== totalDaysMethod2) {
+      setValidationError(
+        `Calendar math doesn't add up:
+        - ${months} months × ${daysInMonth} days = ${totalDaysMethod1} total days
+        - ${weeks} weeks × ${days} days = ${totalDaysMethod2} total days
+        These should be equal!`
+      );
+      setIsFormValid(false);
+    } else {
+      setValidationError("");
+      // Don't set isFormValid here - let the existing checkFormValidity handle that
+    }
+  };
+
+  // Modify checkFormValidity to include math validation
   const checkFormValidity = () => {
     const allFieldsFilled =
       months &&
@@ -40,8 +62,14 @@ const CustomCalendar = () => {
           date.startMonth && date.startDay && date.endMonth && date.endDay
       );
 
-    setIsFormValid(allFieldsFilled);
+    // Only set form as valid if all fields are filled AND there's no validation error
+    setIsFormValid(allFieldsFilled && !validationError);
   };
+
+  // Add validation check whenever relevant values change
+  React.useEffect(() => {
+    validateCalendarMath();
+  }, [months, weeks, daysInMonth, days]);
 
   // Call checkFormValidity whenever relevant state changes
   React.useEffect(() => {
@@ -345,6 +373,13 @@ const CustomCalendar = () => {
               ))}
             </div>
           )}
+        {validationError && (
+          <div
+            style={{ color: "red", whiteSpace: "pre-line", margin: "10px 0" }}
+          >
+            {validationError}
+          </div>
+        )}
         {isFormValid && ( // Show submit button if the form is valid
           <button type="submit">Submit</button>
         )}
