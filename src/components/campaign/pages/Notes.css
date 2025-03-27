@@ -1,0 +1,143 @@
+/* Inheriting the D&D Theme Colors from Players.css */
+:root {
+  --dnd-red: #8b0000;
+  --dnd-gold: #d4af37;
+  --dnd-brown: #f5deb3;
+  --dnd-dark: #2c1810;
+  --dnd-light: #fff8e7;
+  --dnd-accent: #8b4513;
+}
+
+.notes-container {
+  padding: 2rem;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--dnd-light);
+  border: 3px solid var(--dnd-gold);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notes-header h2 {
+  font-family: "Cinzel", serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.note-card {
+  background-color: var(--dnd-light);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 3px solid var(--dnd-gold);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+}
+
+.note-card::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 2px solid var(--dnd-red);
+  border-radius: 12px;
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.note-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.note-header {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  /* border-bottom: 2px solid var(--dnd-gold); */
+}
+
+.note-header h3 {
+  font-family: "Cinzel", serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.note-preview {
+  padding: 0.5rem;
+  background-color: rgba(245, 222, 179, 0.5);
+  border-radius: 4px;
+  min-height: 80px;
+}
+
+.auth-button {
+  background-color: var(--dnd-red);
+  color: var(--dnd-light) !important;
+  border: none;
+  border-radius: 4px;
+  font-family: "Cinzel", serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.auth-button:hover {
+  background-color: var(--dnd-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-container {
+    padding: 1rem;
+  }
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-content {
+  padding: 1rem;
+  background-color: rgba(245, 222, 179, 0.5);
+  border-radius: 4px;
+  min-height: 200px;
+  font-family: "Crimson Text", serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.note-content p {
+  margin-bottom: 1rem;
+}

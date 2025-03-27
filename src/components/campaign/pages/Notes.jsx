@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "../../../firebase"; // adjust path as needed
+import "./Notes.css";
 
 const Notes = () => {
   const [notes, setNotes] = useState([]);
@@ -33,32 +34,48 @@ const Notes = () => {
     fetchNotes();
   }, [campaignId]); // Add campaignId as dependency
 
+  if (loading) {
+    return <h2 className="text-gray-800">Loading Notes...</h2>;
+  }
+
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Notes</h1>
+    <div className="notes-container">
+      <div className="notes-header">
+        <h2 className="text-2xl font-bold text-gray-800">Campaign Notes</h2>
         <Link
           to="create-note"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+          className="auth-button text-gray-800"
+          style={{ width: "auto", padding: "0.5rem 1rem" }}
         >
           Create Note
         </Link>
       </div>
 
-      {loading ? (
-        <p>Loading notes...</p>
+      {notes.length === 0 ? (
+        <p className="text-center text-gray-600">
+          No notes found. Create your first note!
+        </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="notes-grid">
           {notes.map((note) => (
             <Link
               key={note.id}
-              to={`note/${note.id}`}
-              className="p-4 border rounded-lg hover:shadow-lg transition-shadow"
+              to={`/campaign/${campaignId}/notes/${note.id}`}
+              className="note-card"
             >
-              <h3 className="text-lg font-semibold">{note.title}</h3>
-              <p className="text-gray-600 text-sm">
-                {new Date(note.createdAt).toLocaleDateString()}
-              </p>
+              <div className="note-header">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {note.title}
+                  </h3>
+                  {/* <p className="text-sm text-gray-600">
+                    {new Date(note.createdAt).toLocaleDateString()}
+                  </p> */}
+                </div>
+              </div>
+              {/* <div className="note-preview">
+                <p className="text-gray-800 line-clamp-3">{note.content}</p>
+              </div> */}
             </Link>
           ))}
         </div>

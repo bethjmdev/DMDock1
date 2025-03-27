@@ -33,6 +33,7 @@ import EncounterList from "./components/campaign/pages/EncounterList";
 import MonsterList from "./components/campaign/pages/MonsterList";
 import Notes from "./components/campaign/pages/Notes";
 import CreateNote from "./components/campaign/pages/CreateNote";
+import ViewNote from "./components/campaign/pages/ViewNote";
 
 import CustomCalendar from "./components/campaign/weather/CustomCalendar";
 
@@ -181,6 +182,10 @@ const AppRouter = () => {
             <CreateNote />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/campaign/:campaignId/notes/:noteId"
+        element={<ViewNote />}
       />
       <Route
         path="/campaign/:campaignId/players/edit/:playerId"
