@@ -142,7 +142,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/date"
+        path="/campaign/:campaignId/date"
         element={
           <ProtectedRoute>
             <DateTracker />

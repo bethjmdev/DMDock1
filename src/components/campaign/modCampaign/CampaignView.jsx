@@ -108,7 +108,11 @@ const CampaignView = () => {
     { title: "Town Generator", path: "/campaign/town" },
     { title: "NPC Generator", path: "/campaign/npc-generator" },
     { title: "Spell Slot Tracker", path: "/campaign/spell-slots" },
-    { title: "See Calendar", path: "/campaign/date" },
+    {
+      title: "Change Date",
+      path: `/campaign/${campaignId}/date`,
+      state: { campaignId, date: dateValue, campaign: campaignData },
+    },
     { title: "Encounter", path: "/campaign/encounter-list" },
     { title: "List of Monsters", path: "/campaign/monsters" },
     { title: "Notes", path: "/campaign/notes" },
@@ -231,7 +235,11 @@ const CampaignView = () => {
           {buttons.map((button) => (
             <button
               key={button.path}
-              onClick={() => navigate(button.path)}
+              onClick={() =>
+                navigate(button.path, {
+                  state: button.state,
+                })
+              }
               className="campaign-button"
             >
               {button.title}
