@@ -11,116 +11,109 @@ const Monster = () => {
   const { currentUser } = useAuth();
   const [monsters, setMonsters] = useState([]);
   const [loading, setLoading] = useState(true);
-  console.log("NPCS", monsters);
+
   useEffect(() => {
-    const fetchNPCs = async () => {
+    const fetchMonsters = async () => {
       try {
-        const NPCsRef = collection(db, "NPC");
+        const monstersRef = collection(db, "Monsters");
         const q = query(
-          NPCsRef,
+          monstersRef,
           where("campaign_id", "==", campaignId),
           where("dm", "==", currentUser.uid)
         );
 
         const querySnapshot = await getDocs(q);
-        const NPCsList = querySnapshot.docs.map((doc) => ({
+        const monstersList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        setNPCs(NPCsList);
+        setMonsters(monstersList);
       } catch (error) {
-        console.error("Error fetching npc's:", error);
+        console.error("Error fetching monsters:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNPCs();
+    fetchMonsters();
   }, [campaignId, currentUser.uid]);
 
-  const handleAddNPC = () => {
-    navigate(`/campaign/${campaignId}/npc/add`);
+  const handleAddMonster = () => {
+    navigate(`/campaign/${campaignId}/monster/add`);
   };
 
   if (loading) {
-    return <h2 className="text-gray-800">Loading NPCSs...</h2>;
+    return <h2 className="text-gray-800">Loading Monsters...</h2>;
   }
 
   return (
     <div className="players-container">
       <div className="players-header">
-        <h2 className="text-2xl font-bold text-gray-800">NPCs</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Monsters</h2>
         <button
-          onClick={handleAddNPC}
+          onClick={handleAddMonster}
           className="auth-button text-gray-800"
           style={{ width: "auto", padding: "0.5rem 1rem" }}
         >
-          Add NPC
+          Add Monster
         </button>
       </div>
 
-      {NPCs.length === 0 ? (
+      {monsters.length === 0 ? (
         <p className="text-center text-gray-600">
-          No NPCs found. Add your first NPC!
+          No monsters found. Add your first monster!
         </p>
       ) : (
         <div className="players-grid">
-          {NPCs.map((NPC) => (
-            <div key={NPC.id} className="player-card">
+          {monsters.map((monster) => (
+            <div key={monster.id} className="player-card">
               <div className="player-header">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {NPC.name}
+                    {monster.character_name}
                   </h3>
+                  <p className="text-sm text-gray-600">
+                    Monster: {monster.monster_name}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-800">
-                    Alignment: {NPC.alignment}
+                    AC: {monster.ac}
                   </p>
                 </div>
               </div>
-
-              <div className="players-stats">
-                <p className="text-sm text-gray-600">
-                  Occupation: {NPC.occupation}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Description: {NPC.description}
-                </p>
+              <div className="player-stats">
                 <div className="text-gray-800">
-                  <span className="font-medium">STR:</span>{" "}
-                  {NPC.ability_scores.strength}
+                  <span className="font-medium">STR:</span> {monster.strength}
                 </div>
                 <div className="text-gray-800">
-                  <span className="font-medium">DEX:</span>{" "}
-                  {NPC.ability_scores.dexterity}
+                  <span className="font-medium">DEX:</span> {monster.dexterity}
                 </div>
                 <div className="text-gray-800">
                   <span className="font-medium">CON:</span>{" "}
-                  {NPC.ability_scores.con}
+                  {monster.constitution}
                 </div>
                 <div className="text-gray-800">
                   <span className="font-medium">INT:</span>{" "}
-                  {NPC.ability_scores.intellect}
+                  {monster.intelligence}
                 </div>
                 <div className="text-gray-800">
-                  <span className="font-medium">WIS:</span>{" "}
-                  {NPC.ability_scores.wisdom}
+                  <span className="font-medium">WIS:</span> {monster.wisdom}
                 </div>
                 <div className="text-gray-800">
-                  <span className="font-medium">CHA:</span>{" "}
-                  {NPC.ability_scores.charisma}
+                  <span className="font-medium">CHA:</span> {monster.charisma}
                 </div>
-                <p className="text-sm text-gray-600">Notes: {NPC.notes}</p>
               </div>
               <button
                 onClick={() =>
-                  navigate(`/campaign/${campaignId}/npcs/edit/${NPC.id}`)
+                  navigate(
+                    `/campaign/${campaignId}/monsters/edit/${monster.id}`
+                  )
                 }
                 className="edit-button"
               >
-                Edit / Add Notes
+                Edit
               </button>
             </div>
           ))}

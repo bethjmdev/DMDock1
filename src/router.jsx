@@ -45,7 +45,7 @@ const AppRouter = () => {
         element={currentUser ? <Players /> : <Navigate to="/login" />}
       />
       <Route
-        path="/campaign/:campaignId/monsters"
+        path="/campaign/:campaignId/monster"
         element={currentUser ? <Monster /> : <Navigate to="/login" />}
       />
       <Route
