@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
 import { db } from "../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import "./CampaignControl.css";
 
 const CampaignControl = () => {
@@ -12,16 +12,16 @@ const CampaignControl = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
-      if (!currentUser) return;
+    if (!currentUser) return;
 
-      try {
-        const campaignsQuery = query(
-          collection(db, "Campaign"),
-          where("dmId", "==", currentUser.uid)
-        );
+    const campaignsQuery = query(
+      collection(db, "Campaign"),
+      where("dmId", "==", currentUser.uid)
+    );
 
-        const querySnapshot = await getDocs(campaignsQuery);
+    const unsubscribe = onSnapshot(
+      campaignsQuery,
+      (querySnapshot) => {
         const campaignList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -33,14 +33,16 @@ const CampaignControl = () => {
         });
 
         setCampaigns(sortedCampaigns);
-      } catch (error) {
+        setLoading(false);
+      },
+      (error) => {
         console.error("Error fetching campaigns:", error);
-      } finally {
         setLoading(false);
       }
-    };
+    );
 
-    fetchCampaigns();
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [currentUser]);
 
   const handleSignOut = async () => {

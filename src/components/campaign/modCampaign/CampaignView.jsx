@@ -9,6 +9,7 @@ import {
   doc,
   updateDoc,
   getDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import "./CampaignView.css";
 
@@ -16,14 +17,16 @@ const CampaignView = () => {
   const navigate = useNavigate();
   const { campaignId } = useParams();
   const location = useLocation();
-  const campaign = location.state?.campaign;
+  const [campaignData, setCampaignData] = useState(
+    location.state?.campaign || {}
+  );
   const date = location.state?.date;
 
   // Assuming you have userId available in this component
   const userId = "exampleUserId"; // Replace with actual userId logic
 
   console.log(campaignId);
-  console.log("campaign from campaign view", campaign);
+  console.log("campaign from campaign view", campaignData);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [month, setMonth] = useState("");
@@ -73,10 +76,29 @@ const CampaignView = () => {
 
   // Set the date value from the campaign object when the component mounts
   useEffect(() => {
-    if (campaign.date) {
-      setDateValue(campaign.date); // Set the dateValue from campaign.date if it exists
+    if (campaignData.date) {
+      setDateValue(campaignData.date); // Set the dateValue from campaignData.date if it exists
     }
-  }, [campaign.date]);
+  }, [campaignData.date]);
+
+  // Add this useEffect for real-time updates
+  useEffect(() => {
+    if (!campaignId) return;
+
+    const campaignRef = doc(db, "Campaign", campaignId);
+    const unsubscribe = onSnapshot(campaignRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        setCampaignData(data);
+        if (data.date) {
+          setDateValue(data.date);
+        }
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [campaignId]);
 
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
@@ -128,22 +150,22 @@ const CampaignView = () => {
     <div className="campaign-view-container">
       <div className="campaign-view-content">
         <h1 className="campaign-view-title">
-          {campaign.name || "Campaign Tools"}
+          {campaignData.name || "Campaign Tools"}
           <br />
           <br />
-          {campaign.custom_weather === false ? (
+          {campaignData.custom_weather === false ? (
             <button
               className="set-weather-button"
               onClick={() =>
                 navigate(`/campaign/${campaignId}/customcalendar`, {
-                  state: { campaignId, userId, campaign },
+                  state: { campaignId, userId, campaign: campaignData },
                 })
               }
             >
               Set your campaign calendar and active weather
             </button>
           ) : null}
-          {campaign.custom_weather === true && !dateValue ? (
+          {campaignData.custom_weather === true && !dateValue ? (
             <button
               className="select-date-button"
               onClick={() => {
