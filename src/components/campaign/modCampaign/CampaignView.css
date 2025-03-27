@@ -59,3 +59,23 @@
   text-align: center;
   font-size: 1rem;
 }
+
+.date-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.next-day-button {
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.next-day-button:hover {
+  background-color: #45a049;
+}

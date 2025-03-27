@@ -37,6 +37,9 @@ const CampaignView = () => {
   const [dayNames, setDayNames] = useState([]);
   const [dateValue, setDateValue] = useState(null); // State to hold the date value
 
+  // Add new state for calendar rules
+  const [calendarRules, setCalendarRules] = useState(null);
+
   // Firestore initialization
   const db = getFirestore();
 
@@ -55,6 +58,14 @@ const CampaignView = () => {
         setMonthNames(data.monthNames);
         console.log("Day Names:", data.dayNames);
         setDayNames(data.dayNames);
+        // Store all calendar rules
+        setCalendarRules({
+          months: data.months,
+          daysInMonth: data.daysInMonth,
+          days: data.days, // days in week
+          monthNames: data.monthNames,
+          dayNames: data.dayNames,
+        });
       });
     } else {
       console.log("No such document!");
@@ -98,6 +109,13 @@ const CampaignView = () => {
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
+  }, [campaignId]);
+
+  // Add this useEffect to fetch calendar rules when component mounts
+  useEffect(() => {
+    if (campaignId) {
+      fetchDateInfo();
+    }
   }, [campaignId]);
 
   const buttons = [
@@ -148,6 +166,53 @@ const CampaignView = () => {
     await fetchDateValue(); // Call the function to fetch the updated date value
 
     setShowDatePicker(false);
+  };
+
+  // Add function to calculate next day
+  const handleNextDay = async () => {
+    if (!dateValue || !calendarRules) return;
+
+    let newDate = { ...dateValue };
+
+    // Get current positions
+    let currentMonthIndex = calendarRules.monthNames.indexOf(dateValue.month);
+    let currentDayIndex = calendarRules.dayNames.indexOf(dateValue.week_day);
+    let currentDay = parseInt(dateValue.number_day);
+    let currentYear = parseInt(dateValue.year);
+
+    // Increment day
+    currentDay++;
+
+    // Move to next day of week
+    currentDayIndex = (currentDayIndex + 1) % calendarRules.dayNames.length;
+
+    // Check if we need to move to next month
+    if (currentDay > calendarRules.daysInMonth) {
+      currentDay = 1;
+      currentMonthIndex++;
+
+      // Check if we need to move to next year
+      if (currentMonthIndex >= calendarRules.monthNames.length) {
+        currentMonthIndex = 0;
+        currentYear++;
+      }
+    }
+
+    // Create new date object
+    newDate = {
+      month: calendarRules.monthNames[currentMonthIndex],
+      number_day: currentDay,
+      week_day: calendarRules.dayNames[currentDayIndex],
+      year: currentYear,
+    };
+
+    // Update in Firestore
+    const campaignRef = doc(db, "Campaign", campaignId);
+    await updateDoc(campaignRef, {
+      date: newDate,
+    });
+
+    // Local state will update through the existing onSnapshot listener
   };
 
   return (
@@ -228,6 +293,14 @@ const CampaignView = () => {
               Today is {dateValue.week_day}, {dateValue.month}{" "}
               {dateValue.number_day}, {dateValue.year}
             </p>
+            {calendarRules && ( // Only show button if calendar rules are loaded
+              <button
+                onClick={handleNextDay}
+                className="next-day-button" // Add styling as needed
+              >
+                Next Day →
+              </button>
+            )}
           </div>
         )}
 
