@@ -33,16 +33,44 @@ const CustomCalendar = () => {
     const totalDaysMethod2 = weeks * days;
 
     if (totalDaysMethod1 !== totalDaysMethod2) {
+      // Calculate some suggestions
+      let suggestions = "";
+
+      // Suggest adjusting weeks
+      const suggestedWeeks = Math.floor(totalDaysMethod1 / days);
+
+      // Suggest adjusting days per week
+      const suggestedDaysPerWeek = Math.floor(totalDaysMethod1 / weeks);
+
+      // Suggest adjusting days per month
+      const suggestedDaysPerMonth = Math.floor((weeks * days) / months);
+
+      suggestions = `Here are some ways to make it work:
+
+      Option 1: Keep ${months} months and ${daysInMonth} days per month, but change to:
+      - ${suggestedWeeks} weeks with ${days} days per week
+
+      Option 2: Keep ${months} months and ${weeks} weeks, but change to:
+      - ${suggestedDaysPerMonth} days per month with ${days} days per week
+
+      Option 3: Keep ${months} months and ${weeks} weeks, but change to:
+      - ${daysInMonth} days per month with ${suggestedDaysPerWeek} days per week
+
+      Common calendar examples:
+      • Standard Earth: 12 months × 30.44 days ≈ 52 weeks × 7 days = 365.25 days
+      • Fantasy Example: 10 months × 36 days = 60 weeks × 6 days = 360 days
+      • Simple Format: 12 months × 30 days = 60 weeks × 6 days = 360 days`;
+
       setValidationError(
         `Calendar math doesn't add up:
         - ${months} months × ${daysInMonth} days = ${totalDaysMethod1} total days
         - ${weeks} weeks × ${days} days = ${totalDaysMethod2} total days
-        These should be equal!`
+
+        ${suggestions}`
       );
       setIsFormValid(false);
     } else {
       setValidationError("");
-      // Don't set isFormValid here - let the existing checkFormValidity handle that
     }
   };
 
