@@ -48,12 +48,9 @@ const CreateNote = () => {
         </button>
       </div>
 
-      <div
-        className="note-card"
-        style={{ maxWidth: "800px", margin: "0 auto" }}
-      >
+      <div className="note-card create-note-card">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
+          <div className="title-input-container">
             <label htmlFor="title" className="form-label">
               Title
             </label>
@@ -64,10 +61,11 @@ const CreateNote = () => {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter note title..."
               required
+              className="title-input"
             />
           </div>
 
-          <div>
+          <div className="content-input-container">
             <label htmlFor="content" className="form-label">
               Content
             </label>
@@ -77,10 +75,11 @@ const CreateNote = () => {
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write your note here..."
               required
+              className="content-input"
             />
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-end mt-6">
             <button
               type="submit"
               disabled={saving}
