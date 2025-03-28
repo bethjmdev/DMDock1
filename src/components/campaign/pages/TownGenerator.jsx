@@ -3,9 +3,9 @@ import React, { useState } from "react";
 const TownGenerator = () => {
   const [townData, setTownData] = useState(null);
   const [formData, setFormData] = useState({
-    size: "medium", // small, medium, large
-    population: "medium", // small, medium, large
-    wealth: "medium", // poor, medium, rich
+    size: "medium", // random, small, medium, large
+    population: "medium", // random, small, medium, large
+    wealth: "medium", // random, poor, medium, rich
   });
 
   const generateTownName = () => {
@@ -780,14 +780,35 @@ const TownGenerator = () => {
     });
   };
 
+  const getRandomOption = (options) => {
+    const index = Math.floor(Math.random() * options.length);
+    return options[index];
+  };
+
   const generateTown = () => {
-    const population = calculatePopulation(formData.size);
+    const sizeOptions = ["small", "medium", "large"];
+    const wealthOptions = ["poor", "medium", "rich"];
+
+    const actualSize =
+      formData.size === "random" ? getRandomOption(sizeOptions) : formData.size;
+
+    const actualPopulation =
+      formData.population === "random"
+        ? getRandomOption(sizeOptions)
+        : formData.population;
+
+    const actualWealth =
+      formData.wealth === "random"
+        ? getRandomOption(wealthOptions)
+        : formData.wealth;
+
+    const population = calculatePopulation(actualSize);
     const acres = calculateAcres(population);
-    const wealth = calculateWealth(formData.wealth);
-    const defenses = generateDefenses(formData.size);
-    const organizations = generateOrganizations(formData.size);
+    const wealth = calculateWealth(actualWealth);
+    const defenses = generateDefenses(actualSize);
+    const organizations = generateOrganizations(actualSize);
     const demographics = generateRaceDemographics();
-    const shops = generateShops(formData.size, demographics, formData.wealth);
+    const shops = generateShops(actualSize, demographics, actualWealth);
 
     setTownData({
       name: generateTownName(),
@@ -820,6 +841,7 @@ const TownGenerator = () => {
                 setFormData((prev) => ({ ...prev, size: e.target.value }))
               }
             >
+              <option value="random">Random</option>
               <option value="small">Small</option>
               <option value="medium">Medium</option>
               <option value="large">Large</option>
@@ -835,6 +857,7 @@ const TownGenerator = () => {
                 setFormData((prev) => ({ ...prev, population: e.target.value }))
               }
             >
+              <option value="random">Random</option>
               <option value="small">Small</option>
               <option value="medium">Medium</option>
               <option value="large">Large</option>
@@ -850,6 +873,7 @@ const TownGenerator = () => {
                 setFormData((prev) => ({ ...prev, wealth: e.target.value }))
               }
             >
+              <option value="random">Random</option>
               <option value="poor">Poor</option>
               <option value="medium">Medium</option>
               <option value="rich">Rich</option>
