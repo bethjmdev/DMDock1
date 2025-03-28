@@ -8,9 +8,9 @@ const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 2 weeks in milliseconds
 const EncounterGenerator = () => {
   const [encounterParams, setEncounterParams] = useState({
     partyLevel: 1,
-    difficulty: "medium",
-    environment: "plains",
-    location: "underground",
+    difficulty: "random",
+    environment: "random",
+    location: "random",
     mixedTypes: false,
     minMonsters: 1,
     maxMonsters: 4,
@@ -22,6 +22,31 @@ const EncounterGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [fetchingMonsters, setFetchingMonsters] = useState(false);
   const [monsterFetchError, setMonsterFetchError] = useState(null);
+
+  // Add these helper functions at the top of the component, after the state declarations
+  const difficultyOptions = ["easy", "medium", "hard", "deadly"];
+  const environmentOptions = [
+    "plains",
+    "forest",
+    "hills",
+    "mountain",
+    "marsh",
+    "desert",
+  ];
+  const locationOptions = [
+    "underground",
+    "aquatic",
+    "underdark",
+    "abyss",
+    "nine_hells",
+    "gehenna",
+  ];
+
+  // Helper function to get random item from array
+  const getRandomOption = (options) => {
+    const randomIndex = Math.floor(Math.random() * options.length);
+    return options[randomIndex];
+  };
 
   // Fetch monsters from D&D 5e API in batches
   useEffect(() => {
@@ -165,20 +190,58 @@ const EncounterGenerator = () => {
         encounterParams
       );
 
-      // Filter monsters by environment
-      const filteredMonsters = filterMonstersByEnvironment(monsters);
-      console.log("Filtered monsters:", filteredMonsters.length);
+      // Handle random selections first
+      const effectiveParams = {
+        ...encounterParams,
+        difficulty:
+          encounterParams.difficulty === "random"
+            ? getRandomOption(difficultyOptions)
+            : encounterParams.difficulty,
+        environment:
+          encounterParams.environment === "random"
+            ? getRandomOption(environmentOptions)
+            : encounterParams.environment,
+        location:
+          encounterParams.location === "random"
+            ? getRandomOption(locationOptions)
+            : encounterParams.location,
+      };
 
-      // Calculate target CR
-      const targetCR = calculateTargetCR();
-      console.log("Target CR:", targetCR);
+      console.log("Using effective params:", effectiveParams);
+
+      // Calculate target CR using the resolved difficulty
+      const targetCR = (() => {
+        const baseCR = parseInt(effectiveParams.partyLevel);
+        const difficultyMultipliers = {
+          easy: 0.75,
+          medium: 1,
+          hard: 1.5,
+          deadly: 2,
+        };
+        return baseCR * difficultyMultipliers[effectiveParams.difficulty];
+      })();
+
+      console.log("Calculated target CR:", targetCR);
+
+      // Filter monsters by environment using the resolved environment/location
+      const filteredMonsters = monsters.filter((monster) => {
+        if (!monster.environments || monster.environments.length === 0) {
+          return true; // Include monsters without environment tags
+        }
+        return monster.environments.some(
+          (env) =>
+            env.toLowerCase().includes(effectiveParams.environment) ||
+            env.toLowerCase().includes(effectiveParams.location)
+        );
+      });
+
+      console.log("Filtered monsters count:", filteredMonsters.length);
 
       // Determine number of monsters
       const numMonsters = getRandomNumber(
-        parseInt(encounterParams.minMonsters),
-        parseInt(encounterParams.maxMonsters)
+        parseInt(effectiveParams.minMonsters),
+        parseInt(effectiveParams.maxMonsters)
       );
-      console.log("Number of monsters to generate:", numMonsters);
 
       // Select monsters based on CR
       const selectedMonsters = [];
@@ -186,53 +249,33 @@ const EncounterGenerator = () => {
 
       for (let i = 0; i < numMonsters; i++) {
         const individualTargetCR = remainingCR / (numMonsters - i);
-        console.log(`Monster ${i + 1} target CR:`, individualTargetCR);
 
         const crFilteredMonsters = filteredMonsters.filter((monster) => {
           const monsterCR = parseFloat(monster.challenge_rating);
           return Math.abs(monsterCR - individualTargetCR) <= 1;
         });
-        console.log(
-          `Found ${crFilteredMonsters.length} monsters matching CR criteria`
-        );
 
         if (crFilteredMonsters.length === 0) {
-          console.log("No monsters found matching CR criteria, breaking loop");
+          console.log("No suitable monsters found for CR:", individualTargetCR);
           break;
         }
 
-        const randomIndex = Math.floor(
-          Math.random() * crFilteredMonsters.length
-        );
-        const selectedMonster = crFilteredMonsters[randomIndex];
-        console.log("Selected monster:", {
-          name: selectedMonster.name,
-          cr: selectedMonster.challenge_rating,
-          hasActions: !!selectedMonster.actions,
-          actionCount: selectedMonster.actions?.length,
-        });
+        const selectedMonster =
+          crFilteredMonsters[
+            Math.floor(Math.random() * crFilteredMonsters.length)
+          ];
 
         selectedMonsters.push(selectedMonster);
         remainingCR -= parseFloat(selectedMonster.challenge_rating);
       }
 
-      console.log("Final encounter:", {
-        monsterCount: selectedMonsters.length,
-        totalCR: targetCR,
-        remainingCR,
-        monsters: selectedMonsters.map((m) => ({
-          name: m.name,
-          cr: m.challenge_rating,
-          hasActions: !!m.actions,
-          actionCount: m.actions?.length,
-        })),
-      });
-
+      // Set the generated encounter with the resolved parameters
       setGeneratedEncounter({
         monsters: selectedMonsters,
         totalCR: targetCR,
-        environment: encounterParams.environment,
-        location: encounterParams.location,
+        environment: effectiveParams.environment,
+        location: effectiveParams.location,
+        difficulty: effectiveParams.difficulty,
       });
     } catch (error) {
       console.error("Error generating encounter:", error);
@@ -457,6 +500,7 @@ const EncounterGenerator = () => {
               onChange={handleParamChange}
               className="control-input"
             >
+              <option value="random">Random</option>
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
@@ -473,6 +517,7 @@ const EncounterGenerator = () => {
               onChange={handleParamChange}
               className="control-input"
             >
+              <option value="random">Random</option>
               <option value="plains">Plains</option>
               <option value="forest">Forest</option>
               <option value="hills">Hills</option>
@@ -491,6 +536,7 @@ const EncounterGenerator = () => {
               onChange={handleParamChange}
               className="control-input"
             >
+              <option value="random">Random</option>
               <option value="underground">Underground</option>
               <option value="aquatic">Aquatic</option>
               <option value="underdark">Underdark</option>

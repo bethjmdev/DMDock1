@@ -12,7 +12,10 @@ const MonsterList = () => {
   const [monsters, setMonsters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const location = window.location;
+    return location.state?.previousPage || 1;
+  });
   const monstersPerPage = 12;
 
   useEffect(() => {
@@ -73,7 +76,9 @@ const MonsterList = () => {
   const totalPages = Math.ceil(monsters.length / monstersPerPage);
 
   const handleMonsterClick = (monsterIndex) => {
-    navigate(`/monsters/${monsterIndex}`);
+    navigate(`/monsters/${monsterIndex}`, {
+      state: { previousPage: currentPage },
+    });
   };
 
   return (

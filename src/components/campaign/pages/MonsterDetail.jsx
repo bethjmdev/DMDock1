@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./MonsterDetail.css";
 
 const MonsterDetail = () => {
-  const { monsterId } = useParams();
+  const { monsterId, campaignId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [monster, setMonster] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,6 +28,12 @@ const MonsterDetail = () => {
     fetchMonsterDetails();
   }, [monsterId]);
 
+  const handleBack = () => {
+    navigate(`/campaign/${campaignId}/monsterslist`, {
+      state: { previousPage: location.state?.previousPage || 1 },
+    });
+  };
+
   if (loading)
     return <div className="monster-detail-container">Loading...</div>;
   if (error)
@@ -39,6 +47,9 @@ const MonsterDetail = () => {
     <div className="monster-detail-container">
       <div className="monster-detail-content">
         <div className="monster-detail-header">
+          <button onClick={handleBack} className="back-button">
+            ← Back to Monster List
+          </button>
           <h1 className="monster-detail-title">{monster.name}</h1>
         </div>
 

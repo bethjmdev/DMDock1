@@ -110,7 +110,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/encounter"
+        path="/campaign/:campaignId/encounter-generator"
         element={
           <ProtectedRoute>
             <EncounterGenerator />
@@ -150,7 +150,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/encounter-list"
+        path="/campaign/:campaignId/encounter"
         element={
           <ProtectedRoute>
             <EncounterList />
