@@ -43,6 +43,7 @@ import ViewNPC from "./components/campaign/npc/ViewNPC";
 import CreateNPCNote from "./components/campaign/npc/CreateNPCNote";
 import ViewTowns from "./components/campaign/pages/ViewTowns";
 import ViewTownDetails from "./components/campaign/pages/ViewTownDetails";
+import CreateTownNote from "./components/campaign/pages/CreateTownNote";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -255,6 +256,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <ViewTownDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/towns/:townId/add-note"
+        element={
+          <ProtectedRoute>
+            <CreateTownNote />
           </ProtectedRoute>
         }
       />

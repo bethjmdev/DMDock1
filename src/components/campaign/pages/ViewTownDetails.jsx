@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import "./TownGenerator.css";
+import { useAuth } from "../../auth/AuthContext";
 
 const ViewTownDetails = () => {
   const [town, setTown] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { campaignId, townId } = useParams();
+  const { currentUser } = useAuth();
+  const [notes, setNotes] = useState([]);
 
   useEffect(() => {
     const fetchTown = async () => {
@@ -26,8 +36,46 @@ const ViewTownDetails = () => {
       }
     };
 
-    fetchTown();
+    const fetchTownNotes = async () => {
+      try {
+        const q = query(
+          collection(db, "TownNotes"),
+          where("townId", "==", townId)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const notesList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt
+            ? new Date(doc.data().createdAt)
+            : null,
+        }));
+
+        notesList.sort((a, b) => b.createdAt - a.createdAt);
+
+        setNotes(notesList);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      }
+    };
+
+    const fetchData = async () => {
+      try {
+        await fetchTown();
+        await fetchTownNotes();
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    fetchData();
   }, [townId]);
+
+  const formatDate = (date) => {
+    if (!date) return "Unknown date";
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+  };
 
   if (loading) return <p>Loading town details...</p>;
   if (!town) return <p>Town not found</p>;
@@ -130,6 +178,42 @@ const ViewTownDetails = () => {
               )}
             </div>
           ))}
+        </section>
+
+        <section className="notes-section">
+          <div className="notes-header">
+            <h3>Notes</h3>
+            <button
+              onClick={() =>
+                navigate(`/campaign/${campaignId}/towns/${townId}/add-note`)
+              }
+              className="add-note-button"
+            >
+              Add Note
+            </button>
+          </div>
+
+          {notes.length === 0 ? (
+            <p className="no-notes">
+              No notes yet. Add one to track important information!
+            </p>
+          ) : (
+            <div className="notes-grid">
+              {notes.map((note) => (
+                <div key={note.id} className="note-card">
+                  <div className="note-header">
+                    <h4>{note.title}</h4>
+                    <span className="note-date">
+                      {formatDate(note.createdAt)}
+                    </span>
+                  </div>
+                  <div className="note-content">
+                    <p>{note.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>
