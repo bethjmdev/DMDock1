@@ -8,7 +8,7 @@ import {
   getDocs,
   and,
 } from "firebase/firestore";
-import { useAuth } from "../../../components/auth/AuthContext";
+import { useAuth } from "../../auth/AuthContext";
 import "./MonsterList.css"; // Reuse the monster list styles
 import "./Players.css";
 

@@ -41,6 +41,8 @@ import CreateEncounterNote from "./components/campaign/encounter/CreateEncounter
 import CustomCalendar from "./components/campaign/weather/CustomCalendar";
 import ViewNPC from "./components/campaign/npc/ViewNPC";
 import CreateNPCNote from "./components/campaign/npc/CreateNPCNote";
+import ViewTowns from "./components/campaign/pages/ViewTowns";
+import ViewTownDetails from "./components/campaign/pages/ViewTownDetails";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -122,7 +124,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/town"
+        path="/campaign/:campaignId/town-generator"
         element={
           <ProtectedRoute>
             <TownGenerator />
@@ -240,6 +242,22 @@ const AppRouter = () => {
         element={<CreateNPCNote />}
       />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
+      <Route
+        path="/campaign/:campaignId/towns"
+        element={
+          <ProtectedRoute>
+            <ViewTowns />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/towns/:townId"
+        element={
+          <ProtectedRoute>
+            <ViewTownDetails />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };
