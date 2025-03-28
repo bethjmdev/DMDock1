@@ -320,24 +320,26 @@ const CampaignView = () => {
   };
 
   const buttons = [
-    ,
     { title: "Players", path: `/campaign/${campaignId}/players` },
-    { title: "NPC", path: `/campaign/${campaignId}/npc` },
-    { title: "Monster", path: `/campaign/${campaignId}/monster` },
+    { title: "NPCs", path: `/campaign/${campaignId}/npc` },
+    { title: "Monsters", path: `/campaign/${campaignId}/monster` },
+    { title: "Encounters", path: `/campaign/${campaignId}/encounter` },
     { title: "Notes", path: `/campaign/${campaignId}/notes` },
     { title: "Spell Slot Tracker", path: "/campaign/spell-slots" },
     { title: "List of Monsters", path: `/campaign/${campaignId}/monsterslist` },
-
-    { title: "Encounter Generator", path: "/campaign/encounter" },
-    { title: "Town Generator", path: "/campaign/town" },
-    { title: "NPC Generator", path: "/campaign/npc-generator" },
+    {
+      title: "Encounter Generator",
+      path: `/campaign/${campaignId}/encounter-generator`,
+    },
+    { title: "Town Generator", path: `/campaign/${campaignId}/town-generator` },
+    { title: "View Towns", path: `/campaign/${campaignId}/towns` },
+    { title: "NPC Generator", path: `/campaign/${campaignId}/npc-generator` },
     {
       title: "Change Date",
       path: `/campaign/${campaignId}/date`,
       state: { campaignId, date: dateValue, campaign: campaignData },
     },
     // { title: "Weather Generator", path: `/campaign/${campaignId}/weather` },
-    // { title: "Encounter", path: "/campaign/encounter-list" },
   ];
 
   const handleSubmitDate = async () => {

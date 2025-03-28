@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./MonsterDetail.css";
+import { useAuth } from "../../auth/AuthContext";
+import { db } from "../../../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 const MonsterDetail = () => {
-  const { monsterId } = useParams();
+  const { monsterId, campaignId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [monster, setMonster] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchMonsterDetails = async () => {
@@ -26,6 +33,36 @@ const MonsterDetail = () => {
     fetchMonsterDetails();
   }, [monsterId]);
 
+  const handleBack = () => {
+    navigate(`/campaign/${campaignId}/monster`);
+  };
+
+  const handleSaveMonster = async () => {
+    if (!monster || !campaignId) {
+      alert("Unable to save monster: Missing required data");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const monsterData = {
+        ...monster,
+        campaignId: campaignId,
+        dm: currentUser.uid,
+        createdAt: new Date().toISOString(),
+      };
+
+      const docRef = await addDoc(collection(db, "Monsters"), monsterData);
+      alert("Monster saved successfully!");
+      navigate(`/campaign/${campaignId}/monster`);
+    } catch (error) {
+      console.error("Error saving monster:", error);
+      alert("Failed to save monster: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (loading)
     return <div className="monster-detail-container">Loading...</div>;
   if (error)
@@ -39,7 +76,17 @@ const MonsterDetail = () => {
     <div className="monster-detail-container">
       <div className="monster-detail-content">
         <div className="monster-detail-header">
+          <button onClick={handleBack} className="back-button">
+            ← Back to Monster List
+          </button>
           <h1 className="monster-detail-title">{monster.name}</h1>
+          <button
+            onClick={handleSaveMonster}
+            disabled={isSaving}
+            className="save-button"
+          >
+            {isSaving ? "Saving..." : "Save to Campaign"}
+          </button>
         </div>
 
         <div className="stat-grid">

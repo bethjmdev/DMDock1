@@ -35,8 +35,15 @@ import MonsterList from "./components/campaign/pages/MonsterList";
 import Notes from "./components/campaign/pages/Notes";
 import CreateNote from "./components/campaign/pages/CreateNote";
 import ViewNote from "./components/campaign/pages/ViewNote";
+import ViewEncounter from "./components/campaign/pages/ViewEncounter";
+import CreateEncounterNote from "./components/campaign/encounter/CreateEncounterNote";
 
 import CustomCalendar from "./components/campaign/weather/CustomCalendar";
+import ViewNPC from "./components/campaign/npc/ViewNPC";
+import CreateNPCNote from "./components/campaign/npc/CreateNPCNote";
+import ViewTowns from "./components/campaign/pages/ViewTowns";
+import ViewTownDetails from "./components/campaign/pages/ViewTownDetails";
+import CreateTownNote from "./components/campaign/pages/CreateTownNote";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -110,7 +117,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/encounter"
+        path="/campaign/:campaignId/encounter-generator"
         element={
           <ProtectedRoute>
             <EncounterGenerator />
@@ -118,7 +125,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/town"
+        path="/campaign/:campaignId/town-generator"
         element={
           <ProtectedRoute>
             <TownGenerator />
@@ -126,7 +133,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/npc-generator"
+        path="/campaign/:campaignId/npc-generator"
         element={
           <ProtectedRoute>
             <NPCGenerator />
@@ -150,7 +157,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/encounter-list"
+        path="/campaign/:campaignId/encounter"
         element={
           <ProtectedRoute>
             <EncounterList />
@@ -177,12 +184,8 @@ const AppRouter = () => {
       />
 
       <Route
-        path="/monsters/:monsterId"
-        element={
-          <ProtectedRoute>
-            <MonsterDetail />
-          </ProtectedRoute>
-        }
+        path="/campaign/:campaignId/monsters/:monsterId"
+        element={<MonsterDetail />}
       />
 
       <Route
@@ -218,7 +221,52 @@ const AppRouter = () => {
         path="/campaign/:campaignId/monster/add"
         element={currentUser ? <AddMonster /> : <Navigate to="/login" />}
       />
+      <Route
+        path="/campaign/:campaignId/encounters/:encounterId"
+        element={
+          <ProtectedRoute>
+            <ViewEncounter />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/encounters/:encounterId/add-note"
+        element={
+          <ProtectedRoute>
+            <CreateEncounterNote />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/campaign/:campaignId/npcs/:npcId" element={<ViewNPC />} />
+      <Route
+        path="/campaign/:campaignId/npcs/:npcId/add-note"
+        element={<CreateNPCNote />}
+      />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
+      <Route
+        path="/campaign/:campaignId/towns"
+        element={
+          <ProtectedRoute>
+            <ViewTowns />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/towns/:townId"
+        element={
+          <ProtectedRoute>
+            <ViewTownDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/towns/:townId/add-note"
+        element={
+          <ProtectedRoute>
+            <CreateTownNote />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };

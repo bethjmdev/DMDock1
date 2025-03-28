@@ -18,7 +18,7 @@ const Monster = () => {
         const monstersRef = collection(db, "Monsters");
         const q = query(
           monstersRef,
-          where("campaign_id", "==", campaignId),
+          where("campaignId", "==", campaignId),
           where("dm", "==", currentUser.uid)
         );
 
@@ -67,54 +67,80 @@ const Monster = () => {
       ) : (
         <div className="players-grid">
           {monsters.map((monster) => (
-            <div key={monster.id} className="player-card">
-              <div className="player-header">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {monster.character_name}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Monster: {monster.monster_name}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-800">
-                    AC: {monster.ac}
-                  </p>
-                </div>
+            <div key={monster.id} className="monster-card">
+              <div className="monster-header">
+                <h3 className="monster-name">{monster.name}</h3>
+                <p className="monster-meta">
+                  {monster.size} {monster.type}, {monster.alignment}
+                </p>
               </div>
-              <div className="player-stats">
-                <div className="text-gray-800">
-                  <span className="font-medium">STR:</span> {monster.strength}
+
+              <div className="monster-stats">
+                <div className="stat-row">
+                  <span>AC: {monster.armor_class?.[0]?.value}</span>
+                  <span>HP: {monster.hit_points}</span>
+                  <span>CR: {monster.challenge_rating}</span>
                 </div>
-                <div className="text-gray-800">
-                  <span className="font-medium">DEX:</span> {monster.dexterity}
+
+                <div className="ability-scores">
+                  <div className="ability">
+                    <span>STR</span>
+                    <span>{monster.strength}</span>
+                  </div>
+                  <div className="ability">
+                    <span>DEX</span>
+                    <span>{monster.dexterity}</span>
+                  </div>
+                  <div className="ability">
+                    <span>CON</span>
+                    <span>{monster.constitution}</span>
+                  </div>
+                  <div className="ability">
+                    <span>INT</span>
+                    <span>{monster.intelligence}</span>
+                  </div>
+                  <div className="ability">
+                    <span>WIS</span>
+                    <span>{monster.wisdom}</span>
+                  </div>
+                  <div className="ability">
+                    <span>CHA</span>
+                    <span>{monster.charisma}</span>
+                  </div>
                 </div>
-                <div className="text-gray-800">
-                  <span className="font-medium">CON:</span>{" "}
-                  {monster.constitution}
-                </div>
-                <div className="text-gray-800">
-                  <span className="font-medium">INT:</span>{" "}
-                  {monster.intelligence}
-                </div>
-                <div className="text-gray-800">
-                  <span className="font-medium">WIS:</span> {monster.wisdom}
-                </div>
-                <div className="text-gray-800">
-                  <span className="font-medium">CHA:</span> {monster.charisma}
-                </div>
+
+                {monster.special_abilities && (
+                  <div className="special-abilities">
+                    <h4>Special Abilities</h4>
+                    {monster.special_abilities.map((ability, index) => (
+                      <p key={index}>{ability.name}</p>
+                    ))}
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() =>
-                  navigate(
-                    `/campaign/${campaignId}/monsters/edit/${monster.id}`
-                  )
-                }
-                className="edit-button"
-              >
-                Edit
-              </button>
+
+              <div className="monster-actions">
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/campaign/${campaignId}/monsters/${monster.index}`
+                    )
+                  }
+                  className="view-details-button"
+                >
+                  View Full Details
+                </button>
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/campaign/${campaignId}/monsters/edit/${monster.id}`
+                    )
+                  }
+                  className="edit-button"
+                >
+                  Edit
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import "./TownGenerator.css";
+import { useNavigate, useParams } from "react-router-dom";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { useAuth } from "../../auth/AuthContext";
 
 const TownGenerator = () => {
+  const navigate = useNavigate();
+  const { campaignId } = useParams();
+  const { currentUser } = useAuth();
   const [townData, setTownData] = useState(null);
   const [formData, setFormData] = useState({
     size: "medium", // random, small, medium, large
@@ -554,6 +561,7 @@ const TownGenerator = () => {
   };
 
   const generateSpecialItems = (type, wealth) => {
+    // Define all possible items for each shop type
     const items = {
       blacksmith: [
         { name: "Shield", source: "phb 145", price: 10 },
@@ -605,7 +613,23 @@ const TownGenerator = () => {
         { name: "Crowbar", source: "phb 151", price: 2 },
         { name: "Grappling Hook", source: "phb 151", price: 2 },
       ],
+      church: [
+        { name: "Holy Symbol", source: "phb 151", price: 5 },
+        { name: "Holy Water", source: "phb 151", price: 25 },
+        { name: "Prayer Book", source: "custom", price: 10 },
+        { name: "Incense", source: "phb 150", price: 1 },
+        { name: "Healer's Kit", source: "phb 151", price: 5 },
+        { name: "Priest's Pack", source: "phb 151", price: 19 },
+        { name: "Acolyte's Robes", source: "custom", price: 5 },
+        { name: "Religious Text", source: "custom", price: 25 },
+      ],
     };
+
+    // If the shop type doesn't exist in our items object, return an empty array
+    if (!items[type]) {
+      console.warn(`No items defined for shop type: ${type}`);
+      return [];
+    }
 
     const maxItems = wealth === "rich" ? 5 : wealth === "medium" ? 3 : 2;
     const selectedItems = [];
@@ -823,6 +847,30 @@ const TownGenerator = () => {
     });
   };
 
+  const handleSaveTown = async () => {
+    if (!townData) {
+      alert("Please generate a town first");
+      return;
+    }
+
+    try {
+      const townToSave = {
+        ...townData,
+        campaignId,
+        dm: currentUser.uid,
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      };
+
+      await addDoc(collection(db, "Towns"), townToSave);
+      alert("Town saved successfully!");
+      navigate(`/campaign/${campaignId}/towns`);
+    } catch (error) {
+      console.error("Error saving town:", error);
+      alert("Failed to save town: " + error.message);
+    }
+  };
+
   return (
     <div className="town-generator">
       <div className="town-container">
@@ -889,113 +937,122 @@ const TownGenerator = () => {
         </button>
 
         {townData && (
-          <div className="town-results">
-            <h2 className="town-name">{townData.name}</h2>
-            <div className="town-info-grid">
-              <div className="info-section">
-                <p>
-                  <strong>Population:</strong>{" "}
-                  {townData.population.toLocaleString()}
-                </p>
-                <p>
-                  <strong>Size:</strong> {townData.acres} acres
-                </p>
-                <p>
-                  <strong>Demographics:</strong>
-                </p>
-                <ul className="info-list">
-                  {Object.entries(townData.demographics).map(
-                    ([race, percentage]) => (
-                      <li key={race} className="capitalize">
-                        {race}: {percentage}%
-                      </li>
-                    )
-                  )}
-                </ul>
-              </div>
-              <div className="info-section">
-                <p>
-                  <strong>Wealth:</strong>
-                </p>
-                <ul className="info-list">
-                  <li>Total: {townData.wealth.total.toLocaleString()} gp</li>
-                  <li>
-                    Max value for sale:{" "}
-                    {townData.wealth.maxSale.toLocaleString()} gp
-                  </li>
-                  <li>
-                    Max pawn value: {townData.wealth.maxPawn.toLocaleString()}{" "}
-                    gp
-                  </li>
-                </ul>
-                <p className="mt-2">
-                  <strong>Defenses:</strong>
-                </p>
-                <ul className="info-list">
-                  {townData.defenses.map((defense, index) => (
-                    <li key={index}>{defense}</li>
-                  ))}
-                </ul>
-                <p className="mt-2">
-                  <strong>Organizations:</strong>
-                </p>
-                <ul className="info-list">
-                  {townData.organizations.map((org, index) => (
-                    <li key={index}>{org}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <h2 className="section-title">Shops and Buildings</h2>
-            {townData.shops.map((shop, index) => (
-              <div key={index} className="shop-card">
-                <h3 className="shop-title">
-                  {shop.type}: {shop.name}
-                </h3>
-                <div className="shop-info">
+          <>
+            <button
+              className="save-button"
+              onClick={handleSaveTown}
+              style={{ marginLeft: "10px" }}
+            >
+              Save Town
+            </button>
+            <div className="town-results">
+              <h2 className="town-name">{townData.name}</h2>
+              <div className="town-info-grid">
+                <div className="info-section">
                   <p>
-                    <strong>Owner:</strong> {shop.owner.name},{" "}
-                    {shop.owner.gender} {shop.owner.race}
+                    <strong>Population:</strong>{" "}
+                    {townData.population.toLocaleString()}
                   </p>
                   <p>
-                    <strong>Location:</strong> {shop.location}
+                    <strong>Size:</strong> {townData.acres} acres
                   </p>
                   <p>
-                    <strong>Description:</strong> {shop.description}
+                    <strong>Demographics:</strong>
                   </p>
+                  <ul className="info-list">
+                    {Object.entries(townData.demographics).map(
+                      ([race, percentage]) => (
+                        <li key={race} className="capitalize">
+                          {race}: {percentage}%
+                        </li>
+                      )
+                    )}
+                  </ul>
                 </div>
-                {shop.specials.length > 0 && (
-                  <>
-                    <p>
-                      <strong>Specials:</strong>
-                    </p>
-                    <ul className="shop-list">
-                      {shop.specials.map((item, itemIndex) => (
-                        <li key={itemIndex}>
-                          {item.name} ({item.source}) ({item.price} gp)
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-                {shop.patrons.length > 0 && (
-                  <>
-                    <p>
-                      <strong>Other Patrons:</strong>
-                    </p>
-                    <ul className="shop-list">
-                      {shop.patrons.map((patron, patronIndex) => (
-                        <li key={patronIndex}>
-                          {patron.name}, {patron.gender} {patron.race}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
+                <div className="info-section">
+                  <p>
+                    <strong>Wealth:</strong>
+                  </p>
+                  <ul className="info-list">
+                    <li>Total: {townData.wealth.total.toLocaleString()} gp</li>
+                    <li>
+                      Max value for sale:{" "}
+                      {townData.wealth.maxSale.toLocaleString()} gp
+                    </li>
+                    <li>
+                      Max pawn value: {townData.wealth.maxPawn.toLocaleString()}{" "}
+                      gp
+                    </li>
+                  </ul>
+                  <p className="mt-2">
+                    <strong>Defenses:</strong>
+                  </p>
+                  <ul className="info-list">
+                    {townData.defenses.map((defense, index) => (
+                      <li key={index}>{defense}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2">
+                    <strong>Organizations:</strong>
+                  </p>
+                  <ul className="info-list">
+                    {townData.organizations.map((org, index) => (
+                      <li key={index}>{org}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            ))}
-          </div>
+
+              <h2 className="section-title">Shops and Buildings</h2>
+              {townData.shops.map((shop, index) => (
+                <div key={index} className="shop-card">
+                  <h3 className="shop-title">
+                    {shop.type}: {shop.name}
+                  </h3>
+                  <div className="shop-info">
+                    <p>
+                      <strong>Owner:</strong> {shop.owner.name},{" "}
+                      {shop.owner.gender} {shop.owner.race}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {shop.location}
+                    </p>
+                    <p>
+                      <strong>Description:</strong> {shop.description}
+                    </p>
+                  </div>
+                  {shop.specials.length > 0 && (
+                    <>
+                      <p>
+                        <strong>Specials:</strong>
+                      </p>
+                      <ul className="shop-list">
+                        {shop.specials.map((item, itemIndex) => (
+                          <li key={itemIndex}>
+                            {item.name} ({item.source}) ({item.price} gp)
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  {shop.patrons.length > 0 && (
+                    <>
+                      <p>
+                        <strong>Other Patrons:</strong>
+                      </p>
+                      <ul className="shop-list">
+                        {shop.patrons.map((patron, patronIndex) => (
+                          <li key={patronIndex}>
+                            {patron.name}, {patron.gender} {patron.race}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
