@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./EncounterGenerator.css";
 
 const BATCH_SIZE = 40; // Number of monsters to fetch at once
+const CACHE_KEY = "dnd_monsters_cache";
+const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 2 weeks in milliseconds
 
 const EncounterGenerator = () => {
   const [encounterParams, setEncounterParams] = useState({
@@ -29,7 +31,21 @@ const EncounterGenerator = () => {
         setMonsterFetchError(null);
         console.log("Starting monster fetch...");
 
-        // First, get the list of all monsters
+        // Check localStorage for cached data
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          const isExpired = Date.now() - timestamp > CACHE_DURATION;
+
+          if (!isExpired) {
+            console.log("Using cached monster data");
+            setMonsters(data);
+            setFetchingMonsters(false);
+            return;
+          }
+        }
+
+        // If no cache or expired, fetch from API
         const response = await fetch("https://www.dnd5eapi.co/api/monsters");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -78,7 +94,16 @@ const EncounterGenerator = () => {
           setMonsters((prevMonsters) => [...prevMonsters, ...validMonsters]);
         }
 
-        console.log("All monsters fetched successfully");
+        // Store in localStorage with timestamp
+        localStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({
+            data: allMonsters,
+            timestamp: Date.now(),
+          })
+        );
+
+        console.log("All monsters fetched and cached successfully");
       } catch (error) {
         console.error("Error in monster fetch:", error);
         setMonsterFetchError(error.message);
@@ -295,9 +320,9 @@ const EncounterGenerator = () => {
       // Handle nested actions
       if (action.actions && Array.isArray(action.actions)) {
         return (
-          <li key={index}>
+          <li key={index} style={{ listStyle: "none" }}>
             <span className="font-medium">{actionName}:</span> {description}
-            <ul className="list-disc list-inside ml-4">
+            <ul style={{ listStyle: "none", marginLeft: "1rem" }}>
               {action.actions.map((nestedAction, nestedIndex) =>
                 renderAction(nestedAction, `${index}-${nestedIndex}`)
               )}
@@ -307,7 +332,7 @@ const EncounterGenerator = () => {
       }
 
       return (
-        <li key={index}>
+        <li key={index} style={{ listStyle: "none" }}>
           <span className="font-medium">{actionName}:</span> {description}
         </li>
       );
@@ -370,9 +395,16 @@ const EncounterGenerator = () => {
         {encounterParams.showMonsters && hasValidActions && (
           <div className="actions-section">
             <p className="actions-title">Actions:</p>
-            <ul className="actions-list">
+            <ul
+              className="actions-list"
+              style={{ listStyle: "none", padding: 0 }}
+            >
               {monster.actions.map((action, index) => (
-                <li key={index} className="action-item">
+                <li
+                  key={index}
+                  className="action-item"
+                  style={{ listStyle: "none" }}
+                >
                   <span className="action-name">{action.name}:</span>{" "}
                   {formatActionDesc(action.desc)}
                 </li>

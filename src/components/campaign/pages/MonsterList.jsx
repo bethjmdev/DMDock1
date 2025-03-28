@@ -5,7 +5,7 @@ import "./MonsterList.css";
 import "./Players.css";
 
 const CACHE_KEY = "dnd_monsters_cache";
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 2 weeks in milliseconds
 
 const MonsterList = () => {
   const navigate = useNavigate();
