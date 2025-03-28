@@ -54,10 +54,7 @@ const AppRouter = () => {
         path="/campaign/:campaignId/players/add"
         element={currentUser ? <AddPlayerForm /> : <Navigate to="/login" />}
       />
-      <Route
-        path="/"
-        element={<Navigate to={currentUser ? "/dashboard" : "/login"} />}
-      />
+
       <Route path="/signin" element={<SignInForm />} />
       <Route path="/signup" element={<SignUpForm />} />
       <Route
