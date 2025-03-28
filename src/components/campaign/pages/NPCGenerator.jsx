@@ -166,6 +166,204 @@ const NPCGenerator = () => {
     "{subject} is a workaholic",
   ];
 
+  const physicalDescriptions = {
+    hair: {
+      length: [
+        "short",
+        "long",
+        "medium-length",
+        "shoulder-length",
+        "waist-length",
+      ],
+      style: [
+        "straight",
+        "curled",
+        "wavy",
+        "braided",
+        "dreadlocked",
+        "shaved on the right side",
+        "shaved on the left side",
+        "shaved on both sides",
+      ],
+      color: [
+        "black",
+        "brown",
+        "blond",
+        "red",
+        "white",
+        "gray",
+        "silver",
+        "golden",
+        "auburn",
+        "dark brown",
+        "light brown",
+        "strawberry blond",
+        "platinum blond",
+        "jet black",
+        "raven black",
+        "copper",
+        "bronze",
+        "cyan",
+        "green",
+        "blue",
+        "purple",
+        "pink",
+      ],
+    },
+    eyes: {
+      color: [
+        "black",
+        "brown",
+        "blue",
+        "green",
+        "gray",
+        "hazel",
+        "amber",
+        "golden",
+        "silver",
+        "red",
+        "purple",
+        "cyan",
+        "violet",
+        "pink",
+        "white",
+        "yellow",
+        "orange",
+        "heterochromatic",
+      ],
+    },
+    skin: {
+      texture: [
+        "smooth",
+        "rough",
+        "scaled",
+        "furry",
+        "feathered",
+        "leathery",
+        "veiny",
+        "pockmarked",
+        "scarred",
+        "tattooed",
+        "wrinkled",
+        "youthful",
+        "weathered",
+      ],
+      color: [
+        "pale",
+        "fair",
+        "olive",
+        "brown",
+        "dark",
+        "black",
+        "white",
+        "green",
+        "blue",
+        "red",
+        "gray",
+        "tan",
+        "bronze",
+        "copper",
+        "golden",
+        "silver",
+        "purple",
+        "pink",
+        "yellow",
+        "orange",
+      ],
+    },
+    height: {
+      cm: Array.from({ length: 100 }, (_, i) => i + 100), // 100cm to 200cm
+      feet: Array.from({ length: 7 }, (_, i) => i + 3), // 3' to 10'
+      inches: Array.from({ length: 12 }, (_, i) => i), // 0" to 11"
+    },
+    build: [
+      "slim",
+      "athletic",
+      "muscular",
+      "stocky",
+      "fat",
+      "regular",
+      "beefy",
+      "lean",
+      "skinny",
+      "chubby",
+      "plump",
+      "tall",
+      "short",
+      "average",
+    ],
+    face: {
+      shape: [
+        "round",
+        "oval",
+        "square",
+        "heart",
+        "diamond",
+        "triangular",
+        "rectangular",
+        "long",
+        "wide",
+        "narrow",
+      ],
+      features: [
+        "plain",
+        "handsome",
+        "beautiful",
+        "ugly",
+        "common",
+        "uncommon",
+        "striking",
+        "memorable",
+        "forgettable",
+        "bland",
+        "mediocre",
+        "average",
+        "slightly common",
+        "incredibly bland",
+        "extremely mediocre",
+      ],
+      additional: [
+        "with a very long moustache",
+        "with a short beard",
+        "with a long beard",
+        "with a goatee",
+        "with a scar",
+        "with freckles",
+        "with dimples",
+        "with high cheekbones",
+        "with a strong jaw",
+        "with a weak chin",
+        "with a prominent nose",
+        "with a small nose",
+        "with a wide smile",
+        "with thin lips",
+        "with full lips",
+      ],
+    },
+    distinguishingFeatures: [
+      "is branded as a prisoner on {possessive} left arm",
+      'rolls {possessive} "R"s profusely',
+      "is mute",
+      "smells of dogs",
+      "is slightly allergic to dragonborns",
+      "has a distinctive birthmark on {possessive} face",
+      "walks with a slight limp",
+      "speaks with a lisp",
+      "has a nervous tick",
+      "always wears gloves",
+      "has a prosthetic limb",
+      "has a magical aura",
+      "glows faintly in the dark",
+      "has a constant cough",
+      "has a distinctive laugh",
+      "has a collection of scars",
+      "has a unique tattoo",
+      "has a distinctive voice",
+      "has a particular way of walking",
+      "has a specific smell",
+    ],
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -233,6 +431,89 @@ const NPCGenerator = () => {
     return traits;
   };
 
+  const generatePhysicalDescription = () => {
+    const npcPronouns = pronouns[formData.sex];
+    const age = Math.floor(Math.random() * 500) + 18; // Random age between 18 and 518
+
+    // Generate random height
+    const heightCm =
+      physicalDescriptions.height.cm[
+        Math.floor(Math.random() * physicalDescriptions.height.cm.length)
+      ];
+    const feet = Math.floor(heightCm / 30.48);
+    const inches = Math.round((heightCm % 30.48) / 2.54);
+
+    // Generate random physical features
+    const hairLength =
+      physicalDescriptions.hair.length[
+        Math.floor(Math.random() * physicalDescriptions.hair.length.length)
+      ];
+    const hairStyle =
+      physicalDescriptions.hair.style[
+        Math.floor(Math.random() * physicalDescriptions.hair.style.length)
+      ];
+    const hairColor =
+      physicalDescriptions.hair.color[
+        Math.floor(Math.random() * physicalDescriptions.hair.color.length)
+      ];
+    const eyeColor =
+      physicalDescriptions.eyes.color[
+        Math.floor(Math.random() * physicalDescriptions.eyes.color.length)
+      ];
+    const skinTexture =
+      physicalDescriptions.skin.texture[
+        Math.floor(Math.random() * physicalDescriptions.skin.texture.length)
+      ];
+    const skinColor =
+      physicalDescriptions.skin.color[
+        Math.floor(Math.random() * physicalDescriptions.skin.color.length)
+      ];
+    const build =
+      physicalDescriptions.build[
+        Math.floor(Math.random() * physicalDescriptions.build.length)
+      ];
+    const faceShape =
+      physicalDescriptions.face.shape[
+        Math.floor(Math.random() * physicalDescriptions.face.shape.length)
+      ];
+    const faceFeature =
+      physicalDescriptions.face.features[
+        Math.floor(Math.random() * physicalDescriptions.face.features.length)
+      ];
+    const faceAdditional =
+      Math.random() < 0.5
+        ? physicalDescriptions.face.additional[
+            Math.floor(
+              Math.random() * physicalDescriptions.face.additional.length
+            )
+          ]
+        : "";
+
+    // Generate 1-2 distinguishing features
+    const numFeatures = Math.floor(Math.random() * 2) + 1;
+    const shuffledFeatures = [
+      ...physicalDescriptions.distinguishingFeatures,
+    ].sort(() => Math.random() - 0.5);
+    const features = shuffledFeatures
+      .slice(0, numFeatures)
+      .map((feature) =>
+        feature.replace(/{possessive}/g, npcPronouns.possessive)
+      );
+
+    return [
+      `${
+        formData.name
+      } is a ${age} year old ${formData.sex.toLowerCase()} ${formData.race.toLowerCase()} ${formData.occupation.toLowerCase()}.`,
+      `${npcPronouns.subject} has ${hairLength}, ${hairStyle}, ${hairColor} hair and ${eyeColor} eyes.`,
+      `${npcPronouns.subject} has ${skinTexture} ${skinColor} skin.`,
+      `${npcPronouns.subject} stands ${heightCm}cm (${feet}'${inches}") tall and has a ${build} build.`,
+      `${npcPronouns.subject} has a ${faceShape}, ${faceFeature} face${
+        faceAdditional ? ` ${faceAdditional}` : ""
+      }.`,
+      ...features,
+    ];
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -240,6 +521,7 @@ const NPCGenerator = () => {
       ...formData,
       ability_scores: generateAbilityScores(),
       personality_traits: generatePersonalityTraits(),
+      physical_description: generatePhysicalDescription(),
     };
 
     setGeneratedNPC(npc);

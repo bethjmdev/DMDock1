@@ -61,6 +61,17 @@ const StatBlock = ({ npc }) => {
       </div>
 
       <div className="mt-6 border-t-2 border-gray-200 pt-4">
+        <h4 className="font-bold text-lg mb-2">Physical Description</h4>
+        <div className="space-y-2">
+          {npc.physical_description.map((line, index) => (
+            <p key={index} className="text-gray-700">
+              {line}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6 border-t-2 border-gray-200 pt-4">
         <h4 className="font-bold text-lg mb-2">Personality & Beliefs</h4>
         <PersonalityTraits traits={npc.personality_traits} />
       </div>
