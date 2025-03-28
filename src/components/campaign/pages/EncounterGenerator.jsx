@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import "./EncounterGenerator.css";
 
-const BATCH_SIZE = 20; // Number of monsters to fetch at once
+const BATCH_SIZE = 40; // Number of monsters to fetch at once
 
 const EncounterGenerator = () => {
   const [encounterParams, setEncounterParams] = useState({
@@ -338,43 +339,44 @@ const EncounterGenerator = () => {
     };
 
     return (
-      <div className="border rounded-lg p-4 mb-4 bg-white shadow-sm">
-        <h3 className="text-lg font-bold mb-2">
+      <div className="monster-card">
+        <h3 className="monster-name">
           {safeRender(monster.name) || "Unnamed Monster"}
         </h3>
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div>
-            <span className="font-semibold">CR:</span>{" "}
+        <div className="monster-stats">
+          <div className="stat-box">
+            <span className="stat-label">CR:</span>{" "}
             {safeRender(monster.challenge_rating)}
           </div>
-          <div>
-            <span className="font-semibold">Type:</span>{" "}
-            {safeRender(monster.type)}
+          <div className="stat-box">
+            <span className="stat-label">Type:</span> {safeRender(monster.type)}
           </div>
-          <div>
-            <span className="font-semibold">Size:</span>{" "}
-            {safeRender(monster.size)}
+          <div className="stat-box">
+            <span className="stat-label">Size:</span> {safeRender(monster.size)}
           </div>
-          <div>
-            <span className="font-semibold">Alignment:</span>{" "}
+          <div className="stat-box">
+            <span className="stat-label">Alignment:</span>{" "}
             {safeRender(monster.alignment)}
           </div>
-          <div>
-            <span className="font-semibold">AC:</span>{" "}
+          <div className="stat-box">
+            <span className="stat-label">AC:</span>{" "}
             {safeRender(monster.armor_class)}
           </div>
-          <div>
-            <span className="font-semibold">HP:</span>{" "}
+          <div className="stat-box">
+            <span className="stat-label">HP:</span>{" "}
             {safeRender(monster.hit_points)}
           </div>
         </div>
         {encounterParams.showMonsters && hasValidActions && (
-          <div className="mt-2 text-sm">
-            <p className="font-semibold">Actions:</p>
-            <ul className="list-disc list-inside">
-              {monster.actions.map((action, index) =>
-                renderAction(action, index)
-              )}
+          <div className="actions-section">
+            <p className="actions-title">Actions:</p>
+            <ul className="actions-list">
+              {monster.actions.map((action, index) => (
+                <li key={index} className="action-item">
+                  <span className="action-name">{action.name}:</span>{" "}
+                  {formatActionDesc(action.desc)}
+                </li>
+              ))}
             </ul>
           </div>
         )}
@@ -383,168 +385,168 @@ const EncounterGenerator = () => {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">D&D 5e Encounter Generator</h1>
+    <div className="encounter-generator">
+      <div className="encounter-container">
+        <h1 className="encounter-title">D&D 5e Encounter Generator</h1>
 
-      {monsterFetchError && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          Error loading monsters: {monsterFetchError}
-        </div>
-      )}
+        {monsterFetchError && (
+          <div className="error-message">
+            Error loading monsters: {monsterFetchError}
+          </div>
+        )}
 
-      {fetchingMonsters && (
-        <div className="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
-          Loading monsters... This may take a few moments.
-        </div>
-      )}
+        {fetchingMonsters && (
+          <div className="loading-message">
+            Loading monsters... This may take a few moments.
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {/* Party Level */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Party Level</label>
-          <input
-            type="number"
-            name="partyLevel"
-            value={encounterParams.partyLevel}
-            onChange={handleParamChange}
-            min="1"
-            max="20"
-            className="w-full p-2 border rounded"
-          />
+        <div className="controls-grid">
+          {/* Party Level */}
+          <div className="control-group">
+            <label className="control-label">Party Level</label>
+            <input
+              type="number"
+              name="partyLevel"
+              value={encounterParams.partyLevel}
+              onChange={handleParamChange}
+              min="1"
+              max="20"
+              className="control-input"
+            />
+          </div>
+
+          {/* Difficulty */}
+          <div className="control-group">
+            <label className="control-label">Difficulty</label>
+            <select
+              name="difficulty"
+              value={encounterParams.difficulty}
+              onChange={handleParamChange}
+              className="control-input"
+            >
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+              <option value="deadly">Deadly</option>
+            </select>
+          </div>
+
+          {/* Environment */}
+          <div className="control-group">
+            <label className="control-label">Environment</label>
+            <select
+              name="environment"
+              value={encounterParams.environment}
+              onChange={handleParamChange}
+              className="control-input"
+            >
+              <option value="plains">Plains</option>
+              <option value="forest">Forest</option>
+              <option value="hills">Hills</option>
+              <option value="mountain">Mountain</option>
+              <option value="marsh">Marsh</option>
+              <option value="desert">Desert</option>
+            </select>
+          </div>
+
+          {/* Location */}
+          <div className="control-group">
+            <label className="control-label">Location</label>
+            <select
+              name="location"
+              value={encounterParams.location}
+              onChange={handleParamChange}
+              className="control-input"
+            >
+              <option value="underground">Underground</option>
+              <option value="aquatic">Aquatic</option>
+              <option value="underdark">Underdark</option>
+              <option value="abyss">Abyss</option>
+              <option value="nine_hells">Nine Hells</option>
+              <option value="gehenna">Gehenna</option>
+            </select>
+          </div>
+
+          {/* Monster Count Range */}
+          <div className="control-group">
+            <label className="control-label">Min Monsters</label>
+            <input
+              type="number"
+              name="minMonsters"
+              value={encounterParams.minMonsters}
+              onChange={handleParamChange}
+              min="1"
+              className="control-input"
+            />
+          </div>
+
+          <div className="control-group">
+            <label className="control-label">Max Monsters</label>
+            <input
+              type="number"
+              name="maxMonsters"
+              value={encounterParams.maxMonsters}
+              onChange={handleParamChange}
+              min="1"
+              className="control-input"
+            />
+          </div>
+
+          {/* Mixed Types Toggle */}
+          <div className="control-group checkbox-group">
+            <input
+              type="checkbox"
+              name="mixedTypes"
+              checked={encounterParams.mixedTypes}
+              onChange={handleParamChange}
+              className="checkbox-input"
+            />
+            <label className="control-label">Allow Mixed Monster Types</label>
+          </div>
+
+          {/* Show Monsters Toggle */}
+          <div className="control-group checkbox-group">
+            <input
+              type="checkbox"
+              name="showMonsters"
+              checked={encounterParams.showMonsters}
+              onChange={handleParamChange}
+              className="checkbox-input"
+            />
+            <label className="control-label">Show Monster Details</label>
+          </div>
         </div>
 
-        {/* Difficulty */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Difficulty</label>
-          <select
-            name="difficulty"
-            value={encounterParams.difficulty}
-            onChange={handleParamChange}
-            className="w-full p-2 border rounded"
-          >
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-            <option value="deadly">Deadly</option>
-          </select>
-        </div>
+        <button
+          onClick={generateEncounter}
+          disabled={loading || fetchingMonsters}
+          className="generate-button"
+        >
+          {loading ? "Generating..." : "Generate Encounter"}
+        </button>
 
-        {/* Environment */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Environment</label>
-          <select
-            name="environment"
-            value={encounterParams.environment}
-            onChange={handleParamChange}
-            className="w-full p-2 border rounded"
-          >
-            <option value="plains">Plains</option>
-            <option value="forest">Forest</option>
-            <option value="hills">Hills</option>
-            <option value="mountain">Mountain</option>
-            <option value="marsh">Marsh</option>
-            <option value="desert">Desert</option>
-          </select>
-        </div>
-
-        {/* Location */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Location</label>
-          <select
-            name="location"
-            value={encounterParams.location}
-            onChange={handleParamChange}
-            className="w-full p-2 border rounded"
-          >
-            <option value="underground">Underground</option>
-            <option value="aquatic">Aquatic</option>
-            <option value="underdark">Underdark</option>
-            <option value="abyss">Abyss</option>
-            <option value="nine_hells">Nine Hells</option>
-            <option value="gehenna">Gehenna</option>
-          </select>
-        </div>
-
-        {/* Monster Count Range */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Min Monsters</label>
-          <input
-            type="number"
-            name="minMonsters"
-            value={encounterParams.minMonsters}
-            onChange={handleParamChange}
-            min="1"
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Max Monsters</label>
-          <input
-            type="number"
-            name="maxMonsters"
-            value={encounterParams.maxMonsters}
-            onChange={handleParamChange}
-            min="1"
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* Mixed Types Toggle */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            name="mixedTypes"
-            checked={encounterParams.mixedTypes}
-            onChange={handleParamChange}
-            className="mr-2"
-          />
-          <label className="text-sm font-medium">
-            Allow Mixed Monster Types
-          </label>
-        </div>
-
-        {/* Show Monsters Toggle */}
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            name="showMonsters"
-            checked={encounterParams.showMonsters}
-            onChange={handleParamChange}
-            className="mr-2"
-          />
-          <label className="text-sm font-medium">Show Monster Details</label>
-        </div>
+        {/* Results Section */}
+        {generatedEncounter && (
+          <div className="results-section">
+            <h2 className="results-title">Generated Encounter</h2>
+            <div className="results-info">
+              <p>
+                Environment: {generatedEncounter.environment} | Location:{" "}
+                {generatedEncounter.location}
+              </p>
+              <p>
+                Total Challenge Rating: {generatedEncounter.totalCR.toFixed(1)}
+              </p>
+            </div>
+            <div className="monster-list">
+              {generatedEncounter.monsters.map((monster, index) => (
+                <MonsterCard key={index} monster={monster} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-
-      <button
-        onClick={generateEncounter}
-        disabled={loading || fetchingMonsters}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300"
-      >
-        {loading ? "Generating..." : "Generate Encounter"}
-      </button>
-
-      {/* Results Section */}
-      {generatedEncounter && (
-        <div className="mt-6 p-4 border rounded bg-gray-50">
-          <h2 className="text-xl font-bold mb-4">Generated Encounter</h2>
-          <div className="mb-4">
-            <p className="text-sm text-gray-600">
-              Environment: {generatedEncounter.environment} | Location:{" "}
-              {generatedEncounter.location}
-            </p>
-            <p className="text-sm text-gray-600">
-              Total Challenge Rating: {generatedEncounter.totalCR.toFixed(1)}
-            </p>
-          </div>
-          <div className="space-y-4">
-            {generatedEncounter.monsters.map((monster, index) => (
-              <MonsterCard key={index} monster={monster} />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
