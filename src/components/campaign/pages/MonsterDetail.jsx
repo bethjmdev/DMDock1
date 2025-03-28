@@ -2,14 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./MonsterDetail.css";
+import { useAuth } from "../../auth/AuthContext";
+import { db } from "../../../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 const MonsterDetail = () => {
   const { monsterId, campaignId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [monster, setMonster] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchMonsterDetails = async () => {
@@ -29,9 +34,33 @@ const MonsterDetail = () => {
   }, [monsterId]);
 
   const handleBack = () => {
-    navigate(`/campaign/${campaignId}/monsterslist`, {
-      state: { previousPage: location.state?.previousPage || 1 },
-    });
+    navigate(`/campaign/${campaignId}/monster`);
+  };
+
+  const handleSaveMonster = async () => {
+    if (!monster || !campaignId) {
+      alert("Unable to save monster: Missing required data");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const monsterData = {
+        ...monster,
+        campaignId: campaignId,
+        dm: currentUser.uid,
+        createdAt: new Date().toISOString(),
+      };
+
+      const docRef = await addDoc(collection(db, "Monsters"), monsterData);
+      alert("Monster saved successfully!");
+      navigate(`/campaign/${campaignId}/monster`);
+    } catch (error) {
+      console.error("Error saving monster:", error);
+      alert("Failed to save monster: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (loading)
@@ -51,6 +80,13 @@ const MonsterDetail = () => {
             ← Back to Monster List
           </button>
           <h1 className="monster-detail-title">{monster.name}</h1>
+          <button
+            onClick={handleSaveMonster}
+            disabled={isSaving}
+            className="save-button"
+          >
+            {isSaving ? "Saving..." : "Save to Campaign"}
+          </button>
         </div>
 
         <div className="stat-grid">

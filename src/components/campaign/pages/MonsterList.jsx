@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "./MonsterList.css";
 import "./Players.css";
@@ -8,6 +8,7 @@ const CACHE_KEY = "dnd_monsters_cache";
 const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 2 weeks in milliseconds
 
 const MonsterList = () => {
+  const { campaignId } = useParams();
   const navigate = useNavigate();
   const [monsters, setMonsters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,7 +77,7 @@ const MonsterList = () => {
   const totalPages = Math.ceil(monsters.length / monstersPerPage);
 
   const handleMonsterClick = (monsterIndex) => {
-    navigate(`/monsters/${monsterIndex}`, {
+    navigate(`/campaign/${campaignId}/monsters/${monsterIndex}`, {
       state: { previousPage: currentPage },
     });
   };

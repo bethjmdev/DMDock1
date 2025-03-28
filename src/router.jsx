@@ -181,12 +181,8 @@ const AppRouter = () => {
       />
 
       <Route
-        path="/monsters/:monsterId"
-        element={
-          <ProtectedRoute>
-            <MonsterDetail />
-          </ProtectedRoute>
-        }
+        path="/campaign/:campaignId/monsters/:monsterId"
+        element={<MonsterDetail />}
       />
 
       <Route
