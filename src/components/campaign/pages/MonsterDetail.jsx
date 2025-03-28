@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import "./MonsterDetail.css";
 
 const MonsterDetail = () => {
   const { monsterId } = useParams();
@@ -25,104 +26,113 @@ const MonsterDetail = () => {
     fetchMonsterDetails();
   }, [monsterId]);
 
-  if (loading) return <div className="p-4">Loading...</div>;
-  if (error) return <div className="p-4 text-red-500">{error}</div>;
-  if (!monster) return <div className="p-4">Monster not found</div>;
+  if (loading)
+    return <div className="monster-detail-container">Loading...</div>;
+  if (error)
+    return (
+      <div className="monster-detail-container error-message">{error}</div>
+    );
+  if (!monster)
+    return <div className="monster-detail-container">Monster not found</div>;
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">{monster.name}</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-          <div className="space-y-2">
-            <p>
-              <span className="font-medium">Size:</span> {monster.size}
-            </p>
-            <p>
-              <span className="font-medium">Type:</span> {monster.type}
-            </p>
-            <p>
-              <span className="font-medium">Alignment:</span>{" "}
-              {monster.alignment}
-            </p>
-            <p>
-              <span className="font-medium">Challenge Rating:</span>{" "}
-              {monster.challenge_rating} (XP: {monster.xp})
-            </p>
-            <p>
-              <span className="font-medium">Armor Class:</span>{" "}
-              {monster.armor_class[0].value} ({monster.armor_class[0].type})
-            </p>
-            <p>
-              <span className="font-medium">Hit Points:</span>{" "}
-              {monster.hit_points} ({monster.hit_points_roll})
-            </p>
-          </div>
+    <div className="monster-detail-container">
+      <div className="monster-detail-content">
+        <div className="monster-detail-header">
+          <h1 className="monster-detail-title">{monster.name}</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Abilities</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <span className="font-medium">STR:</span> {monster.strength}
-            </div>
-            <div>
-              <span className="font-medium">DEX:</span> {monster.dexterity}
-            </div>
-            <div>
-              <span className="font-medium">CON:</span> {monster.constitution}
-            </div>
-            <div>
-              <span className="font-medium">INT:</span> {monster.intelligence}
-            </div>
-            <div>
-              <span className="font-medium">WIS:</span> {monster.wisdom}
-            </div>
-            <div>
-              <span className="font-medium">CHA:</span> {monster.charisma}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Special Abilities</h2>
-          <div className="space-y-4">
-            {monster.special_abilities.map((ability, index) => (
-              <div key={index}>
-                <h3 className="font-medium">{ability.name}</h3>
-                <p className="text-gray-600">{ability.desc}</p>
+        <div className="stat-grid">
+          <div className="stat-block">
+            <h2 className="stat-block-title">Basic Information</h2>
+            <div className="stat-list">
+              <div className="stat-item">
+                <span className="stat-label">Size:</span> {monster.size}
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Actions</h2>
-          <div className="space-y-4">
-            {monster.actions.map((action, index) => (
-              <div key={index}>
-                <h3 className="font-medium">{action.name}</h3>
-                <p className="text-gray-600">{action.desc}</p>
+              <div className="stat-item">
+                <span className="stat-label">Type:</span> {monster.type}
               </div>
-            ))}
+              <div className="stat-item">
+                <span className="stat-label">Alignment:</span>{" "}
+                {monster.alignment}
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Challenge Rating:</span>{" "}
+                {monster.challenge_rating} (XP: {monster.xp})
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Armor Class:</span>{" "}
+                {monster.armor_class[0].value} ({monster.armor_class[0].type})
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Hit Points:</span>{" "}
+                {monster.hit_points} ({monster.hit_points_roll})
+              </div>
+            </div>
           </div>
-        </div>
 
-        {monster.legendary_actions && (
-          <div className="bg-white rounded-lg shadow-md p-6 md:col-span-2">
-            <h2 className="text-xl font-semibold mb-4">Legendary Actions</h2>
-            <div className="space-y-4">
-              {monster.legendary_actions.map((action, index) => (
-                <div key={index}>
-                  <h3 className="font-medium">{action.name}</h3>
-                  <p className="text-gray-600">{action.desc}</p>
+          <div className="stat-block">
+            <h2 className="stat-block-title">Abilities</h2>
+            <div className="ability-grid">
+              <div className="stat-item">
+                <span className="stat-label">STR:</span> {monster.strength}
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">DEX:</span> {monster.dexterity}
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">CON:</span> {monster.constitution}
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">INT:</span> {monster.intelligence}
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">WIS:</span> {monster.wisdom}
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">CHA:</span> {monster.charisma}
+              </div>
+            </div>
+          </div>
+
+          <div className="stat-block">
+            <h2 className="stat-block-title">Special Abilities</h2>
+            <div className="stat-list">
+              {monster.special_abilities.map((ability, index) => (
+                <div key={index} className="ability-block">
+                  <h3 className="ability-name">{ability.name}</h3>
+                  <p className="ability-description">{ability.desc}</p>
                 </div>
               ))}
             </div>
           </div>
-        )}
+
+          <div className="stat-block">
+            <h2 className="stat-block-title">Actions</h2>
+            <div className="stat-list">
+              {monster.actions.map((action, index) => (
+                <div key={index} className="ability-block">
+                  <h3 className="ability-name">{action.name}</h3>
+                  <p className="ability-description">{action.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {monster.legendary_actions && (
+            <div className="stat-block legendary-actions">
+              <h2 className="stat-block-title">Legendary Actions</h2>
+              <div className="stat-list">
+                {monster.legendary_actions.map((action, index) => (
+                  <div key={index} className="ability-block">
+                    <h3 className="ability-name">{action.name}</h3>
+                    <p className="ability-description">{action.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
