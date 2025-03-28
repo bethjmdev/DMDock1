@@ -68,6 +68,16 @@ const MonsterDetail = () => {
                 <span className="stat-label">Hit Points:</span>{" "}
                 {monster.hit_points} ({monster.hit_points_roll})
               </div>
+              <div className="stat-item">
+                <span className="stat-label">Speed:</span>{" "}
+                {Object.entries(monster.speed)
+                  .map(([type, value]) => `${type}: ${value}`)
+                  .join(", ")}
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Languages:</span>{" "}
+                {monster.languages}
+              </div>
             </div>
           </div>
 
@@ -96,12 +106,65 @@ const MonsterDetail = () => {
           </div>
 
           <div className="stat-block">
+            <h2 className="stat-block-title">Proficiencies</h2>
+            <div className="stat-list">
+              {monster.proficiencies.map((prof, index) => (
+                <div key={index} className="stat-item">
+                  <span className="stat-label">{prof.proficiency.name}:</span> +
+                  {prof.value}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="stat-block">
+            <h2 className="stat-block-title">Senses & Resistances</h2>
+            <div className="stat-list">
+              <div className="stat-item">
+                <span className="stat-label">Senses:</span>{" "}
+                {Object.entries(monster.senses)
+                  .map(([sense, value]) => `${sense}: ${value}`)
+                  .join(", ")}
+              </div>
+              {monster.damage_vulnerabilities.length > 0 && (
+                <div className="stat-item">
+                  <span className="stat-label">Damage Vulnerabilities:</span>{" "}
+                  {monster.damage_vulnerabilities.join(", ")}
+                </div>
+              )}
+              {monster.damage_resistances.length > 0 && (
+                <div className="stat-item">
+                  <span className="stat-label">Damage Resistances:</span>{" "}
+                  {monster.damage_resistances.join(", ")}
+                </div>
+              )}
+              {monster.damage_immunities.length > 0 && (
+                <div className="stat-item">
+                  <span className="stat-label">Damage Immunities:</span>{" "}
+                  {monster.damage_immunities.join(", ")}
+                </div>
+              )}
+              {monster.condition_immunities.length > 0 && (
+                <div className="stat-item">
+                  <span className="stat-label">Condition Immunities:</span>{" "}
+                  {monster.condition_immunities.join(", ")}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="stat-block">
             <h2 className="stat-block-title">Special Abilities</h2>
             <div className="stat-list">
               {monster.special_abilities.map((ability, index) => (
                 <div key={index} className="ability-block">
                   <h3 className="ability-name">{ability.name}</h3>
                   <p className="ability-description">{ability.desc}</p>
+                  {ability.dc && (
+                    <p className="ability-dc">
+                      DC: {ability.dc.dc_value} ({ability.dc.dc_type.name})
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -114,6 +177,29 @@ const MonsterDetail = () => {
                 <div key={index} className="ability-block">
                   <h3 className="ability-name">{action.name}</h3>
                   <p className="ability-description">{action.desc}</p>
+                  {action.attack_bonus && (
+                    <p className="ability-attack">
+                      Attack Bonus: +{action.attack_bonus}
+                    </p>
+                  )}
+                  {action.dc && (
+                    <p className="ability-dc">
+                      DC: {action.dc.dc_value} ({action.dc.dc_type.name})
+                    </p>
+                  )}
+                  {action.damage && (
+                    <p className="ability-damage">
+                      Damage:{" "}
+                      {action.damage
+                        .map((d) => `${d.damage_dice} ${d.damage_type.name}`)
+                        .join(", ")}
+                    </p>
+                  )}
+                  {action.usage && (
+                    <p className="ability-usage">
+                      Usage: {action.usage.times} times {action.usage.type}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -127,6 +213,19 @@ const MonsterDetail = () => {
                   <div key={index} className="ability-block">
                     <h3 className="ability-name">{action.name}</h3>
                     <p className="ability-description">{action.desc}</p>
+                    {action.attack_bonus && (
+                      <p className="ability-attack">
+                        Attack Bonus: +{action.attack_bonus}
+                      </p>
+                    )}
+                    {action.damage && (
+                      <p className="ability-damage">
+                        Damage:{" "}
+                        {action.damage
+                          .map((d) => `${d.damage_dice} ${d.damage_type.name}`)
+                          .join(", ")}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
