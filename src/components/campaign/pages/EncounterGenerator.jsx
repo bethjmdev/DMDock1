@@ -317,6 +317,19 @@ const EncounterGenerator = () => {
       if (value === null || value === undefined) return "N/A";
       if (typeof value === "string") return value;
       if (typeof value === "number") return value.toString();
+      if (Array.isArray(value)) {
+        // Handle armor_class array format
+        if (value.length > 0 && value[0].type === "dex") {
+          return value[0].value.toString();
+        }
+        return value
+          .map((item) =>
+            typeof item === "object" && item.value
+              ? item.value
+              : JSON.stringify(item)
+          )
+          .join(", ");
+      }
       if (typeof value === "object") {
         if (value.value) return value.value;
         return JSON.stringify(value);
