@@ -15,48 +15,46 @@ const StatBlock = ({ npc }) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="ability-score">
-          <h4 className="font-bold">STR</h4>
-          <p className="text-lg">{npc.ability_scores.strength}</p>
-          <p className="text-sm text-gray-600">
+      <div className="player-stats grid grid-cols-3 gap-4 mb-4">
+        <div className="text-gray-800">
+          <span className="font-medium">STR:</span>{" "}
+          {npc.ability_scores.strength}
+          <span className="text-sm text-gray-600">
             ({calculateModifier(npc.ability_scores.strength)})
-          </p>
+          </span>
         </div>
-        <div className="ability-score">
-          <h4 className="font-bold">DEX</h4>
-          <p className="text-lg">{npc.ability_scores.dexterity}</p>
-          <p className="text-sm text-gray-600">
+        <div className="text-gray-800">
+          <span className="font-medium">DEX:</span>{" "}
+          {npc.ability_scores.dexterity}
+          <span className="text-sm text-gray-600">
             ({calculateModifier(npc.ability_scores.dexterity)})
-          </p>
+          </span>
         </div>
-        <div className="ability-score">
-          <h4 className="font-bold">CON</h4>
-          <p className="text-lg">{npc.ability_scores.con}</p>
-          <p className="text-sm text-gray-600">
+        <div className="text-gray-800">
+          <span className="font-medium">CON:</span> {npc.ability_scores.con}
+          <span className="text-sm text-gray-600">
             ({calculateModifier(npc.ability_scores.con)})
-          </p>
+          </span>
         </div>
-        <div className="ability-score">
-          <h4 className="font-bold">INT</h4>
-          <p className="text-lg">{npc.ability_scores.intellect}</p>
-          <p className="text-sm text-gray-600">
+        <div className="text-gray-800">
+          <span className="font-medium">INT:</span>{" "}
+          {npc.ability_scores.intellect}
+          <span className="text-sm text-gray-600">
             ({calculateModifier(npc.ability_scores.intellect)})
-          </p>
+          </span>
         </div>
-        <div className="ability-score">
-          <h4 className="font-bold">WIS</h4>
-          <p className="text-lg">{npc.ability_scores.wisdom}</p>
-          <p className="text-sm text-gray-600">
+        <div className="text-gray-800">
+          <span className="font-medium">WIS:</span> {npc.ability_scores.wisdom}
+          <span className="text-sm text-gray-600">
             ({calculateModifier(npc.ability_scores.wisdom)})
-          </p>
+          </span>
         </div>
-        <div className="ability-score">
-          <h4 className="font-bold">CHA</h4>
-          <p className="text-lg">{npc.ability_scores.charisma}</p>
-          <p className="text-sm text-gray-600">
+        <div className="text-gray-800">
+          <span className="font-medium">CHA:</span>{" "}
+          {npc.ability_scores.charisma}
+          <span className="text-sm text-gray-600">
             ({calculateModifier(npc.ability_scores.charisma)})
-          </p>
+          </span>
         </div>
       </div>
 
