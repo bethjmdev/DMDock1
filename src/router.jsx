@@ -39,6 +39,8 @@ import ViewEncounter from "./components/campaign/pages/ViewEncounter";
 import CreateEncounterNote from "./components/campaign/encounter/CreateEncounterNote";
 
 import CustomCalendar from "./components/campaign/weather/CustomCalendar";
+import ViewNPC from "./components/campaign/npc/ViewNPC";
+import CreateNPCNote from "./components/campaign/npc/CreateNPCNote";
 
 const AppRouter = () => {
   const { currentUser } = useAuth();
@@ -128,7 +130,7 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/npc-generator"
+        path="/campaign/:campaignId/npc-generator"
         element={
           <ProtectedRoute>
             <NPCGenerator />
@@ -235,6 +237,11 @@ const AppRouter = () => {
             <CreateEncounterNote />
           </ProtectedRoute>
         }
+      />
+      <Route path="/campaign/:campaignId/npcs/:npcId" element={<ViewNPC />} />
+      <Route
+        path="/campaign/:campaignId/npcs/:npcId/add-note"
+        element={<CreateNPCNote />}
       />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
     </Routes>

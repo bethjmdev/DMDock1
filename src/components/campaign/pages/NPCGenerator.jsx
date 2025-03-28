@@ -5,8 +5,34 @@ import { fantasyNames } from "../data/names";
 import { personalityTraits, deities } from "../data/traits";
 import { physicalDescriptions } from "../data/physical";
 import { races, alignments, occupations } from "../data/races";
+import { useParams, useNavigate } from "react-router-dom";
+import { addDoc, collection } from "firebase/firestore";
+import { db, auth } from "../../../firebase";
+
+const styles = `
+.save-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.save-button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+`;
 
 const NPCGenerator = () => {
+  const { campaignId } = useParams();
   const [formData, setFormData] = useState({
     race: "",
     sex: "",
@@ -15,6 +41,8 @@ const NPCGenerator = () => {
   });
 
   const [generatedNPC, setGeneratedNPC] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
 
   const pronouns = {
     Male: {
@@ -248,6 +276,52 @@ const NPCGenerator = () => {
     setGeneratedNPC(npc);
   };
 
+  const handleSaveNPC = async () => {
+    if (!generatedNPC || !campaignId) return;
+
+    const npcName = prompt("Enter a name for this NPC:");
+    if (!npcName) return;
+
+    setIsSaving(true);
+    try {
+      const npcData = {
+        name: npcName,
+        campaignId: campaignId,
+        dm: auth.currentUser.uid,
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+        notes: "",
+        race: generatedNPC.race,
+        sex: generatedNPC.sex,
+        alignment: generatedNPC.alignment,
+        occupation: generatedNPC.occupation,
+        description: generatedNPC.physical_description.join(" "),
+        personality_traits: generatedNPC.personality_traits,
+        ability_scores: {
+          strength: String(generatedNPC.ability_scores.strength),
+          dexterity: String(generatedNPC.ability_scores.dexterity),
+          con: String(generatedNPC.ability_scores.con),
+          intellect: String(generatedNPC.ability_scores.intellect),
+          wisdom: String(generatedNPC.ability_scores.wisdom),
+          charisma: String(generatedNPC.ability_scores.charisma),
+        },
+        relationships: {
+          rel_status: "unknown",
+          sexual_orientation: "unknown",
+        },
+      };
+
+      const docRef = await addDoc(collection(db, "NPC"), npcData);
+      alert("NPC saved successfully!");
+      navigate(`/campaign/${campaignId}/npc`);
+    } catch (error) {
+      console.error("Error saving NPC:", error);
+      alert("Failed to save NPC: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="npc-generator-container">
       <div className="npc-generator-content">
@@ -342,6 +416,14 @@ const NPCGenerator = () => {
         {generatedNPC && (
           <div className="npc-display">
             <StatBlock npc={generatedNPC} />
+            <button
+              onClick={handleSaveNPC}
+              disabled={isSaving}
+              className="save-button"
+              style={{ marginTop: "1rem", width: "100%" }}
+            >
+              {isSaving ? "Saving..." : "Save NPC"}
+            </button>
           </div>
         )}
       </div>

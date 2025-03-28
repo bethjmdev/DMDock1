@@ -18,15 +18,29 @@ const NPC = () => {
         const NPCsRef = collection(db, "NPC");
         const q = query(
           NPCsRef,
-          where("campaign_id", "==", campaignId),
+          where("campaignId", "==", campaignId),
           where("dm", "==", currentUser.uid)
         );
 
         const querySnapshot = await getDocs(q);
-        const NPCsList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const NPCsList = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            ability_scores: {
+              strength: data.ability_scores?.strength || "0",
+              dexterity: data.ability_scores?.dexterity || "0",
+              con: data.ability_scores?.con || "0",
+              intellect: data.ability_scores?.intellect || "0",
+              wisdom: data.ability_scores?.wisdom || "0",
+              charisma: data.ability_scores?.charisma || "0",
+            },
+            personality_traits: Array.isArray(data.personality_traits)
+              ? data.personality_traits.join(", ")
+              : data.personality_traits || "",
+          };
+        });
 
         setNPCs(NPCsList);
       } catch (error) {

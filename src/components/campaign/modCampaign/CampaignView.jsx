@@ -333,7 +333,7 @@ const CampaignView = () => {
       path: `/campaign/${campaignId}/encounter-generator`,
     },
     { title: "Town Generator", path: "/campaign/town" },
-    { title: "NPC Generator", path: "/campaign/npc-generator" },
+    { title: "NPC Generator", path: `/campaign/${campaignId}/npc-generator` },
     {
       title: "Change Date",
       path: `/campaign/${campaignId}/date`,
