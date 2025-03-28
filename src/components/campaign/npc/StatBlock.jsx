@@ -7,70 +7,71 @@ const StatBlock = ({ npc }) => {
   };
 
   return (
-    <div className="stat-block bg-white p-4 rounded-lg shadow-md">
-      <div className="border-b-2 border-gray-800 mb-4">
-        <h3 className="text-xl font-bold text-center">{npc.name}</h3>
-        <p className="text-center text-gray-600">
+    <div className="stat-block">
+      <div className="stat-block-header">
+        <h3 className="stat-block-title">{npc.name}</h3>
+        <p className="stat-block-subtitle">
           {npc.race} • {npc.sex} • {npc.alignment} • {npc.occupation}
         </p>
       </div>
 
-      <div className="player-stats grid grid-cols-3 gap-4 mb-4">
-        <div className="text-gray-800">
-          <span className="font-medium">STR:</span>{" "}
+      <div className="ability-scores-grid">
+        <div className="ability-score">
+          <span className="ability-label">STR:</span>{" "}
           {npc.ability_scores.strength}
-          <span className="text-sm text-gray-600">
+          <span className="ability-modifier">
             ({calculateModifier(npc.ability_scores.strength)})
           </span>
         </div>
-        <div className="text-gray-800">
-          <span className="font-medium">DEX:</span>{" "}
+        <div className="ability-score">
+          <span className="ability-label">DEX:</span>{" "}
           {npc.ability_scores.dexterity}
-          <span className="text-sm text-gray-600">
+          <span className="ability-modifier">
             ({calculateModifier(npc.ability_scores.dexterity)})
           </span>
         </div>
-        <div className="text-gray-800">
-          <span className="font-medium">CON:</span> {npc.ability_scores.con}
-          <span className="text-sm text-gray-600">
+        <div className="ability-score">
+          <span className="ability-label">CON:</span> {npc.ability_scores.con}
+          <span className="ability-modifier">
             ({calculateModifier(npc.ability_scores.con)})
           </span>
         </div>
-        <div className="text-gray-800">
-          <span className="font-medium">INT:</span>{" "}
+        <div className="ability-score">
+          <span className="ability-label">INT:</span>{" "}
           {npc.ability_scores.intellect}
-          <span className="text-sm text-gray-600">
+          <span className="ability-modifier">
             ({calculateModifier(npc.ability_scores.intellect)})
           </span>
         </div>
-        <div className="text-gray-800">
-          <span className="font-medium">WIS:</span> {npc.ability_scores.wisdom}
-          <span className="text-sm text-gray-600">
+        <div className="ability-score">
+          <span className="ability-label">WIS:</span>{" "}
+          {npc.ability_scores.wisdom}
+          <span className="ability-modifier">
             ({calculateModifier(npc.ability_scores.wisdom)})
           </span>
         </div>
-        <div className="text-gray-800">
-          <span className="font-medium">CHA:</span>{" "}
+        <div className="ability-score">
+          <span className="ability-label">CHA:</span>{" "}
           {npc.ability_scores.charisma}
-          <span className="text-sm text-gray-600">
+          <span className="ability-modifier">
             ({calculateModifier(npc.ability_scores.charisma)})
           </span>
         </div>
       </div>
 
-      <div className="mt-6 border-t-2 border-gray-200 pt-4">
-        <h4 className="font-bold text-lg mb-2">Physical Description</h4>
-        <div className="space-y-2">
+      <div className="description-section">
+        <h4 className="section-title">Physical Description</h4>
+        <div className="description-content">
           {npc.physical_description.map((line, index) => (
-            <p key={index} className="text-gray-700">
+            <p key={index} className="description-text">
               {line}
             </p>
           ))}
         </div>
       </div>
 
-      <div className="mt-6 border-t-2 border-gray-200 pt-4">
-        <h4 className="font-bold text-lg mb-2">Personality & Beliefs</h4>
+      <div className="description-section">
+        <h4 className="section-title">Personality & Beliefs</h4>
         <PersonalityTraits traits={npc.personality_traits} />
       </div>
     </div>

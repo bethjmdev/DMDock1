@@ -250,107 +250,101 @@ const NPCGenerator = () => {
 
   return (
     <div className="npc-generator-container">
-      <div className="npc-generator-header">
-        <h2 className="text-2xl font-bold text-gray-800">NPC Generator</h2>
-      </div>
-
-      <div className="npc-generator-form">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700">
-                Race
-              </label>
-              <select
-                name="race"
-                value={formData.race}
-                onChange={handleChange}
-                className="form-select"
-                required
-              >
-                <option value="">Select a race</option>
-                <option value="random">Random</option>
-                {races.map((race) => (
-                  <option key={race} value={race}>
-                    {race}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700">
-                Sex
-              </label>
-              <select
-                name="sex"
-                value={formData.sex}
-                onChange={handleChange}
-                className="form-select"
-                required
-              >
-                <option value="">Select sex</option>
-                <option value="random">Random</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700">
-                Alignment
-              </label>
-              <select
-                name="alignment"
-                value={formData.alignment}
-                onChange={handleChange}
-                className="form-select"
-                required
-              >
-                <option value="">Select alignment</option>
-                <option value="random">Random</option>
-                {alignments.map((alignment) => (
-                  <option key={alignment} value={alignment}>
-                    {alignment}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="block text-sm font-medium text-gray-700">
-                Occupation
-              </label>
-              <select
-                name="occupation"
-                value={formData.occupation}
-                onChange={handleChange}
-                className="form-select"
-                required
-              >
-                <option value="">Select occupation</option>
-                <option value="random">Random</option>
-                {occupations.map((occupation) => (
-                  <option key={occupation} value={occupation}>
-                    {occupation}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <button type="submit" className="generate-button">
-            Generate NPC
-          </button>
-        </form>
-      </div>
-
-      {generatedNPC && (
-        <div className="npc-display">
-          <StatBlock npc={generatedNPC} />
+      <div className="npc-generator-content">
+        <div className="npc-generator-header">
+          <h2 className="npc-generator-title">NPC Generator</h2>
         </div>
-      )}
+
+        <div className="npc-generator-form">
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">Race</label>
+                <select
+                  name="race"
+                  value={formData.race}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select a race</option>
+                  <option value="random">Random</option>
+                  {races.map((race) => (
+                    <option key={race} value={race}>
+                      {race}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Sex</label>
+                <select
+                  name="sex"
+                  value={formData.sex}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select sex</option>
+                  <option value="random">Random</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Alignment</label>
+                <select
+                  name="alignment"
+                  value={formData.alignment}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select alignment</option>
+                  <option value="random">Random</option>
+                  {alignments.map((alignment) => (
+                    <option key={alignment} value={alignment}>
+                      {alignment}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Occupation</label>
+                <select
+                  name="occupation"
+                  value={formData.occupation}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select occupation</option>
+                  <option value="random">Random</option>
+                  {occupations.map((occupation) => (
+                    <option key={occupation} value={occupation}>
+                      {occupation}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" className="generate-button">
+              Generate NPC
+            </button>
+          </form>
+        </div>
+
+        {generatedNPC && (
+          <div className="npc-display">
+            <StatBlock npc={generatedNPC} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
