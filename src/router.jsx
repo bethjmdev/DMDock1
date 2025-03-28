@@ -22,6 +22,7 @@ import AddNPCForm from "./components/campaign/npc/AddNPCForm";
 import Monster from "./components/campaign/pages/Monster";
 import EditMonster from "./components/campaign/monster/EditMonster";
 import AddMonster from "./components/campaign/monster/AddMonster";
+import MonsterDetail from "./components/campaign/pages/MonsterDetail";
 
 import WeatherGenerator from "./components/campaign/pages/WeatherGenerator";
 import EncounterGenerator from "./components/campaign/pages/EncounterGenerator";
@@ -156,14 +157,7 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/campaign/monsterslist"
-        element={
-          <ProtectedRoute>
-            <MonsterList />
-          </ProtectedRoute>
-        }
-      />
+
       <Route
         path="/campaign/:campaignId/notes"
         element={
@@ -172,6 +166,25 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/campaign/:campaignId/monsterslist"
+        element={
+          <ProtectedRoute>
+            <MonsterList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/monsters/:monsterId"
+        element={
+          <ProtectedRoute>
+            <MonsterDetail />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/campaign/:campaignId/notes/create-note"
         element={

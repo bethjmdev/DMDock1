@@ -326,7 +326,7 @@ const CampaignView = () => {
     { title: "Monster", path: `/campaign/${campaignId}/monster` },
     { title: "Notes", path: `/campaign/${campaignId}/notes` },
     { title: "Spell Slot Tracker", path: "/campaign/spell-slots" },
-    { title: "List of Monsters", path: "/campaign/monsters" },
+    { title: "List of Monsters", path: `/campaign/${campaignId}/monsterslist` },
 
     { title: "Encounter Generator", path: "/campaign/encounter" },
     { title: "Town Generator", path: "/campaign/town" },
