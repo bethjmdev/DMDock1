@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const CACHE_KEY = "dnd_monsters_cache";
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
 const MonsterList = () => {
   const navigate = useNavigate();
   const [monsters, setMonsters] = useState([]);
@@ -13,6 +16,20 @@ const MonsterList = () => {
   useEffect(() => {
     const fetchMonsters = async () => {
       try {
+        // Check localStorage for cached data
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          const isExpired = Date.now() - timestamp > CACHE_DURATION;
+
+          if (!isExpired) {
+            setMonsters(data);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // If no cache or expired, fetch from API
         const response = await axios.get(
           "https://www.dnd5eapi.co/api/monsters"
         );
@@ -23,6 +40,16 @@ const MonsterList = () => {
           return monsterResponse.data;
         });
         const monsterData = await Promise.all(monsterPromises);
+
+        // Store in localStorage with timestamp
+        localStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({
+            data: monsterData,
+            timestamp: Date.now(),
+          })
+        );
+
         setMonsters(monsterData);
         setLoading(false);
       } catch (err) {
