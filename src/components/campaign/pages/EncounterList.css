@@ -1,0 +1,29 @@
+.encounter-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.encounter-footer {
+  margin-top: auto;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.created-at {
+  margin: 0;
+  font-style: italic;
+}
+
+.no-encounters {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2em;
+  color: #666;
+}

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./EncounterGenerator.css";
+import { useParams } from "react-router-dom";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { useAuth } from "../../../components/auth/AuthContext"; // Adjust path as needed
 
 const BATCH_SIZE = 40; // Number of monsters to fetch at once
 const CACHE_KEY = "dnd_monsters_cache";
 const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 2 weeks in milliseconds
 
 const EncounterGenerator = () => {
+  const { campaignId } = useParams();
+  const { currentUser } = useAuth();
   const [encounterParams, setEncounterParams] = useState({
     partyLevel: 1,
     difficulty: "random",
@@ -22,6 +27,9 @@ const EncounterGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [fetchingMonsters, setFetchingMonsters] = useState(false);
   const [monsterFetchError, setMonsterFetchError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const db = getFirestore();
 
   // Add these helper functions at the top of the component, after the state declarations
   const difficultyOptions = ["easy", "medium", "hard", "deadly"];
@@ -459,6 +467,62 @@ const EncounterGenerator = () => {
     );
   };
 
+  // Add this new function to handle saving
+  const saveEncounter = async () => {
+    if (!generatedEncounter) return;
+
+    // Prompt for encounter name
+    const encounterName = prompt("Please enter a name for this encounter:");
+
+    // Check if user cancelled the prompt or entered an empty name
+    if (!encounterName || encounterName.trim() === "") {
+      alert("Encounter name is required to save!");
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const timestamp = new Date();
+
+      const encounterData = {
+        name: encounterName.trim(), // Add the encounter name
+        campaignId,
+        userId: currentUser.uid,
+        createdAt: timestamp,
+        lastModified: timestamp,
+        // Save all encounter parameters
+        partyLevel: encounterParams.partyLevel,
+        difficulty: generatedEncounter.difficulty,
+        environment: generatedEncounter.environment,
+        location: generatedEncounter.location,
+        totalCR: generatedEncounter.totalCR,
+        // Save monster details
+        monsters: generatedEncounter.monsters.map((monster) => ({
+          name: monster.name,
+          challenge_rating: monster.challenge_rating,
+          type: monster.type,
+          size: monster.size,
+          alignment: monster.alignment,
+          armor_class: monster.armor_class,
+          hit_points: monster.hit_points,
+          actions: monster.actions || [],
+        })),
+      };
+
+      const docRef = await addDoc(collection(db, "Encounter"), encounterData);
+      console.log("Encounter saved with ID: ", docRef.id);
+
+      alert(`Encounter "${encounterName}" saved successfully!`);
+    } catch (error) {
+      console.error("Error saving encounter:", error);
+      setSaveError(error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="encounter-generator">
       <div className="encounter-container">
@@ -616,6 +680,18 @@ const EncounterGenerator = () => {
               <p>
                 Total Challenge Rating: {generatedEncounter.totalCR.toFixed(1)}
               </p>
+              <button
+                onClick={saveEncounter}
+                disabled={isSaving}
+                className="save-button"
+              >
+                {isSaving ? "Saving..." : "Save Encounter"}
+              </button>
+              {saveError && (
+                <p className="error-message">
+                  Error saving encounter: {saveError}
+                </p>
+              )}
             </div>
             <div className="monster-list">
               {generatedEncounter.monsters.map((monster, index) => (

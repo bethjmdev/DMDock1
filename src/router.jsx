@@ -35,6 +35,8 @@ import MonsterList from "./components/campaign/pages/MonsterList";
 import Notes from "./components/campaign/pages/Notes";
 import CreateNote from "./components/campaign/pages/CreateNote";
 import ViewNote from "./components/campaign/pages/ViewNote";
+import ViewEncounter from "./components/campaign/pages/ViewEncounter";
+import CreateEncounterNote from "./components/campaign/encounter/CreateEncounterNote";
 
 import CustomCalendar from "./components/campaign/weather/CustomCalendar";
 
@@ -217,6 +219,22 @@ const AppRouter = () => {
       <Route
         path="/campaign/:campaignId/monster/add"
         element={currentUser ? <AddMonster /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/campaign/:campaignId/encounters/:encounterId"
+        element={
+          <ProtectedRoute>
+            <ViewEncounter />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/encounters/:encounterId/add-note"
+        element={
+          <ProtectedRoute>
+            <CreateEncounterNote />
+          </ProtectedRoute>
+        }
       />
       <Route path="/" element={<Navigate to="/campaigns" replace />} />
     </Routes>
