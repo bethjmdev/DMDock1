@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./MonsterList.css";
+import "./Players.css";
 
 const CACHE_KEY = "dnd_monsters_cache";
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -74,60 +76,90 @@ const MonsterList = () => {
     navigate(`/monsters/${monsterIndex}`);
   };
 
-  if (loading) return <div className="p-4">Loading...</div>;
-  if (error) return <div className="p-4 text-red-500">{error}</div>;
-
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">List of Monsters</h1>
+    <div className="players-container">
+      <div className="players-header">
+        <h2 className="monster-title">List of Monsters</h2>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentMonsters.map((monster) => (
-          <div
-            key={monster.index}
-            className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => handleMonsterClick(monster.index)}
-          >
-            <h2 className="text-xl font-semibold mb-2 text-blue-600 hover:text-blue-800">
-              {monster.name}
-            </h2>
-            <div className="space-y-1 text-gray-600">
-              <p>
-                <span className="font-medium">Size:</span> {monster.size}
-              </p>
-              <p>
-                <span className="font-medium">Type:</span> {monster.type}
-              </p>
-              <p>
-                <span className="font-medium">CR:</span>{" "}
-                {monster.challenge_rating}
-              </p>
-            </div>
+      {loading ? (
+        <h2 className="loading-text">Loading Monsters...</h2>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        <>
+          <div className="players-grid">
+            {currentMonsters.map((monster) => (
+              <div
+                key={monster.index}
+                className="player-card monster-card"
+                onClick={() => handleMonsterClick(monster.index)}
+              >
+                <div className="player-header">
+                  <div>
+                    <h3 className="monster-name">{monster.name}</h3>
+                    <p className="monster-type">
+                      {monster.size} {monster.type}
+                    </p>
+                  </div>
+                  <div className="monster-cr">
+                    <p>CR: {monster.challenge_rating}</p>
+                  </div>
+                </div>
+                <div className="player-stats">
+                  <div className="stat-item">
+                    <span className="stat-label">STR:</span> {monster.strength}
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">DEX:</span> {monster.dexterity}
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">CON:</span>{" "}
+                    {monster.constitution}
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">INT:</span>{" "}
+                    {monster.intelligence}
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">WIS:</span> {monster.wisdom}
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">CHA:</span> {monster.charisma}
+                  </div>
+                </div>
+                <div className="monster-footer">
+                  <span className="stat-label">HP:</span> {monster.hit_points}
+                  <span className="stat-label stat-spacer">AC:</span>{" "}
+                  {monster.armor_class[0].value}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <div className="mt-6 flex justify-center space-x-2">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <span className="px-4 py-2">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
-        >
-          Next
-        </button>
-      </div>
+          <div className="pagination">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="pagination-button"
+            >
+              Previous
+            </button>
+            <span className="page-info">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="pagination-button"
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
