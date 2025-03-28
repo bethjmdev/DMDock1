@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./TownGenerator.css";
 
 const TownGenerator = () => {
   const [townData, setTownData] = useState(null);
@@ -823,161 +824,155 @@ const TownGenerator = () => {
   };
 
   return (
-    <div
-      className="p-4"
-      style={{ textAlign: "left", margin: "0 auto", maxWidth: "1200px" }}
-    >
-      <h1 className="text-2xl font-bold mb-4">Town Generator</h1>
+    <div className="town-generator">
+      <div className="town-container">
+        <h1 className="town-title">Town Generator</h1>
 
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-2">Town Parameters</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block mb-1">Size:</label>
-            <select
-              className="w-full p-2 border rounded"
-              value={formData.size}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, size: e.target.value }))
-              }
-            >
-              <option value="random">Random</option>
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </div>
+        <div className="parameters-section">
+          <h2 className="parameters-title">Town Parameters</h2>
+          <div className="parameters-grid">
+            <div className="parameter-group">
+              <label className="parameter-label">Size:</label>
+              <select
+                className="parameter-input"
+                value={formData.size}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, size: e.target.value }))
+                }
+              >
+                <option value="random">Random</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block mb-1">Population:</label>
-            <select
-              className="w-full p-2 border rounded"
-              value={formData.population}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, population: e.target.value }))
-              }
-            >
-              <option value="random">Random</option>
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </div>
+            <div className="parameter-group">
+              <label className="parameter-label">Population:</label>
+              <select
+                className="parameter-input"
+                value={formData.population}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    population: e.target.value,
+                  }))
+                }
+              >
+                <option value="random">Random</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block mb-1">Wealth:</label>
-            <select
-              className="w-full p-2 border rounded"
-              value={formData.wealth}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, wealth: e.target.value }))
-              }
-            >
-              <option value="random">Random</option>
-              <option value="poor">Poor</option>
-              <option value="medium">Medium</option>
-              <option value="rich">Rich</option>
-            </select>
+            <div className="parameter-group">
+              <label className="parameter-label">Wealth:</label>
+              <select
+                className="parameter-input"
+                value={formData.wealth}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, wealth: e.target.value }))
+                }
+              >
+                <option value="random">Random</option>
+                <option value="poor">Poor</option>
+                <option value="medium">Medium</option>
+                <option value="rich">Rich</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-left"
-        onClick={generateTown}
-      >
-        Generate Town
-      </button>
+        <button className="generate-button" onClick={generateTown}>
+          Generate Town
+        </button>
 
-      {townData && (
-        <div className="mt-8 p-4 border rounded text-left">
-          <h2 className="text-2xl font-bold mb-4 text-left">{townData.name}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="text-left">
-              <p>
-                <strong>Population:</strong>{" "}
-                {townData.population.toLocaleString()}
-              </p>
-              <p>
-                <strong>Size:</strong> {townData.acres} acres
-              </p>
-              <p>
-                <strong>Demographics:</strong>
-              </p>
-              <ul className="list-disc pl-5 text-left">
-                {Object.entries(townData.demographics).map(
-                  ([race, percentage]) => (
-                    <li key={race} className="capitalize text-left">
-                      {race}: {percentage}%
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-            <div className="text-left">
-              <p>
-                <strong>Wealth:</strong>
-              </p>
-              <ul className="list-disc pl-5 text-left">
-                <li className="text-left">
-                  Total: {townData.wealth.total.toLocaleString()} gp
-                </li>
-                <li className="text-left">
-                  Max value for sale: {townData.wealth.maxSale.toLocaleString()}{" "}
-                  gp
-                </li>
-                <li className="text-left">
-                  Max pawn value: {townData.wealth.maxPawn.toLocaleString()} gp
-                </li>
-              </ul>
-              <p className="mt-2">
-                <strong>Defenses:</strong>
-              </p>
-              <ul className="list-disc pl-5 text-left">
-                {townData.defenses.map((defense, index) => (
-                  <li key={index} className="text-left">
-                    {defense}
+        {townData && (
+          <div className="town-results">
+            <h2 className="town-name">{townData.name}</h2>
+            <div className="town-info-grid">
+              <div className="info-section">
+                <p>
+                  <strong>Population:</strong>{" "}
+                  {townData.population.toLocaleString()}
+                </p>
+                <p>
+                  <strong>Size:</strong> {townData.acres} acres
+                </p>
+                <p>
+                  <strong>Demographics:</strong>
+                </p>
+                <ul className="info-list">
+                  {Object.entries(townData.demographics).map(
+                    ([race, percentage]) => (
+                      <li key={race} className="capitalize">
+                        {race}: {percentage}%
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
+              <div className="info-section">
+                <p>
+                  <strong>Wealth:</strong>
+                </p>
+                <ul className="info-list">
+                  <li>Total: {townData.wealth.total.toLocaleString()} gp</li>
+                  <li>
+                    Max value for sale:{" "}
+                    {townData.wealth.maxSale.toLocaleString()} gp
                   </li>
-                ))}
-              </ul>
-              <p className="mt-2">
-                <strong>Organizations:</strong>
-              </p>
-              <ul className="list-disc pl-5 text-left">
-                {townData.organizations.map((org, index) => (
-                  <li key={index} className="text-left">
-                    {org}
+                  <li>
+                    Max pawn value: {townData.wealth.maxPawn.toLocaleString()}{" "}
+                    gp
                   </li>
-                ))}
-              </ul>
+                </ul>
+                <p className="mt-2">
+                  <strong>Defenses:</strong>
+                </p>
+                <ul className="info-list">
+                  {townData.defenses.map((defense, index) => (
+                    <li key={index}>{defense}</li>
+                  ))}
+                </ul>
+                <p className="mt-2">
+                  <strong>Organizations:</strong>
+                </p>
+                <ul className="info-list">
+                  {townData.organizations.map((org, index) => (
+                    <li key={index}>{org}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Shops and Buildings</h2>
+            <h2 className="section-title">Shops and Buildings</h2>
             {townData.shops.map((shop, index) => (
-              <div key={index} className="mb-8 p-4 border rounded">
-                <h3 className="text-xl font-semibold capitalize mb-2">
+              <div key={index} className="shop-card">
+                <h3 className="shop-title">
                   {shop.type}: {shop.name}
                 </h3>
-                <p className="mb-2">
-                  <strong>Owner:</strong> {shop.owner.name}, {shop.owner.gender}{" "}
-                  {shop.owner.race}
-                </p>
-                <p className="mb-2">
-                  <strong>Location:</strong> {shop.location}
-                </p>
-                <p className="mb-2">
-                  <strong>Description:</strong> {shop.description}
-                </p>
+                <div className="shop-info">
+                  <p>
+                    <strong>Owner:</strong> {shop.owner.name},{" "}
+                    {shop.owner.gender} {shop.owner.race}
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {shop.location}
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {shop.description}
+                  </p>
+                </div>
                 {shop.specials.length > 0 && (
                   <>
-                    <p className="mb-2">
+                    <p>
                       <strong>Specials:</strong>
                     </p>
-                    <ul className="list-disc pl-5 mb-2 text-left">
+                    <ul className="shop-list">
                       {shop.specials.map((item, itemIndex) => (
-                        <li key={itemIndex} className="text-left">
+                        <li key={itemIndex}>
                           {item.name} ({item.source}) ({item.price} gp)
                         </li>
                       ))}
@@ -986,12 +981,12 @@ const TownGenerator = () => {
                 )}
                 {shop.patrons.length > 0 && (
                   <>
-                    <p className="mb-2">
+                    <p>
                       <strong>Other Patrons:</strong>
                     </p>
-                    <ul className="list-disc pl-5 text-left">
+                    <ul className="shop-list">
                       {shop.patrons.map((patron, patronIndex) => (
-                        <li key={patronIndex} className="text-left">
+                        <li key={patronIndex}>
                           {patron.name}, {patron.gender} {patron.race}
                         </li>
                       ))}
@@ -1001,8 +996,8 @@ const TownGenerator = () => {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
