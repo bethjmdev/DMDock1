@@ -1,4 +1,5 @@
 import React from "react";
+import PersonalityTraits from "./PersonalityTraits";
 
 const StatBlock = ({ npc }) => {
   const calculateModifier = (score) => {
@@ -57,6 +58,11 @@ const StatBlock = ({ npc }) => {
             ({calculateModifier(npc.ability_scores.charisma)})
           </p>
         </div>
+      </div>
+
+      <div className="mt-6 border-t-2 border-gray-200 pt-4">
+        <h4 className="font-bold text-lg mb-2">Personality & Beliefs</h4>
+        <PersonalityTraits traits={npc.personality_traits} />
       </div>
     </div>
   );

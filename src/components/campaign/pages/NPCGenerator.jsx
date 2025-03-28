@@ -12,6 +12,27 @@ const NPCGenerator = () => {
 
   const [generatedNPC, setGeneratedNPC] = useState(null);
 
+  const pronouns = {
+    Male: {
+      subject: "He",
+      object: "him",
+      possessive: "his",
+      reflexive: "himself",
+    },
+    Female: {
+      subject: "She",
+      object: "her",
+      possessive: "hers",
+      reflexive: "herself",
+    },
+    Other: {
+      subject: "They",
+      object: "them",
+      possessive: "theirs",
+      reflexive: "themselves",
+    },
+  };
+
   const races = [
     "Human",
     "Elf",
@@ -99,6 +120,52 @@ const NPCGenerator = () => {
     "Pilgrim",
   ];
 
+  const deities = [
+    {
+      name: "Oghma",
+      domain: "God of knowledge, invention, inspiration, bards",
+      alignment: "True Neutral",
+    },
+    {
+      name: "Shar",
+      domain:
+        "Goddess of dark, night, loss, forgetfulness, unrevealed secrets, caverns, dungeons, the Underdark",
+      alignment: "Neutral Evil",
+    },
+    { name: "none", domain: "", alignment: "" },
+  ];
+
+  const personalityTraits = [
+    "{subject} is very competitive",
+    "{subject} is very self-confident",
+    "{subject} always wears a fancy hat",
+    "{subject} makes anyone {subject} speaks to feel like the most important person in the world",
+    "{subject} gets bored easily",
+    "{subject} constantly looks for the loophole",
+    "{subject} believes in soulmates",
+    "{subject} is always prepared",
+    "{subject} always eats like it's {subject} last meal",
+    "{subject} spaces out often, lost in thought",
+    "{subject} is a compulsive liar",
+    "{subject} has a photographic memory",
+    "{subject} is terrified of spiders",
+    "{subject} collects rare books",
+    "{subject} speaks in riddles",
+    "{subject} is obsessed with cleanliness",
+    "{subject} has a secret identity",
+    "{subject} is a hopeless romantic",
+    "{subject} is a perfectionist",
+    "{subject} is superstitious",
+    "{subject} is a conspiracy theorist",
+    "{subject} is a compulsive gambler",
+    "{subject} is a food critic",
+    "{subject} is a hopeless klutz",
+    "{subject} is a master of disguise",
+    "{subject} is a compulsive hoarder",
+    "{subject} is a thrill seeker",
+    "{subject} is a workaholic",
+  ];
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -119,7 +186,6 @@ const NPCGenerator = () => {
     ];
 
     abilities.forEach((ability) => {
-      // Roll 4d6, drop lowest
       const rolls = Array.from(
         { length: 4 },
         () => Math.floor(Math.random() * 6) + 1
@@ -131,12 +197,49 @@ const NPCGenerator = () => {
     return scores;
   };
 
+  const generatePersonalityTraits = () => {
+    const traits = [];
+    const deity = deities[Math.floor(Math.random() * deities.length)];
+    const npcPronouns = pronouns[formData.sex];
+
+    // Add deity worship trait
+    if (deity.name === "none") {
+      traits.push(`${npcPronouns.subject} doesn't worship any god.`);
+    } else {
+      const worshipStyle =
+        Math.random() < 0.5 ? "quietly worships" : "proudly claims to worship";
+      traits.push(
+        `${npcPronouns.subject} ${worshipStyle} ${deity.name}, ${deity.domain}. (${deity.alignment})`
+      );
+    }
+
+    // Add 3-5 random personality traits
+    const numTraits = Math.floor(Math.random() * 3) + 3; // Random number between 3 and 5
+    const shuffledTraits = [...personalityTraits].sort(
+      () => Math.random() - 0.5
+    );
+
+    for (let i = 0; i < numTraits; i++) {
+      let trait = shuffledTraits[i];
+      // Replace pronouns in the trait
+      trait = trait
+        .replace(/{subject}/g, npcPronouns.subject)
+        .replace(/{object}/g, npcPronouns.object)
+        .replace(/{possessive}/g, npcPronouns.possessive)
+        .replace(/{reflexive}/g, npcPronouns.reflexive);
+      traits.push(trait);
+    }
+
+    return traits;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const npc = {
       ...formData,
       ability_scores: generateAbilityScores(),
+      personality_traits: generatePersonalityTraits(),
     };
 
     setGeneratedNPC(npc);
