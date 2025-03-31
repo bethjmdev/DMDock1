@@ -300,8 +300,6 @@ const SpellSlotTracker = () => {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [editingSpells, setEditingSpells] = useState(null);
-  const [newSpell, setNewSpell] = useState("");
   const [editingNotes, setEditingNotes] = useState(null);
   const [notes, setNotes] = useState({});
   const [spellsByLevel, setSpellsByLevel] = useState({});
@@ -970,86 +968,6 @@ const SpellSlotTracker = () => {
                       </div>
                     )
                   )}
-                </div>
-
-                <div className="spell-management">
-                  <h4>Spell Management</h4>
-                  {editingSpells === character.id ? (
-                    <div className="add-spell-form">
-                      <input
-                        type="text"
-                        value={newSpell}
-                        onChange={(e) => setNewSpell(e.target.value)}
-                        placeholder="Enter spell name"
-                        className="spell-input"
-                      />
-                      <button
-                        onClick={() => handleAddSpell(character.id, 1)}
-                        className="add-spell-button"
-                      >
-                        Add Spell
-                      </button>
-                      <button
-                        onClick={() => setEditingSpells(null)}
-                        className="cancel-button"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setEditingSpells(character.id)}
-                      className="edit-spells-button"
-                    >
-                      Add New Spell
-                    </button>
-                  )}
-
-                  {character.selectedSpells &&
-                    character.selectedSpells.length > 0 && (
-                      <div className="spell-list">
-                        <div className="spell-list-header">
-                          <h5>Spells</h5>
-                          <button
-                            onClick={() => handleResetSpells(character.id)}
-                            className="reset-spells-button"
-                          >
-                            Reset All
-                          </button>
-                        </div>
-                        <ul>
-                          {character.selectedSpells.map((spell) => (
-                            <li
-                              key={spell.id}
-                              className={`spell-item ${
-                                spell.used ? "used" : ""
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={spell.used}
-                                onChange={() =>
-                                  handleToggleSpellUsage(character.id, spell.id)
-                                }
-                                className="spell-checkbox"
-                              />
-                              <span className="spell-name">{spell.name}</span>
-                              <span className="spell-level">
-                                Level {spell.level}
-                              </span>
-                              <button
-                                className="delete-spell-button"
-                                onClick={() =>
-                                  deleteSpell(character.id, spell.id)
-                                }
-                              >
-                                ×
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                 </div>
 
                 <div className="character-notes">

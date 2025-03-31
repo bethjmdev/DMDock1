@@ -387,13 +387,6 @@
   opacity: 0.8;
 }
 
-.spell-checkbox {
-  margin-right: 0;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
 .spell-name {
   flex: 1;
   font-size: 14px;
