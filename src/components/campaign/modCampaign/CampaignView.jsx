@@ -10,6 +10,7 @@ import {
   updateDoc,
   getDoc,
   onSnapshot,
+  deleteDoc,
 } from "firebase/firestore";
 import "./CampaignView.css";
 
@@ -406,13 +407,11 @@ const CampaignView = () => {
       path: `/campaign/${campaignId}/encounter-generator`,
     },
     { title: "Town Generator", path: `/campaign/${campaignId}/town-generator` },
-
     {
       title: "Change Date",
       path: `/campaign/${campaignId}/date`,
       state: { campaignId, date: dateValue, campaign: campaignData },
     },
-    // { title: "Weather Generator", path: `/campaign/${campaignId}/weather` },
   ];
 
   const handleSubmitDate = async () => {
@@ -536,6 +535,64 @@ const CampaignView = () => {
     setCurrentWeather(weatherForNextDay);
   };
 
+  const handleDeleteCampaign = async () => {
+    // First confirmation
+    if (!window.confirm("Are you sure you want to delete this campaign?")) {
+      return;
+    }
+
+    // Second confirmation
+    if (
+      !window.confirm(
+        "This action CANNOT be undone. Are you absolutely sure you want to delete this campaign? This will delete all related data including players, NPCs, monsters, encounters, towns, notes, and spell slots."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // Delete from all collections that might have documents with this campaignId
+      const collections = [
+        "Calendar",
+        "Encounter",
+        "EncounterNotes",
+        "Monsters",
+        "NPC",
+        "Notes",
+        "Players",
+        "SpellSlot",
+        "TownNotes",
+        "Towns",
+      ];
+
+      // First delete all related documents that have campaignId field
+      for (const collectionName of collections) {
+        const q = query(
+          collection(db, collectionName),
+          where("campaignId", "==", campaignId)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        const deletePromises = querySnapshot.docs.map((doc) =>
+          deleteDoc(doc.ref)
+        );
+        await Promise.all(deletePromises);
+      }
+
+      // Then delete the campaign document itself using its document ID
+      const campaignRef = doc(db, "Campaign", campaignId);
+      await deleteDoc(campaignRef);
+
+      navigate("/campaigns");
+    } catch (error) {
+      console.error("Error deleting campaign:", error);
+      alert(
+        "Failed to delete campaign and its related data. Please try again."
+      );
+    }
+  };
+
   return (
     <div className="campaign-view-container">
       <div className="campaign-view-content">
@@ -642,6 +699,9 @@ const CampaignView = () => {
               {button.title}
             </button>
           ))}
+          <button className="campaign-button" onClick={handleDeleteCampaign}>
+            Delete Campaign
+          </button>
         </div>
       </div>
     </div>
