@@ -34,7 +34,7 @@ const NewSpellSlotCharacter = () => {
     selectedSpells: [],
     createdAt: new Date().toISOString(),
     campaignId,
-    userId: "dm",
+    dmId: currentUser.uid,
   });
 
   const [error, setError] = useState("");
@@ -130,7 +130,12 @@ const NewSpellSlotCharacter = () => {
         return;
       }
 
-      await addDoc(collection(db, "SpellSlot"), formData);
+      const dataToSave = {
+        ...formData,
+        characterLevel: Number(formData.characterLevel),
+      };
+
+      await addDoc(collection(db, "SpellSlot"), dataToSave);
       navigate(`/campaign/${campaignId}/spell-slot`);
     } catch (error) {
       console.error("Error adding character:", error);
