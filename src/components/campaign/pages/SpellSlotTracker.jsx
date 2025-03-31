@@ -656,9 +656,11 @@ const SpellSlotTracker = () => {
       const character = characters.find((c) => c.id === characterId);
       const maxSlots = character.spellSlots[level];
       const currentUsedSlots = character.usedSpellSlots?.[level] || 0;
+
+      // Calculate new used slots count
       const newUsedSlots = isUsed ? currentUsedSlots + 1 : currentUsedSlots - 1;
 
-      // Don't allow more used slots than available
+      // Don't allow more used slots than available or negative values
       if (newUsedSlots > maxSlots || newUsedSlots < 0) return;
 
       // Initialize the spells array for this level if it doesn't exist
