@@ -1,9 +1,9 @@
-.spell-slot-container {
+/* .spell-slot-container {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #f4e4bc; /* Tan background */
-}
+  background-color: #f4e4bc;
+} */
 
 .spell-slot-header {
   display: flex;
@@ -31,14 +31,14 @@
 .add-character-button:hover {
   background-color: #600000; /* Darker maroon */
 }
-
+/* 
 .spell-slot-content {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(44, 27, 77, 0.2);
   padding: 20px;
-  border: 1px solid #d4b895; /* Tan border */
-}
+  border: 1px solid #d4b895; 
+} */
 
 /* Form Styles */
 .character-form {
