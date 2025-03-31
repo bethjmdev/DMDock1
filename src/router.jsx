@@ -28,6 +28,7 @@ import WeatherGenerator from "./components/campaign/pages/WeatherGenerator";
 import EncounterGenerator from "./components/campaign/pages/EncounterGenerator";
 import TownGenerator from "./components/campaign/pages/TownGenerator";
 import AddTown from "./components/campaign/pages/AddTown";
+import EditTown from "./components/campaign/pages/EditTown";
 import NPCGenerator from "./components/campaign/pages/NPCGenerator";
 import SpellSlotTracker from "./components/campaign/pages/SpellSlotTracker";
 import NewSpellSlotCharacter from "./components/campaign/pages/NewSpellSlotCharacter";
@@ -274,6 +275,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <ViewTownDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/towns/:townId/edit"
+        element={
+          <ProtectedRoute>
+            <EditTown />
           </ProtectedRoute>
         }
       />

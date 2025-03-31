@@ -84,12 +84,22 @@ const ViewTownDetails = () => {
     <div className="town-details-container">
       <div className="town-details-header">
         <h2>{town.name}</h2>
-        <button
-          onClick={() => navigate(`/campaign/${campaignId}/towns`)}
-          className="back-button"
-        >
-          Back to Towns
-        </button>
+        <div className="town-details-actions">
+          <button
+            onClick={() =>
+              navigate(`/campaign/${campaignId}/towns/${townId}/edit`)
+            }
+            className="edit-button"
+          >
+            Edit Town
+          </button>
+          <button
+            onClick={() => navigate(`/campaign/${campaignId}/towns`)}
+            className="back-button"
+          >
+            Back to Towns
+          </button>
+        </div>
       </div>
 
       <div className="town-details-content">
