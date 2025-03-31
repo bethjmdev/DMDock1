@@ -65,10 +65,21 @@ const ViewTowns = () => {
   return (
     <div className="towns-container">
       <div className="towns-header">
-        <h2>Your Towns</h2>
-        <button onClick={handleGenerateNew} className="generate-button">
-          Generate New Town
-        </button>
+        <h2 className="towns-title">Your Towns</h2>
+        <div className="towns-header-buttons">
+          <button
+            onClick={() => navigate(`/campaign/${campaignId}/create-town`)}
+            className="create-town-button"
+          >
+            Create New Town
+          </button>
+          <button
+            onClick={handleGenerateNew}
+            className="generate-new-town-button"
+          >
+            Generate New Town
+          </button>
+        </div>
       </div>
 
       {loading ? (

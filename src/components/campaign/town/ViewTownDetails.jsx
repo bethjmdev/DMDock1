@@ -9,7 +9,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db } from "../../../firebase";
-import "./TownGenerator.css";
+import "../pages/TownGenerator.css";
 import { useAuth } from "../../auth/AuthContext";
 
 const ViewTownDetails = () => {
@@ -84,17 +84,27 @@ const ViewTownDetails = () => {
     <div className="town-details-container">
       <div className="town-details-header">
         <h2>{town.name}</h2>
-        <button
-          onClick={() => navigate(`/campaign/${campaignId}/towns`)}
-          className="back-button"
-        >
-          Back to Towns
-        </button>
+        <div className="header-buttons">
+          <button
+            onClick={() =>
+              navigate(`/campaign/${campaignId}/towns/${townId}/edit`)
+            }
+            className="edit-button"
+          >
+            Edit Town
+          </button>
+          <button
+            onClick={() => navigate(`/campaign/${campaignId}/towns`)}
+            className="back-button"
+          >
+            Back to Towns
+          </button>
+        </div>
       </div>
 
       <div className="town-details-content">
         <section className="town-basic-info">
-          <h3>Basic Information</h3>
+          <h3>Basic Information PIIIIIZZZZAAA</h3>
           <p>Population: {town.population.toLocaleString()}</p>
           <p>Size: {town.acres} acres</p>
           <p>Total Wealth: {town.wealth.total.toLocaleString()} gp</p>
