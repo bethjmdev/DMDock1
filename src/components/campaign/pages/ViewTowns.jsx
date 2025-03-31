@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useAuth } from "../../auth/AuthContext";
 import "./TownGenerator.css";
@@ -43,6 +50,18 @@ const ViewTowns = () => {
     navigate(`/campaign/${campaignId}/town-generator`);
   };
 
+  const handleDeleteTown = async (townId) => {
+    if (window.confirm("Are you sure you want to delete this town?")) {
+      try {
+        await deleteDoc(doc(db, "Towns", townId));
+        setTowns(towns.filter((town) => town.id !== townId));
+      } catch (error) {
+        console.error("Error deleting town:", error);
+        alert("Failed to delete town");
+      }
+    }
+  };
+
   return (
     <div className="towns-container">
       <div className="towns-header">
@@ -67,14 +86,26 @@ const ViewTowns = () => {
                 <p>Shops: {town.shops.length}</p>
                 <p>Organizations: {town.organizations.length}</p>
               </div>
-              <button
-                onClick={() =>
-                  navigate(`/campaign/${campaignId}/towns/${town.id}`)
-                }
-                className="view-details-button"
-              >
-                View Details
-              </button>
+              <div className="button-group">
+                <button
+                  onClick={() =>
+                    navigate(`/campaign/${campaignId}/towns/${town.id}`)
+                  }
+                  className="view-details-button"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleDeleteTown(town.id)}
+                  className="edit-button"
+                  style={{
+                    backgroundColor: "#dc2626",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  Delete Town
+                </button>
+              </div>
             </div>
           ))}
         </div>
