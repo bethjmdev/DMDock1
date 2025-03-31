@@ -10,6 +10,7 @@ import {
   updateDoc,
   getDoc,
   onSnapshot,
+  deleteDoc,
 } from "firebase/firestore";
 import "./CampaignView.css";
 
@@ -391,6 +392,70 @@ const CampaignView = () => {
     campaignId,
   ]);
 
+  const handleDeleteCampaign = async () => {
+    // First confirmation
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this campaign? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    // Second confirmation with more details
+    if (
+      !window.confirm(
+        "WARNING: This will permanently delete:\n\n" +
+          "- The campaign and all its settings\n" +
+          "- All players associated with this campaign\n" +
+          "- All NPCs and monsters\n" +
+          "- All encounters and towns\n" +
+          "- All notes and spell slot tracking\n" +
+          "- Calendar and weather settings\n\n" +
+          "Are you absolutely sure you want to proceed with deletion?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // Collections to check for campaign data
+      const collections = [
+        "Calendar",
+        "Players",
+        "NPCs",
+        "Monsters",
+        "Encounters",
+        "Towns",
+        "Notes",
+        "SpellSlots",
+      ];
+
+      // Delete all documents in each collection that have matching campaignId
+      for (const collectionName of collections) {
+        const q = query(
+          collection(db, collectionName),
+          where("campaignId", "==", campaignId)
+        );
+        const querySnapshot = await getDocs(q);
+
+        const deletePromises = querySnapshot.docs.map((doc) =>
+          deleteDoc(doc.ref)
+        );
+        await Promise.all(deletePromises);
+      }
+
+      // Finally delete the campaign document itself
+      await deleteDoc(doc(db, "Campaign", campaignId));
+
+      // Navigate back to campaigns list
+      navigate("/campaigns");
+    } catch (error) {
+      console.error("Error deleting campaign:", error);
+      alert("There was an error deleting the campaign. Please try again.");
+    }
+  };
+
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
     { title: "NPCs", path: `/campaign/${campaignId}/npc` },
@@ -411,6 +476,11 @@ const CampaignView = () => {
       title: "Change Date",
       path: `/campaign/${campaignId}/date`,
       state: { campaignId, date: dateValue, campaign: campaignData },
+    },
+    {
+      title: "Delete Campaign",
+      action: handleDeleteCampaign,
+      className: "delete-campaign-button",
     },
     // { title: "Weather Generator", path: `/campaign/${campaignId}/weather` },
   ];
@@ -631,13 +701,17 @@ const CampaignView = () => {
         <div className="campaign-buttons-grid">
           {buttons.map((button) => (
             <button
-              key={button.path}
-              onClick={() =>
-                navigate(button.path, {
-                  state: button.state,
-                })
-              }
-              className="campaign-button"
+              key={button.path || button.title}
+              onClick={() => {
+                if (button.action) {
+                  button.action();
+                } else {
+                  navigate(button.path, {
+                    state: button.state,
+                  });
+                }
+              }}
+              className={`campaign-button ${button.className || ""}`}
             >
               {button.title}
             </button>

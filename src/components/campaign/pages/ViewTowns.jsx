@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useAuth } from "../../auth/AuthContext";
 import "./TownGenerator.css";
@@ -43,13 +50,36 @@ const ViewTowns = () => {
     navigate(`/campaign/${campaignId}/town-generator`);
   };
 
+  const handleDeleteTown = async (townId) => {
+    if (window.confirm("Are you sure you want to delete this town?")) {
+      try {
+        await deleteDoc(doc(db, "Towns", townId));
+        setTowns(towns.filter((town) => town.id !== townId));
+      } catch (error) {
+        console.error("Error deleting town:", error);
+        alert("Failed to delete town");
+      }
+    }
+  };
+
   return (
     <div className="towns-container">
       <div className="towns-header">
-        <h2>Your Towns</h2>
-        <button onClick={handleGenerateNew} className="generate-button">
-          Generate New Town
-        </button>
+        <h2 className="towns-title">Your Towns</h2>
+        <div className="towns-header-buttons">
+          <button
+            onClick={() => navigate(`/campaign/${campaignId}/create-town`)}
+            className="create-town-button"
+          >
+            Create New Town
+          </button>
+          <button
+            onClick={handleGenerateNew}
+            className="generate-new-town-button"
+          >
+            Generate New Town
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -67,14 +97,26 @@ const ViewTowns = () => {
                 <p>Shops: {town.shops.length}</p>
                 <p>Organizations: {town.organizations.length}</p>
               </div>
-              <button
-                onClick={() =>
-                  navigate(`/campaign/${campaignId}/towns/${town.id}`)
-                }
-                className="view-details-button"
-              >
-                View Details
-              </button>
+              <div className="button-group">
+                <button
+                  onClick={() =>
+                    navigate(`/campaign/${campaignId}/towns/${town.id}`)
+                  }
+                  className="view-details-button"
+                >
+                  View Details
+                </button>
+                <button
+                  onClick={() => handleDeleteTown(town.id)}
+                  className="edit-button"
+                  style={{
+                    backgroundColor: "#dc2626",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  Delete Town
+                </button>
+              </div>
             </div>
           ))}
         </div>

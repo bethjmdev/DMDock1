@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { db } from "../../../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import "./Players.css";
 
 const Players = () => {
@@ -41,6 +48,18 @@ const Players = () => {
 
   const handleAddPlayer = () => {
     navigate(`/campaign/${campaignId}/players/add`);
+  };
+
+  const handleDeletePlayer = async (playerId) => {
+    if (window.confirm("Are you sure you want to delete this player?")) {
+      try {
+        await deleteDoc(doc(db, "Players", playerId));
+        setPlayers(players.filter((player) => player.id !== playerId));
+      } catch (error) {
+        console.error("Error deleting player:", error);
+        alert("Failed to delete player");
+      }
+    }
   };
 
   if (loading) {
@@ -105,14 +124,28 @@ const Players = () => {
                   <span className="font-medium">CHA:</span> {player.charisma}
                 </div>
               </div>
-              <button
-                onClick={() =>
-                  navigate(`/campaign/${campaignId}/players/edit/${player.id}`)
-                }
-                className="edit-button"
-              >
-                Edit
-              </button>
+              <div className="button-group">
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/campaign/${campaignId}/players/edit/${player.id}`
+                    )
+                  }
+                  className="edit-button"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeletePlayer(player.id)}
+                  className="edit-button"
+                  style={{
+                    backgroundColor: "#dc2626",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  Delete Player
+                </button>
+              </div>
             </div>
           ))}
         </div>

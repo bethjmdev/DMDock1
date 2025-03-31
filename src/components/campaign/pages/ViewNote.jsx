@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import "./Notes.css";
 
@@ -27,6 +27,18 @@ const ViewNote = () => {
     fetchNote();
   }, [noteId]);
 
+  const handleDeleteNote = async () => {
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      try {
+        await deleteDoc(doc(db, "Notes", noteId));
+        navigate(`/campaign/${campaignId}/notes`);
+      } catch (error) {
+        console.error("Error deleting note:", error);
+        alert("Failed to delete note");
+      }
+    }
+  };
+
   if (loading) return <h2 className="text-gray-800">Loading Note...</h2>;
   if (!note) return <div className="notes-container">Note not found</div>;
 
@@ -34,13 +46,26 @@ const ViewNote = () => {
     <div className="notes-container">
       <div className="notes-header">
         <h2 className="text-2xl font-bold text-gray-800">{note.title}</h2>
-        <button
-          onClick={() => navigate(`/campaign/${campaignId}/notes`)}
-          className="auth-button"
-          style={{ width: "auto", padding: "0.5rem 1rem" }}
-        >
-          Back to Notes
-        </button>
+        <div className="button-group">
+          <button
+            onClick={() => navigate(`/campaign/${campaignId}/notes`)}
+            className="auth-button"
+            style={{ width: "auto", padding: "0.5rem 1rem" }}
+          >
+            Back to Notes
+          </button>
+          <button
+            onClick={handleDeleteNote}
+            className="edit-button"
+            style={{
+              backgroundColor: "#dc2626",
+              marginLeft: "0.5rem",
+              padding: "0.5rem 1rem",
+            }}
+          >
+            Delete Note
+          </button>
+        </div>
       </div>
 
       <div

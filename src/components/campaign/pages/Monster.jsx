@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { db } from "../../../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import "./Players.css";
 
 const Monster = () => {
@@ -41,6 +48,18 @@ const Monster = () => {
 
   const handleAddMonster = () => {
     navigate(`/campaign/${campaignId}/monster/add`);
+  };
+
+  const handleDeleteMonster = async (monsterId) => {
+    if (window.confirm("Are you sure you want to delete this monster?")) {
+      try {
+        await deleteDoc(doc(db, "Monsters", monsterId));
+        setMonsters(monsters.filter((monster) => monster.id !== monsterId));
+      } catch (error) {
+        console.error("Error deleting monster:", error);
+        alert("Failed to delete monster");
+      }
+    }
   };
 
   if (loading) {
@@ -139,6 +158,16 @@ const Monster = () => {
                   className="edit-button"
                 >
                   Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteMonster(monster.id)}
+                  className="edit-button"
+                  style={{
+                    backgroundColor: "#dc2626",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  Delete Monster
                 </button>
               </div>
             </div>

@@ -8,6 +8,7 @@ import {
   query,
   where,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 import { useAuth } from "../../../components/auth/AuthContext";
 
@@ -54,6 +55,18 @@ const ViewNPC = () => {
     fetchNPCAndNotes();
   }, [npcId]);
 
+  const handleDeleteNPC = async () => {
+    if (window.confirm("Are you sure you want to delete this NPC?")) {
+      try {
+        await deleteDoc(doc(db, "NPC", npcId));
+        navigate(`/campaign/${campaignId}/npcs`);
+      } catch (error) {
+        console.error("Error deleting NPC:", error);
+        alert("Failed to delete NPC");
+      }
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (!npc) return <div>NPC not found</div>;
 
@@ -61,7 +74,18 @@ const ViewNPC = () => {
     <div className="view-npc-container">
       {/* NPC Details */}
       <div className="npc-details">
-        <h1>{npc.name}</h1>
+        <div className="npc-header">
+          <h1>{npc.name}</h1>
+          <button
+            onClick={handleDeleteNPC}
+            className="edit-button"
+            style={{
+              backgroundColor: "#dc2626",
+            }}
+          >
+            Delete NPC
+          </button>
+        </div>
         {/* Display all NPC information */}
       </div>
 

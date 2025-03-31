@@ -7,6 +7,8 @@ import {
   where,
   getDocs,
   and,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
 import { useAuth } from "../../auth/AuthContext";
 import "./MonsterList.css"; // Reuse the monster list styles
@@ -86,6 +88,23 @@ const EncounterList = () => {
     });
   };
 
+  const handleDeleteEncounter = async (e, encounterId) => {
+    // Stop the click event from bubbling up to the card
+    e.stopPropagation();
+
+    if (window.confirm("Are you sure you want to delete this encounter?")) {
+      try {
+        await deleteDoc(doc(db, "Encounter", encounterId));
+        setEncounters(
+          encounters.filter((encounter) => encounter.id !== encounterId)
+        );
+      } catch (error) {
+        console.error("Error deleting encounter:", error);
+        alert("Failed to delete encounter");
+      }
+    }
+  };
+
   return (
     <div className="players-container">
       <div className="players-header">
@@ -137,6 +156,16 @@ const EncounterList = () => {
                   <p className="created-at">
                     Created: {formatDate(encounter.createdAt)}
                   </p>
+                  <button
+                    onClick={(e) => handleDeleteEncounter(e, encounter.id)}
+                    className="edit-button"
+                    style={{
+                      backgroundColor: "#dc2626",
+                      marginTop: "0.5rem",
+                    }}
+                  >
+                    Delete Encounter
+                  </button>
                 </div>
               </div>
             ))}
