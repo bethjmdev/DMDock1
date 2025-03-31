@@ -1,16 +1,40 @@
-.floating-nav-button {
+.floating-nav-buttons {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #8b0000; /* Temporarily change to red for visibility */
-  color: white;
-  border-radius: 50%;
-  width: 50px; /* Adjust size as needed */
-  height: 50px; /* Adjust size as needed */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.floating-nav-button {
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #1a1a1a; /* D&D dark gray/black */
+  color: white;
+  border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  font-size: 14px; /* Adjust font size as needed */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px;
+}
+
+.floating-nav-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background-color: #333333;
+}
+
+.floating-nav-button.home-button {
+  background-color: #c41e3a; /* D&D red */
+}
+
+.floating-nav-button.home-button:hover {
+  background-color: #e62244;
 }

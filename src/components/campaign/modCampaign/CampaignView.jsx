@@ -468,7 +468,7 @@ const CampaignView = () => {
     <div className="campaign-view-container">
       <div className="campaign-view-content">
         <h1 className="campaign-view-title">
-          {campaignData.name || "Campaign Tools"}
+          {campaignData.name || "There be an error"}
           <br />
           <br />
           {campaignData.custom_weather === false ? (

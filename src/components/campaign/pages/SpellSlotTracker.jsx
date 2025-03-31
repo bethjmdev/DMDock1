@@ -11,6 +11,7 @@ import {
   updateDoc,
   deleteDoc,
   addDoc,
+  writeBatch,
 } from "firebase/firestore";
 import "./SpellSlotTracker.css";
 
@@ -310,7 +311,7 @@ const SpellSlotTracker = () => {
         const q = query(
           collection(db, "SpellSlot"),
           where("campaignId", "==", campaignId),
-          where("userId", "==", "dm")
+          where("dmId", "==", currentUser.uid)
         );
 
         const querySnapshot = await getDocs(q);
@@ -318,6 +319,9 @@ const SpellSlotTracker = () => {
           id: doc.id,
           ...doc.data(),
         }));
+
+        // Sort by order, fallback to 0 if order is not set
+        charactersList.sort((a, b) => (a.order || 0) - (b.order || 0));
 
         // Initialize spellsByLevel from the fetched data
         const initialSpellsByLevel = {};
@@ -337,7 +341,7 @@ const SpellSlotTracker = () => {
     };
 
     fetchCharacters();
-  }, [campaignId]);
+  }, [campaignId, currentUser.uid]);
 
   const getSpellSlots = (characterClass, level) => {
     const progression = SPELL_SLOT_PROGRESSION[characterClass];
@@ -590,7 +594,7 @@ const SpellSlotTracker = () => {
     }
   };
 
-  const moveCharacter = (index, direction) => {
+  const moveCharacter = async (index, direction) => {
     if (
       (direction === "up" && index === 0) ||
       (direction === "down" && index === characters.length - 1)
@@ -600,12 +604,32 @@ const SpellSlotTracker = () => {
 
     const newCharacters = [...characters];
     const newIndex = direction === "up" ? index - 1 : index + 1;
+
+    // Swap the characters
     [newCharacters[index], newCharacters[newIndex]] = [
       newCharacters[newIndex],
       newCharacters[index],
     ];
 
-    setCharacters(newCharacters);
+    // Update orders in Firestore
+    try {
+      const batch = writeBatch(db);
+
+      // Update order for both moved characters
+      const char1Ref = doc(db, "SpellSlot", newCharacters[index].id);
+      const char2Ref = doc(db, "SpellSlot", newCharacters[newIndex].id);
+
+      batch.update(char1Ref, { order: index });
+      batch.update(char2Ref, { order: newIndex });
+
+      await batch.commit();
+
+      // Update local state
+      setCharacters(newCharacters);
+    } catch (error) {
+      console.error("Error updating character order:", error);
+      setError("Failed to update character order");
+    }
   };
 
   const handleLevelUp = async (characterId) => {
