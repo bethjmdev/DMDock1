@@ -6,6 +6,52 @@ import { useAuth } from "../../auth/AuthContext";
 import { db } from "../../../firebase";
 import { collection, addDoc } from "firebase/firestore";
 
+// Define spellcasting monster types
+const SPELLCASTING_MONSTER_TYPES = {
+  FULL_CASTER: "Full Caster", // Like Archmage, Lich
+  HALF_CASTER: "Half Caster", // Like Death Knight, Drow Priestess
+  INNATE_CASTER: "Innate Caster", // Like Dragons, Beholders
+  SPECIAL: "Special", // Like Beholder, Mind Flayer
+};
+
+// Define spell slot progression for monsters
+const SPELL_SLOT_PROGRESSION = {
+  [SPELLCASTING_MONSTER_TYPES.FULL_CASTER]: {
+    startLevel: 1,
+    slots: {
+      1: { 1: 2 }, // CR 1/4 - 1/2
+      2: { 1: 3 }, // CR 1
+      3: { 1: 4, 2: 2 }, // CR 2
+      4: { 1: 4, 2: 3 }, // CR 3
+      5: { 1: 4, 2: 3, 3: 2 }, // CR 4
+      6: { 1: 4, 2: 3, 3: 3 }, // CR 5
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 }, // CR 6
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 }, // CR 7
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 }, // CR 8
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 }, // CR 9
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 }, // CR 10
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 }, // CR 11
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 }, // CR 12
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 }, // CR 13
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 }, // CR 14
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 }, // CR 15
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 }, // CR 16
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 }, // CR 17
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 }, // CR 18
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 }, // CR 19-20
+    },
+  },
+  // ... other monster types ...
+};
+
+const getSpellSlots = (spellcastingType, level) => {
+  const progression = SPELL_SLOT_PROGRESSION[spellcastingType];
+  if (!progression) return null;
+
+  const maxLevel = Math.min(level, 20);
+  return progression.slots[maxLevel] || null;
+};
+
 const MonsterDetail = () => {
   const { monsterId, campaignId } = useParams();
   const location = useLocation();
@@ -45,6 +91,7 @@ const MonsterDetail = () => {
 
     setIsSaving(true);
     try {
+      // Add monster to campaign
       const monsterData = {
         ...monster,
         campaignId: campaignId,
@@ -53,6 +100,58 @@ const MonsterDetail = () => {
       };
 
       const docRef = await addDoc(collection(db, "Monsters"), monsterData);
+
+      // Check if monster is a spellcaster
+      const isSpellcaster =
+        monster.spellcasting ||
+        monster.spells ||
+        (monster.special_abilities &&
+          monster.special_abilities.some(
+            (ability) =>
+              ability.name.toLowerCase().includes("spellcasting") ||
+              ability.name.toLowerCase().includes("spells")
+          ));
+
+      if (isSpellcaster) {
+        // Determine spellcasting type based on monster properties
+        let spellcastingType = SPELLCASTING_MONSTER_TYPES.FULL_CASTER; // Default to full caster
+
+        // Check for specific monster types
+        if (
+          monster.name.toLowerCase().includes("priest") ||
+          monster.name.toLowerCase().includes("paladin") ||
+          monster.name.toLowerCase().includes("ranger")
+        ) {
+          spellcastingType = SPELLCASTING_MONSTER_TYPES.HALF_CASTER;
+        } else if (
+          monster.name.toLowerCase().includes("dragon") ||
+          monster.name.toLowerCase().includes("beholder") ||
+          monster.name.toLowerCase().includes("mind flayer")
+        ) {
+          spellcastingType = SPELLCASTING_MONSTER_TYPES.INNATE_CASTER;
+        }
+
+        // Create spell slot entry
+        const spellSlotData = {
+          characterName: monster.name,
+          characterType: "Monster",
+          characterClass: spellcastingType,
+          characterLevel: Math.ceil(monster.challenge_rating),
+          campaignId,
+          dmId: currentUser.uid,
+          createdAt: new Date().toISOString(),
+          lastModified: new Date().toISOString(),
+          spellSlots: getSpellSlots(
+            spellcastingType,
+            Math.ceil(monster.challenge_rating)
+          ),
+          usedSpellSlots: {},
+          order: 0, // Will be updated by SpellSlotTracker
+        };
+
+        await addDoc(collection(db, "SpellSlot"), spellSlotData);
+      }
+
       alert("Monster saved successfully!");
       navigate(`/campaign/${campaignId}/monster`);
     } catch (error) {

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../../auth/AuthContext";
+import { db } from "../../../firebase";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import "./MonsterList.css";
 import "./Players.css";
 
@@ -10,6 +13,7 @@ const CACHE_DURATION = 14 * 24 * 60 * 60 * 1000; // 2 weeks in milliseconds
 const MonsterList = () => {
   const { campaignId } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [monsters, setMonsters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -76,10 +80,90 @@ const MonsterList = () => {
 
   const totalPages = Math.ceil(monsters.length / monstersPerPage);
 
-  const handleMonsterClick = (monsterIndex) => {
-    navigate(`/campaign/${campaignId}/monsters/${monsterIndex}`, {
-      state: { previousPage: currentPage },
-    });
+  const handleMonsterClick = async (monster) => {
+    try {
+      // Check if monster already exists in campaign
+      const monstersRef = collection(db, "Monsters");
+      const q = query(
+        monstersRef,
+        where("campaignId", "==", campaignId),
+        where("dm", "==", currentUser.uid),
+        where("index", "==", monster.index)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        // Add monster to campaign
+        const monsterData = {
+          ...monster,
+          campaignId,
+          dm: currentUser.uid,
+          createdAt: new Date().toISOString(),
+          lastModified: new Date().toISOString(),
+        };
+        await addDoc(collection(db, "Monsters"), monsterData);
+
+        // Check if monster is a spellcaster
+        const isSpellcaster =
+          monster.spellcasting ||
+          monster.spells ||
+          (monster.special_abilities &&
+            monster.special_abilities.some(
+              (ability) =>
+                ability.name.toLowerCase().includes("spellcasting") ||
+                ability.name.toLowerCase().includes("spells")
+            ));
+
+        if (isSpellcaster) {
+          // Determine spellcasting type based on monster properties
+          let spellcastingType = "FULL_CASTER"; // Default to full caster
+
+          // Check for specific monster types
+          if (
+            monster.name.toLowerCase().includes("priest") ||
+            monster.name.toLowerCase().includes("paladin") ||
+            monster.name.toLowerCase().includes("ranger")
+          ) {
+            spellcastingType = "HALF_CASTER";
+          } else if (
+            monster.name.toLowerCase().includes("dragon") ||
+            monster.name.toLowerCase().includes("beholder") ||
+            monster.name.toLowerCase().includes("mind flayer")
+          ) {
+            spellcastingType = "INNATE_CASTER";
+          }
+
+          // Create spell slot entry
+          const spellSlotData = {
+            characterName: monster.name,
+            characterType: "Monster",
+            characterClass: spellcastingType,
+            characterLevel: Math.ceil(monster.challenge_rating),
+            campaignId,
+            dmId: currentUser.uid,
+            createdAt: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+            spellSlots: getSpellSlots(
+              spellcastingType,
+              Math.ceil(monster.challenge_rating),
+              "Monster"
+            ),
+            usedSpellSlots: {},
+            order: 0, // Will be updated by SpellSlotTracker
+          };
+
+          await addDoc(collection(db, "SpellSlot"), spellSlotData);
+        }
+      }
+
+      // Navigate to monster details
+      navigate(`/campaign/${campaignId}/monsters/${monster.index}`, {
+        state: { previousPage: currentPage },
+      });
+    } catch (error) {
+      console.error("Error adding monster:", error);
+      setError("Failed to add monster");
+    }
   };
 
   return (
@@ -99,7 +183,7 @@ const MonsterList = () => {
               <div
                 key={monster.index}
                 className="player-card monster-card"
-                onClick={() => handleMonsterClick(monster.index)}
+                onClick={() => handleMonsterClick(monster)}
               >
                 <div className="player-header">
                   <div>

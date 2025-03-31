@@ -467,6 +467,46 @@ const EncounterGenerator = () => {
     );
   };
 
+  // Define spellcasting monster types
+  const SPELLCASTING_MONSTER_TYPES = {
+    FULL_CASTER: "Full Caster", // Like Archmage, Lich
+    HALF_CASTER: "Half Caster", // Like Death Knight, Drow Priestess
+    INNATE_CASTER: "Innate Caster", // Like Dragons, Beholders
+    SPECIAL: "Special", // Like Beholder, Mind Flayer
+  };
+
+  // Define spellcasting monster examples
+  const SPELLCASTING_MONSTERS = {
+    [SPELLCASTING_MONSTER_TYPES.FULL_CASTER]: [
+      "Archmage",
+      "Lich",
+      "Drow Matron Mother",
+      "Death Slaad",
+      "Rakshasa",
+    ],
+    [SPELLCASTING_MONSTER_TYPES.HALF_CASTER]: [
+      "Death Knight",
+      "Drow Priestess",
+      "Drow Elite Warrior",
+      "Drow Mage",
+      "Drow Priestess of Lolth",
+    ],
+    [SPELLCASTING_MONSTER_TYPES.INNATE_CASTER]: [
+      "Ancient Dragon",
+      "Adult Dragon",
+      "Young Dragon",
+      "Wyrmling Dragon",
+      "Beholder",
+    ],
+    [SPELLCASTING_MONSTER_TYPES.SPECIAL]: [
+      "Beholder",
+      "Mind Flayer",
+      "Aboleth",
+      "Yuan-ti Anathema",
+      "Death Tyrant",
+    ],
+  };
+
   // Add this new function to handle saving
   const saveEncounter = async () => {
     if (!generatedEncounter) return;
@@ -487,18 +527,16 @@ const EncounterGenerator = () => {
       const timestamp = new Date();
 
       const encounterData = {
-        name: encounterName.trim(), // Add the encounter name
+        name: encounterName.trim(),
         campaignId,
         userId: currentUser.uid,
         createdAt: timestamp,
         lastModified: timestamp,
-        // Save all encounter parameters
         partyLevel: encounterParams.partyLevel,
         difficulty: generatedEncounter.difficulty,
         environment: generatedEncounter.environment,
         location: generatedEncounter.location,
         totalCR: generatedEncounter.totalCR,
-        // Save monster details
         monsters: generatedEncounter.monsters.map((monster) => ({
           name: monster.name,
           challenge_rating: monster.challenge_rating,
@@ -514,6 +552,72 @@ const EncounterGenerator = () => {
       const docRef = await addDoc(collection(db, "Encounter"), encounterData);
       console.log("Encounter saved with ID: ", docRef.id);
 
+      // Create spell slot entries for spellcasting monsters
+      const spellSlotPromises = generatedEncounter.monsters
+        .filter((monster) => {
+          // Check if monster has spellcasting ability
+          return (
+            monster.spellcasting ||
+            monster.spells ||
+            monster.spellcasting_ability
+          );
+        })
+        .map(async (monster) => {
+          // Determine monster's spellcasting type based on its properties
+          let spellcastingType = null;
+
+          // Check for full caster traits
+          if (
+            monster.spellcasting &&
+            monster.spellcasting.ability === "intelligence" &&
+            monster.spellcasting.level >= 9
+          ) {
+            spellcastingType = SPELLCASTING_MONSTER_TYPES.FULL_CASTER;
+          }
+          // Check for half caster traits
+          else if (monster.spellcasting && monster.spellcasting.level >= 5) {
+            spellcastingType = SPELLCASTING_MONSTER_TYPES.HALF_CASTER;
+          }
+          // Check for innate spellcasting
+          else if (
+            monster.spellcasting &&
+            monster.spellcasting.ability === "charisma"
+          ) {
+            spellcastingType = SPELLCASTING_MONSTER_TYPES.INNATE_CASTER;
+          }
+          // Check for special cases
+          else if (monster.type === "aberration" || monster.type === "undead") {
+            spellcastingType = SPELLCASTING_MONSTER_TYPES.SPECIAL;
+          }
+
+          if (spellcastingType) {
+            const spellSlots = getSpellSlots(
+              spellcastingType,
+              Math.ceil(parseFloat(monster.challenge_rating)),
+              "Monster"
+            );
+            if (spellSlots) {
+              const spellSlotData = {
+                characterName: monster.name,
+                characterType: "Monster",
+                characterClass: spellcastingType,
+                characterLevel: Math.ceil(parseFloat(monster.challenge_rating)),
+                campaignId,
+                dmId: currentUser.uid,
+                spellSlots,
+                usedSpellSlots: {},
+                createdAt: timestamp,
+                lastModified: timestamp,
+                encounterId: docRef.id,
+              };
+
+              return addDoc(collection(db, "SpellSlot"), spellSlotData);
+            }
+          }
+        });
+
+      await Promise.all(spellSlotPromises);
+
       alert(`Encounter "${encounterName}" saved successfully!`);
     } catch (error) {
       console.error("Error saving encounter:", error);
@@ -521,6 +625,39 @@ const EncounterGenerator = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Helper function to calculate spell slots based on CR
+  const getSpellSlots = (cr) => {
+    // Convert CR to level for spell slot calculation
+    const level = Math.ceil(cr);
+    if (level < 1) return null;
+
+    // Basic spell slot progression based on CR
+    const slots = {
+      1: { 1: 2 }, // CR 1/4 - 1/2
+      2: { 1: 3 }, // CR 1
+      3: { 1: 4, 2: 2 }, // CR 2
+      4: { 1: 4, 2: 3 }, // CR 3
+      5: { 1: 4, 2: 3, 3: 2 }, // CR 4
+      6: { 1: 4, 2: 3, 3: 3 }, // CR 5
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 }, // CR 6
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 }, // CR 7
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 }, // CR 8
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 }, // CR 9
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 }, // CR 10
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 }, // CR 11
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 }, // CR 12
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 }, // CR 13
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 }, // CR 14
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 }, // CR 15
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 }, // CR 16
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 }, // CR 17
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 }, // CR 18
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 }, // CR 19-20
+    };
+
+    return slots[Math.min(level, 20)] || null;
   };
 
   return (

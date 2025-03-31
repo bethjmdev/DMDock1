@@ -15,6 +15,30 @@ import {
 } from "firebase/firestore";
 import "./SpellSlotTracker.css";
 
+// Define spellcasting classes
+const SPELLCASTING_CLASSES = [
+  "Wizard",
+  "Sorcerer",
+  "Cleric",
+  "Druid",
+  "Bard",
+  "Warlock",
+  "Paladin",
+  "Ranger",
+  "Artificer",
+  "Arcane Trickster",
+  "Eldritch Knight",
+].sort();
+
+// Define spellcasting monster types
+const SPELLCASTING_MONSTER_TYPES = {
+  FULL_CASTER: "Full Caster", // Like Archmage, Lich
+  HALF_CASTER: "Half Caster", // Like Death Knight, Drow Priestess
+  INNATE_CASTER: "Innate Caster", // Like Dragons, Beholders
+  SPECIAL: "Special", // Like Beholder, Mind Flayer
+};
+
+// Define spell slot progression for each class
 const SPELL_SLOT_PROGRESSION = {
   // Standard Full Casters (all use the same progression)
   Wizard: {
@@ -292,6 +316,109 @@ const SPELL_SLOT_PROGRESSION = {
       20: { 1: 4, 2: 3, 3: 3, 4: 1 },
     },
   },
+  // Monster spell slot progressions
+  Monster: {
+    [SPELLCASTING_MONSTER_TYPES.FULL_CASTER]: {
+      startLevel: 1,
+      slots: {
+        1: { 1: 2 }, // CR 1/4 - 1/2
+        2: { 1: 3 }, // CR 1
+        3: { 1: 4, 2: 2 }, // CR 2
+        4: { 1: 4, 2: 3 }, // CR 3
+        5: { 1: 4, 2: 3, 3: 2 }, // CR 4
+        6: { 1: 4, 2: 3, 3: 3 }, // CR 5
+        7: { 1: 4, 2: 3, 3: 3, 4: 1 }, // CR 6
+        8: { 1: 4, 2: 3, 3: 3, 4: 2 }, // CR 7
+        9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 }, // CR 8
+        10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 }, // CR 9
+        11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 }, // CR 10
+        12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 }, // CR 11
+        13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 }, // CR 12
+        14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 }, // CR 13
+        15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 }, // CR 14
+        16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 }, // CR 15
+        17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 }, // CR 16
+        18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 }, // CR 17
+        19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 }, // CR 18
+        20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 }, // CR 19-20
+      },
+    },
+    [SPELLCASTING_MONSTER_TYPES.HALF_CASTER]: {
+      startLevel: 1,
+      slots: {
+        1: { 1: 1 }, // CR 1/4 - 1/2
+        2: { 1: 2 }, // CR 1
+        3: { 1: 3 }, // CR 2
+        4: { 1: 3, 2: 1 }, // CR 3
+        5: { 1: 4, 2: 1 }, // CR 4
+        6: { 1: 4, 2: 2 }, // CR 5
+        7: { 1: 4, 2: 2 }, // CR 6
+        8: { 1: 4, 2: 2, 3: 1 }, // CR 7
+        9: { 1: 4, 2: 2, 3: 1 }, // CR 8
+        10: { 1: 4, 2: 2, 3: 2 }, // CR 9
+        11: { 1: 4, 2: 2, 3: 2 }, // CR 10
+        12: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 11
+        13: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 12
+        14: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 13
+        15: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 14
+        16: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 15
+        17: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 16
+        18: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 17
+        19: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 18
+        20: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 19-20
+      },
+    },
+    [SPELLCASTING_MONSTER_TYPES.INNATE_CASTER]: {
+      startLevel: 1,
+      slots: {
+        1: { 1: 1 }, // CR 1/4 - 1/2
+        2: { 1: 2 }, // CR 1
+        3: { 1: 2, 2: 1 }, // CR 2
+        4: { 1: 3, 2: 1 }, // CR 3
+        5: { 1: 3, 2: 2 }, // CR 4
+        6: { 1: 4, 2: 2 }, // CR 5
+        7: { 1: 4, 2: 2, 3: 1 }, // CR 6
+        8: { 1: 4, 2: 2, 3: 1 }, // CR 7
+        9: { 1: 4, 2: 2, 3: 2 }, // CR 8
+        10: { 1: 4, 2: 2, 3: 2 }, // CR 9
+        11: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 10
+        12: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 11
+        13: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 12
+        14: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 13
+        15: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 14
+        16: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 15
+        17: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 16
+        18: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 17
+        19: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 18
+        20: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 19-20
+      },
+    },
+    [SPELLCASTING_MONSTER_TYPES.SPECIAL]: {
+      startLevel: 1,
+      slots: {
+        1: { 1: 1 }, // CR 1/4 - 1/2
+        2: { 1: 2 }, // CR 1
+        3: { 1: 2, 2: 1 }, // CR 2
+        4: { 1: 3, 2: 1 }, // CR 3
+        5: { 1: 3, 2: 2 }, // CR 4
+        6: { 1: 4, 2: 2 }, // CR 5
+        7: { 1: 4, 2: 2, 3: 1 }, // CR 6
+        8: { 1: 4, 2: 2, 3: 1 }, // CR 7
+        9: { 1: 4, 2: 2, 3: 2 }, // CR 8
+        10: { 1: 4, 2: 2, 3: 2 }, // CR 9
+        11: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 10
+        12: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 11
+        13: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 12
+        14: { 1: 4, 2: 2, 3: 2, 4: 1 }, // CR 13
+        15: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 14
+        16: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 15
+        17: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 16
+        18: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 17
+        19: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 18
+        20: { 1: 4, 2: 2, 3: 2, 4: 1, 5: 1 }, // CR 19-20
+      },
+    },
+  },
 };
 
 const SpellSlotTracker = () => {
@@ -343,32 +470,29 @@ const SpellSlotTracker = () => {
     fetchCharacters();
   }, [campaignId, currentUser.uid]);
 
-  const getSpellSlots = (characterClass, level) => {
+  const getSpellSlots = (
+    characterClass,
+    characterLevel,
+    characterType = "Player"
+  ) => {
+    if (!characterClass || !characterLevel) return null;
+
+    // Handle monster spell slots
+    if (characterType === "Monster") {
+      const monsterType = characterClass; // characterClass is actually the monster type in this case
+      const monsterProgression = SPELL_SLOT_PROGRESSION.Monster[monsterType];
+      if (!monsterProgression) return null;
+
+      const level = Math.min(characterLevel, 20);
+      return monsterProgression.slots[level] || null;
+    }
+
+    // Handle player and NPC spell slots
     const progression = SPELL_SLOT_PROGRESSION[characterClass];
     if (!progression) return null;
 
-    // If level is below start level, return null
-    if (level < progression.startLevel) return null;
-
-    // Get the highest level that's not greater than the character's level
-    const availableLevels = Object.keys(progression.slots)
-      .map(Number)
-      .filter((l) => l <= level);
-
-    if (availableLevels.length === 0) return null;
-
-    const highestLevel = Math.max(...availableLevels);
-
-    // Special handling for Warlock's Pact Magic
-    if (progression.pactMagic) {
-      // Warlocks only get their highest level slots
-      const slots = progression.slots[highestLevel];
-      const slotLevel = Object.keys(slots)[0];
-      const slotCount = slots[slotLevel];
-      return { [slotLevel]: slotCount };
-    }
-
-    return progression.slots[highestLevel];
+    const level = Math.min(characterLevel, 20);
+    return progression.slots[level] || null;
   };
 
   const handleSpellSlotChange = async (characterId, spellLevel, change) => {
@@ -642,7 +766,11 @@ const SpellSlotTracker = () => {
         return;
       }
 
-      const newSpellSlots = getSpellSlots(character.characterClass, newLevel);
+      const newSpellSlots = getSpellSlots(
+        character.characterClass,
+        newLevel,
+        character.characterType
+      );
       if (!newSpellSlots) {
         setError("Failed to calculate new spell slots");
         return;
