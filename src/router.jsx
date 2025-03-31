@@ -29,6 +29,7 @@ import EncounterGenerator from "./components/campaign/pages/EncounterGenerator";
 import TownGenerator from "./components/campaign/pages/TownGenerator";
 import NPCGenerator from "./components/campaign/pages/NPCGenerator";
 import SpellSlotTracker from "./components/campaign/pages/SpellSlotTracker";
+import NewSpellSlotCharacter from "./components/campaign/pages/NewSpellSlotCharacter";
 import DateTracker from "./components/campaign/pages/DateTracker";
 import EncounterList from "./components/campaign/pages/EncounterList";
 import MonsterList from "./components/campaign/pages/MonsterList";
@@ -141,10 +142,18 @@ const AppRouter = () => {
         }
       />
       <Route
-        path="/campaign/spell-slots"
+        path="/campaign/:campaignId/spell-slot"
         element={
           <ProtectedRoute>
             <SpellSlotTracker />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campaign/:campaignId/spell-slot/new"
+        element={
+          <ProtectedRoute>
+            <NewSpellSlotCharacter />
           </ProtectedRoute>
         }
       />
