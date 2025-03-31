@@ -1,9 +1,9 @@
-.spell-slot-container {
+/* .spell-slot-container {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #f4e4bc; /* Tan background */
-}
+  background-color: #f4e4bc;
+} */
 
 .spell-slot-header {
   display: flex;
@@ -31,14 +31,14 @@
 .add-character-button:hover {
   background-color: #600000; /* Darker maroon */
 }
-
+/* 
 .spell-slot-content {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(44, 27, 77, 0.2);
   padding: 20px;
-  border: 1px solid #d4b895; /* Tan border */
-}
+  border: 1px solid #d4b895; 
+} */
 
 /* Form Styles */
 .character-form {
@@ -137,97 +137,109 @@
 .character-card {
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(44, 27, 77, 0.1);
   padding: 20px;
-  transition: transform 0.2s;
-  position: relative;
-  border: 1px solid #d4b895;
-}
-
-.character-card:hover {
-  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .character-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.character-header h3 {
+  margin: 0;
+  color: #8b0000;
+  font-size: 1.4rem;
+}
+
+.character-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0 0 15px 0;
+  padding: 0;
+  color: #666;
+  font-size: 0.95rem;
 }
 
 .character-controls {
   display: flex;
-  gap: 8px;
   align-items: center;
-  position: relative;
-  z-index: 1;
+  gap: 8px;
 }
 
 .move-buttons {
   display: flex;
-  flex-direction: column;
   gap: 4px;
-  position: relative;
-  z-index: 1;
 }
 
 .move-button {
-  background-color: #daa520; /* Goldenrod */
-  color: white;
-  border: none;
+  background-color: #f8f1e3;
+  border: 1px solid #d4b895;
+  color: #8b0000;
+  width: 30px;
+  height: 30px;
   border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s;
+  font-size: 16px;
+  transition: all 0.2s;
 }
 
 .move-button:hover:not(:disabled) {
-  background-color: #b8860b; /* Dark goldenrod */
+  background-color: #e8d5c4;
 }
 
 .move-button:disabled {
-  background-color: #a9a9a9;
-  cursor: not-allowed;
   opacity: 0.5;
-}
-
-.character-card h3 {
-  margin: 0;
-  color: #8b0000; /* Maroon */
-  padding-right: 30px;
-  flex: 1;
+  cursor: not-allowed;
 }
 
 .delete-character-button {
-  position: relative;
-  background-color: #8b0000; /* Dark red */
+  background-color: #dc3545;
   color: white;
   border: none;
+  width: 30px;
+  height: 30px;
   border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s;
-  z-index: 0;
+  font-size: 18px;
+  transition: background-color 0.2s;
 }
 
 .delete-character-button:hover {
-  background-color: #660000;
+  background-color: #c82333;
 }
 
-.character-info {
-  color: #b8860b; /* Dark goldenrod */
-  margin-bottom: 15px;
-  font-size: 14px;
+.level-up-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  margin-left: auto;
+}
+
+.level-up-button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.level-up-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
 /* Spell Slots in Character Card */
@@ -385,13 +397,6 @@
   opacity: 0.8;
 }
 
-.spell-checkbox {
-  margin-right: 0;
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
 .spell-name {
   flex: 1;
   font-size: 14px;
@@ -483,4 +488,102 @@
 
 .save-notes-button:hover {
   background-color: #600000;
+}
+
+.spell-level-section {
+  margin-bottom: 20px;
+}
+
+.spell-inputs {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.spell-input-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 10px;
+}
+
+.spell-name-input {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #d4b895;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.spell-name-input:focus {
+  outline: none;
+  border-color: #800000;
+  box-shadow: 0 0 5px rgba(128, 0, 0, 0.2);
+}
+
+.spell-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 2px solid #800000;
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.3s;
+  position: relative;
+  background-color: white;
+}
+
+.spell-checkbox:checked {
+  background-color: #800000;
+}
+
+.spell-checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  left: 2px;
+  top: -1px;
+}
+
+.spell-input-row.used .spell-name-input {
+  opacity: 0.7;
+  background-color: #f8f1e3;
+  text-decoration: line-through;
+}
+
+.spell-checkbox:checked + .spell-name-input {
+  opacity: 0.7;
+  background-color: #f8f1e3;
+  text-decoration: line-through;
+  color: #666;
+}
+
+.spell-slots-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.reset-all-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reset-all-button:hover {
+  background-color: #c82333;
 }

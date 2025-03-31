@@ -319,6 +319,78 @@ const CampaignView = () => {
     };
   };
 
+  // Add this useEffect to generate initial weather if needed
+  useEffect(() => {
+    const generateInitialWeather = async () => {
+      if (
+        campaignData.custom_weather === true &&
+        !campaignData.weather &&
+        dateValue &&
+        calendarRules &&
+        seasonData
+      ) {
+        const currentSeason = determineSeasonForDate(
+          dateValue.month,
+          dateValue.number_day
+        );
+        const weatherData = currentSeason
+          ? generateWeather(currentSeason.weatherPattern)
+          : null;
+
+        if (weatherData) {
+          // Create weather narrative string
+          const weatherString =
+            `The weather is ${weatherData.temperature}°F` +
+            `${
+              weatherData.windChill
+                ? ` (feels like ${weatherData.windChill}°F with wind chill)`
+                : ""
+            }` +
+            `${
+              weatherData.heatIndex
+                ? ` (feels like ${weatherData.heatIndex}°F with heat index)`
+                : ""
+            }` +
+            ` with ${weatherData.wind.strength} winds at ${weatherData.wind.speed} mph.` +
+            `${
+              weatherData.precipitation.type !== "none"
+                ? ` There is a ${weatherData.precipitation.chance}% chance of ${weatherData.precipitation.type} with expected accumulation of ${weatherData.precipitation.amount} inches.`
+                : " No precipitation is expected."
+            }` +
+            `${
+              weatherData.cloudCoverage > 80
+                ? " The sky is heavily overcast"
+                : weatherData.cloudCoverage > 50
+                ? " The sky is partly cloudy"
+                : " The sky is mostly clear"
+            }` +
+            `${weatherData.fog ? " with fog present" : ""}.` +
+            `${weatherData.thunderstorm ? " Thunderstorms are likely." : ""}` +
+            `${
+              weatherData.whiteout ? " Whiteout conditions are in effect." : ""
+            }` +
+            ` Road conditions are ${weatherData.roadConditions}` +
+            ` with ${weatherData.visibility} visibility.`;
+
+          // Update Firestore with the weather
+          const campaignRef = doc(db, "Campaign", campaignId);
+          await updateDoc(campaignRef, {
+            weather: weatherString,
+          });
+        }
+      }
+    };
+
+    generateInitialWeather();
+  }, [
+    campaignData.custom_weather,
+    campaignData.weather,
+    dateValue,
+    calendarRules,
+    seasonData,
+    campaignId,
+  ]);
+
   const buttons = [
     { title: "Players", path: `/campaign/${campaignId}/players` },
     { title: "NPCs", path: `/campaign/${campaignId}/npc` },
@@ -468,7 +540,7 @@ const CampaignView = () => {
     <div className="campaign-view-container">
       <div className="campaign-view-content">
         <h1 className="campaign-view-title">
-          {campaignData.name || "Campaign Tools"}
+          {campaignData.name || "There be an error"}
           <br />
           <br />
           {campaignData.custom_weather === false ? (
