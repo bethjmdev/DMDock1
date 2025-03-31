@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { db } from "../../../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import "./Players.css";
 
 const NPC = () => {
@@ -55,6 +62,18 @@ const NPC = () => {
 
   const handleAddNPC = () => {
     navigate(`/campaign/${campaignId}/npc/add`);
+  };
+
+  const handleDeleteNPC = async (npcId) => {
+    if (window.confirm("Are you sure you want to delete this NPC?")) {
+      try {
+        await deleteDoc(doc(db, "NPC", npcId));
+        setNPCs(NPCs.filter((npc) => npc.id !== npcId));
+      } catch (error) {
+        console.error("Error deleting NPC:", error);
+        alert("Failed to delete NPC");
+      }
+    }
   };
 
   if (loading) {
@@ -128,14 +147,26 @@ const NPC = () => {
                 </div>
                 <p className="text-sm text-gray-600">Notes: {NPC.notes}</p>
               </div>
-              <button
-                onClick={() =>
-                  navigate(`/campaign/${campaignId}/npcs/edit/${NPC.id}`)
-                }
-                className="edit-button"
-              >
-                Edit / Add Notes
-              </button>
+              <div className="button-group">
+                <button
+                  onClick={() =>
+                    navigate(`/campaign/${campaignId}/npcs/edit/${NPC.id}`)
+                  }
+                  className="edit-button"
+                >
+                  Edit / Add Notes
+                </button>
+                <button
+                  onClick={() => handleDeleteNPC(NPC.id)}
+                  className="edit-button"
+                  style={{
+                    backgroundColor: "#dc2626",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  Delete NPC
+                </button>
+              </div>
             </div>
           ))}
         </div>

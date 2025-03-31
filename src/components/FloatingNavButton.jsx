@@ -29,7 +29,7 @@ const FloatingNavButton = () => {
       {showBothButtons ? (
         <>
           <div className="floating-nav-button" onClick={handleCampaignClick}>
-            Back
+            Campaign
           </div>
           <div
             className="floating-nav-button home-button"
