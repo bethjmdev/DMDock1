@@ -347,18 +347,36 @@ const SpellSlotTracker = () => {
     if (availableLevels.length === 0) return null;
 
     const highestLevel = Math.max(...availableLevels);
+
+    // Special handling for Warlock's Pact Magic
+    if (progression.pactMagic) {
+      // Warlocks only get their highest level slots
+      const slots = progression.slots[highestLevel];
+      const slotLevel = Object.keys(slots)[0];
+      const slotCount = slots[slotLevel];
+      return { [slotLevel]: slotCount };
+    }
+
     return progression.slots[highestLevel];
   };
 
   const handleSpellSlotChange = async (characterId, spellLevel, change) => {
     try {
       const character = characters.find((c) => c.id === characterId);
-      const currentSlots = character.spellSlots[spellLevel] || 0;
-      const newSlots = Math.max(0, currentSlots + change);
+      const maxSlots = character.spellSlots[spellLevel];
+      const currentAvailable =
+        maxSlots - (character.usedSpellSlots?.[spellLevel] || 0);
+      const newUsedSlots = Math.max(
+        0,
+        Math.min(
+          maxSlots,
+          (character.usedSpellSlots?.[spellLevel] || 0) - change
+        )
+      );
 
       const characterRef = doc(db, "SpellSlot", characterId);
       await updateDoc(characterRef, {
-        [`spellSlots.${spellLevel}`]: newSlots,
+        [`usedSpellSlots.${spellLevel}`]: newUsedSlots,
       });
 
       // Update local state
@@ -367,9 +385,9 @@ const SpellSlotTracker = () => {
           char.id === characterId
             ? {
                 ...char,
-                spellSlots: {
-                  ...char.spellSlots,
-                  [spellLevel]: newSlots,
+                usedSpellSlots: {
+                  ...char.usedSpellSlots,
+                  [spellLevel]: newUsedSlots,
                 },
               }
             : char
@@ -583,6 +601,47 @@ const SpellSlotTracker = () => {
     setCharacters(newCharacters);
   };
 
+  const handleLevelUp = async (characterId) => {
+    try {
+      const character = characters.find((c) => c.id === characterId);
+      const newLevel = Number(character.characterLevel) + 1;
+
+      if (newLevel > 20) {
+        setError("Character cannot level up beyond level 20");
+        return;
+      }
+
+      const newSpellSlots = getSpellSlots(character.characterClass, newLevel);
+      if (!newSpellSlots) {
+        setError("Failed to calculate new spell slots");
+        return;
+      }
+
+      const characterRef = doc(db, "SpellSlot", characterId);
+      await updateDoc(characterRef, {
+        characterLevel: newLevel,
+        spellSlots: newSpellSlots,
+        usedSpellSlots: {}, // Reset used spell slots on level up
+      });
+
+      setCharacters((prevCharacters) =>
+        prevCharacters.map((char) =>
+          char.id === characterId
+            ? {
+                ...char,
+                characterLevel: newLevel,
+                spellSlots: newSpellSlots,
+                usedSpellSlots: {},
+              }
+            : char
+        )
+      );
+    } catch (error) {
+      console.error("Error leveling up character:", error);
+      setError("Failed to level up character");
+    }
+  };
+
   if (loading) {
     return <div className="spell-slot-container">Loading...</div>;
   }
@@ -637,6 +696,13 @@ const SpellSlotTracker = () => {
                 <p className="character-info">
                   {character.characterType} - {character.characterClass} Level{" "}
                   {character.characterLevel}
+                  <button
+                    className="level-up-button"
+                    onClick={() => handleLevelUp(character.id)}
+                    disabled={character.characterLevel >= 20}
+                  >
+                    Level Up
+                  </button>
                 </p>
 
                 <div className="spell-slots">
@@ -655,7 +721,8 @@ const SpellSlotTracker = () => {
                             -
                           </button>
                           <span className="slot-count">
-                            {character.usedSpellSlots?.[level] || 0}/{slots}
+                            {slots - (character.usedSpellSlots?.[level] || 0)}/
+                            {slots}
                           </span>
                           <button
                             className="slot-button"
