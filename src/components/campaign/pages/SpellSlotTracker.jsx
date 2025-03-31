@@ -782,6 +782,46 @@ const SpellSlotTracker = () => {
     }
   };
 
+  const resetAllSpells = async (characterId) => {
+    try {
+      const character = characters.find((c) => c.id === characterId);
+
+      // Reset all spell slots to unused and clear names
+      const resetSpellsByLevel = {};
+      Object.entries(character.spellSlots || {}).forEach(([level, slots]) => {
+        resetSpellsByLevel[level] = Array(slots)
+          .fill()
+          .map(() => ({ name: "", used: false }));
+      });
+
+      const characterRef = doc(db, "SpellSlot", characterId);
+      await updateDoc(characterRef, {
+        spellsByLevel: resetSpellsByLevel,
+        usedSpellSlots: {}, // Reset all used spell slots
+      });
+
+      // Update local state
+      setSpellsByLevel((prev) => ({
+        ...prev,
+        [characterId]: resetSpellsByLevel,
+      }));
+
+      setCharacters((prevCharacters) =>
+        prevCharacters.map((char) =>
+          char.id === characterId
+            ? {
+                ...char,
+                usedSpellSlots: {},
+              }
+            : char
+        )
+      );
+    } catch (error) {
+      console.error("Error resetting all spells:", error);
+      setError("Failed to reset spells");
+    }
+  };
+
   if (loading) {
     return <div className="spell-slot-container">Loading...</div>;
   }
@@ -846,7 +886,15 @@ const SpellSlotTracker = () => {
                 </p>
 
                 <div className="spell-slots">
-                  <h4>Spell Slots</h4>
+                  <div className="spell-slots-header">
+                    <h4>Spell Slots</h4>
+                    <button
+                      className="reset-all-button"
+                      onClick={() => resetAllSpells(character.id)}
+                    >
+                      Reset All
+                    </button>
+                  </div>
                   {Object.entries(character.spellSlots || {}).map(
                     ([level, slots]) => (
                       <div key={level} className="spell-level-section">
