@@ -2,6 +2,7 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  background-color: #f4e4bc; /* Tan background */
 }
 
 .spell-slot-header {
@@ -13,12 +14,12 @@
 
 .spell-slot-header h1 {
   margin: 0;
-  color: #333;
+  color: #8b0000; /* Maroon for headings */
 }
 
 .add-character-button {
-  background-color: #4caf50;
-  color: white;
+  background-color: #800000; /* Maroon */
+  color: #f4e4bc;
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -28,14 +29,15 @@
 }
 
 .add-character-button:hover {
-  background-color: #45a049;
+  background-color: #600000; /* Darker maroon */
 }
 
 .spell-slot-content {
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(44, 27, 77, 0.2);
   padding: 20px;
+  border: 1px solid #d4b895; /* Tan border */
 }
 
 /* Form Styles */
@@ -56,7 +58,7 @@
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  color: #333;
+  color: #8b0000; /* Maroon for labels */
 }
 
 .form-group input,
@@ -71,21 +73,21 @@
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+  border-color: #800000; /* Maroon */
+  box-shadow: 0 0 5px rgba(128, 0, 0, 0.2);
 }
 
 /* Spell Slots Display */
 .spell-slots-display {
   margin: 20px 0;
   padding: 15px;
-  background-color: #f5f5f5;
+  background-color: #f8f1e3; /* Light tan */
   border-radius: 4px;
 }
 
 .spell-slots-display h3 {
   margin-top: 0;
-  color: #333;
+  color: #8b0000; /* Maroon */
 }
 
 .spell-slot-level {
@@ -94,11 +96,12 @@
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d4b895;
 }
 
 /* Submit Button */
 .submit-button {
-  background-color: #4caf50;
+  background-color: #800000; /* Maroon */
   color: white;
   padding: 12px 24px;
   border: none;
@@ -110,15 +113,15 @@
 }
 
 .submit-button:hover {
-  background-color: #45a049;
+  background-color: #600000;
 }
 
 /* Error Message */
 .error-message {
-  color: #f44336;
+  color: #8b0000; /* Dark red */
   margin: 10px 0;
   padding: 10px;
-  background-color: #ffebee;
+  background-color: #fff5f5;
   border-radius: 4px;
   border: 1px solid #ffcdd2;
 }
@@ -134,27 +137,75 @@
 .character-card {
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(44, 27, 77, 0.1);
   padding: 20px;
   transition: transform 0.2s;
   position: relative;
+  border: 1px solid #d4b895;
 }
 
 .character-card:hover {
   transform: translateY(-2px);
 }
 
+.character-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.character-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.move-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.move-button {
+  background-color: #daa520; /* Goldenrod */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.move-button:hover:not(:disabled) {
+  background-color: #b8860b; /* Dark goldenrod */
+}
+
+.move-button:disabled {
+  background-color: #a9a9a9;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .character-card h3 {
-  margin: 0 0 10px 0;
-  color: #333;
+  margin: 0;
+  color: #8b0000; /* Maroon */
   padding-right: 30px;
+  flex: 1;
 }
 
 .delete-character-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background-color: #f44336;
+  position: relative;
+  background-color: #8b0000; /* Dark red */
   color: white;
   border: none;
   border-radius: 4px;
@@ -166,14 +217,15 @@
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s;
+  z-index: 0;
 }
 
 .delete-character-button:hover {
-  background-color: #d32f2f;
+  background-color: #660000;
 }
 
 .character-info {
-  color: #666;
+  color: #b8860b; /* Dark goldenrod */
   margin-bottom: 15px;
   font-size: 14px;
 }
@@ -185,7 +237,7 @@
 
 .spell-slots h4 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: #8b0000; /* Maroon */
 }
 
 .spell-slot-control {
@@ -194,8 +246,9 @@
   align-items: center;
   margin: 8px 0;
   padding: 8px;
-  background-color: #f5f5f5;
+  background-color: #f8f1e3; /* Light tan */
   border-radius: 4px;
+  border: 1px solid #d4b895;
 }
 
 .slot-controls {
@@ -205,7 +258,7 @@
 }
 
 .slot-button {
-  background-color: #4caf50;
+  background-color: #800000; /* Maroon */
   color: white;
   border: none;
   border-radius: 4px;
@@ -220,7 +273,7 @@
 }
 
 .slot-button:hover {
-  background-color: #45a049;
+  background-color: #600000;
 }
 
 .slot-count {
@@ -238,7 +291,7 @@
 
 .spell-management h4 {
   margin: 0 0 15px 0;
-  color: #333;
+  color: #8b0000; /* Maroon */
 }
 
 .add-spell-form {
@@ -270,24 +323,24 @@
 }
 
 .add-spell-button {
-  background-color: #4caf50;
+  background-color: #800000; /* Maroon */
   color: white;
 }
 
 .edit-spells-button {
-  background-color: #2196f3;
+  background-color: #daa520; /* Goldenrod */
   color: white;
   width: 100%;
   margin-bottom: 15px;
 }
 
 .cancel-button {
-  background-color: #f44336;
+  background-color: #8b0000; /* Dark red */
   color: white;
 }
 
 .reset-spells-button {
-  background-color: #ff9800;
+  background-color: #cd853f; /* Peru */
   color: white;
   font-size: 12px;
   padding: 4px 8px;
@@ -306,7 +359,7 @@
 
 .spell-list-header h5 {
   margin: 0;
-  color: #333;
+  color: #8b0000; /* Maroon */
 }
 
 .spell-list ul {
@@ -319,16 +372,17 @@
   display: flex;
   align-items: center;
   padding: 8px;
-  background-color: #f5f5f5;
+  background-color: #f8f1e3; /* Light tan */
   margin-bottom: 5px;
   border-radius: 4px;
   transition: background-color 0.3s;
   gap: 12px;
+  border: 1px solid #d4b895;
 }
 
 .spell-item.used {
-  background-color: #e0e0e0;
-  opacity: 0.7;
+  background-color: #e8d5c4; /* Used tan */
+  opacity: 0.8;
 }
 
 .spell-checkbox {
@@ -346,14 +400,14 @@
 
 .spell-level {
   font-size: 12px;
-  color: #666;
+  color: #b8860b; /* Dark goldenrod */
   margin-left: 0;
   flex-shrink: 0;
   white-space: nowrap;
 }
 
 .delete-spell-button {
-  background-color: #f44336;
+  background-color: #8b0000; /* Dark red */
   color: white;
   border: none;
   border-radius: 4px;
@@ -369,41 +423,41 @@
 }
 
 .delete-spell-button:hover {
-  background-color: #d32f2f;
+  background-color: #660000;
 }
 
 .add-spell-button:hover {
-  background-color: #45a049;
+  background-color: #600000;
 }
 
 .edit-spells-button:hover {
-  background-color: #1976d2;
+  background-color: #b8860b; /* Dark goldenrod */
 }
 
 .cancel-button:hover {
-  background-color: #d32f2f;
+  background-color: #660000;
 }
 
 .reset-spells-button:hover {
-  background-color: #f57c00;
+  background-color: #b8860b; /* Dark goldenrod */
 }
 
 .character-notes {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #d4b895;
 }
 
 .character-notes h4 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: #8b0000; /* Maroon */
 }
 
 .notes-textarea {
   width: 100%;
   min-height: 100px;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #d4b895;
   border-radius: 4px;
   font-size: 14px;
   resize: vertical;
@@ -412,12 +466,12 @@
 
 .notes-textarea:focus {
   outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+  border-color: #800000;
+  box-shadow: 0 0 5px rgba(128, 0, 0, 0.2);
 }
 
 .save-notes-button {
-  background-color: #4caf50;
+  background-color: #800000; /* Maroon */
   color: white;
   border: none;
   border-radius: 4px;
@@ -428,5 +482,5 @@
 }
 
 .save-notes-button:hover {
-  background-color: #45a049;
+  background-color: #600000;
 }

@@ -10,8 +10,288 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  addDoc,
 } from "firebase/firestore";
 import "./SpellSlotTracker.css";
+
+const SPELL_SLOT_PROGRESSION = {
+  // Standard Full Casters (all use the same progression)
+  Wizard: {
+    startLevel: 1,
+    slots: {
+      1: { 1: 2 },
+      2: { 1: 3 },
+      3: { 1: 4, 2: 2 },
+      4: { 1: 4, 2: 3 },
+      5: { 1: 4, 2: 3, 3: 2 },
+      6: { 1: 4, 2: 3, 3: 3 },
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 },
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 },
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+    },
+  },
+  Bard: {
+    startLevel: 1,
+    slots: {
+      1: { 1: 2 },
+      2: { 1: 3 },
+      3: { 1: 4, 2: 2 },
+      4: { 1: 4, 2: 3 },
+      5: { 1: 4, 2: 3, 3: 2 },
+      6: { 1: 4, 2: 3, 3: 3 },
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 },
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 },
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 2, 8: 1, 9: 1 },
+    },
+  },
+  Cleric: {
+    startLevel: 1,
+    slots: {
+      1: { 1: 2 },
+      2: { 1: 3 },
+      3: { 1: 4, 2: 2 },
+      4: { 1: 4, 2: 3 },
+      5: { 1: 4, 2: 3, 3: 2 },
+      6: { 1: 4, 2: 3, 3: 3 },
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 },
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 },
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+    },
+  },
+  Druid: {
+    startLevel: 1,
+    slots: {
+      1: { 1: 2 },
+      2: { 1: 3 },
+      3: { 1: 4, 2: 2 },
+      4: { 1: 4, 2: 3 },
+      5: { 1: 4, 2: 3, 3: 2 },
+      6: { 1: 4, 2: 3, 3: 3 },
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 },
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 },
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+    },
+  },
+  Sorcerer: {
+    startLevel: 1,
+    slots: {
+      1: { 1: 2 },
+      2: { 1: 3 },
+      3: { 1: 4, 2: 2 },
+      4: { 1: 4, 2: 3 },
+      5: { 1: 4, 2: 3, 3: 2 },
+      6: { 1: 4, 2: 3, 3: 3 },
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 },
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 },
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+    },
+  },
+  // Special Case: Warlock
+  Warlock: {
+    startLevel: 1,
+    pactMagic: true,
+    slots: {
+      1: { 1: 1 },
+      2: { 1: 2 },
+      3: { 2: 2 },
+      4: { 2: 2 },
+      5: { 3: 2 },
+      6: { 3: 2 },
+      7: { 4: 2 },
+      8: { 4: 2 },
+      9: { 5: 2 },
+      10: { 5: 2 },
+      11: { 5: 3 },
+      12: { 5: 3 },
+      13: { 5: 3 },
+      14: { 5: 3 },
+      15: { 5: 3 },
+      16: { 5: 3 },
+      17: { 5: 4 },
+      18: { 5: 4 },
+      19: { 5: 4 },
+      20: { 5: 4 },
+    },
+  },
+  // Half Casters
+  Paladin: {
+    startLevel: 2,
+    slots: {
+      2: { 1: 2 },
+      3: { 1: 3 },
+      4: { 1: 3 },
+      5: { 1: 4, 2: 2 },
+      6: { 1: 4, 2: 2 },
+      7: { 1: 4, 2: 3 },
+      8: { 1: 4, 2: 3 },
+      9: { 1: 4, 2: 3, 3: 2 },
+      10: { 1: 4, 2: 3, 3: 2 },
+      11: { 1: 4, 2: 3, 3: 3 },
+      12: { 1: 4, 2: 3, 3: 3 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 2 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 2 },
+    },
+  },
+  // Third Casters
+  "Arcane Trickster": {
+    startLevel: 3,
+    slots: {
+      3: { 1: 2 },
+      4: { 1: 3 },
+      5: { 1: 3 },
+      6: { 1: 3 },
+      7: { 1: 4, 2: 2 },
+      8: { 1: 4, 2: 2 },
+      9: { 1: 4, 2: 2 },
+      10: { 1: 4, 2: 3 },
+      11: { 1: 4, 2: 3 },
+      12: { 1: 4, 2: 3 },
+      13: { 1: 4, 2: 3, 3: 2 },
+      14: { 1: 4, 2: 3, 3: 2 },
+      15: { 1: 4, 2: 3, 3: 2 },
+      16: { 1: 4, 2: 3, 3: 3 },
+      17: { 1: 4, 2: 3, 3: 3 },
+      18: { 1: 4, 2: 3, 3: 3 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 1 },
+    },
+  },
+  // Half Casters
+  Ranger: {
+    startLevel: 2,
+    slots: {
+      2: { 1: 2 },
+      3: { 1: 3 },
+      4: { 1: 3 },
+      5: { 1: 4, 2: 2 },
+      6: { 1: 4, 2: 2 },
+      7: { 1: 4, 2: 3 },
+      8: { 1: 4, 2: 3 },
+      9: { 1: 4, 2: 3, 3: 2 },
+      10: { 1: 4, 2: 3, 3: 2 },
+      11: { 1: 4, 2: 3, 3: 3 },
+      12: { 1: 4, 2: 3, 3: 3 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 2 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 2 },
+    },
+  },
+  Artificer: {
+    startLevel: 1, // Artificer is special - starts at level 1 but follows half-caster progression
+    slots: {
+      1: { 1: 2 },
+      2: { 1: 2 },
+      3: { 1: 3 },
+      4: { 1: 3 },
+      5: { 1: 4, 2: 2 },
+      6: { 1: 4, 2: 2 },
+      7: { 1: 4, 2: 3 },
+      8: { 1: 4, 2: 3 },
+      9: { 1: 4, 2: 3, 3: 2 },
+      10: { 1: 4, 2: 3, 3: 2 },
+      11: { 1: 4, 2: 3, 3: 3 },
+      12: { 1: 4, 2: 3, 3: 3 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 2 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 2 },
+    },
+  },
+  // Third Casters
+  "Eldritch Knight": {
+    startLevel: 3,
+    slots: {
+      3: { 1: 2 },
+      4: { 1: 3 },
+      5: { 1: 3 },
+      6: { 1: 3 },
+      7: { 1: 4, 2: 2 },
+      8: { 1: 4, 2: 2 },
+      9: { 1: 4, 2: 2 },
+      10: { 1: 4, 2: 3 },
+      11: { 1: 4, 2: 3 },
+      12: { 1: 4, 2: 3 },
+      13: { 1: 4, 2: 3, 3: 2 },
+      14: { 1: 4, 2: 3, 3: 2 },
+      15: { 1: 4, 2: 3, 3: 2 },
+      16: { 1: 4, 2: 3, 3: 3 },
+      17: { 1: 4, 2: 3, 3: 3 },
+      18: { 1: 4, 2: 3, 3: 3 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 1 },
+    },
+  },
+};
 
 const SpellSlotTracker = () => {
   const navigate = useNavigate();
@@ -51,6 +331,24 @@ const SpellSlotTracker = () => {
 
     fetchCharacters();
   }, [campaignId]);
+
+  const getSpellSlots = (characterClass, level) => {
+    const progression = SPELL_SLOT_PROGRESSION[characterClass];
+    if (!progression) return null;
+
+    // If level is below start level, return null
+    if (level < progression.startLevel) return null;
+
+    // Get the highest level that's not greater than the character's level
+    const availableLevels = Object.keys(progression.slots)
+      .map(Number)
+      .filter((l) => l <= level);
+
+    if (availableLevels.length === 0) return null;
+
+    const highestLevel = Math.max(...availableLevels);
+    return progression.slots[highestLevel];
+  };
 
   const handleSpellSlotChange = async (characterId, spellLevel, change) => {
     try {
@@ -267,6 +565,24 @@ const SpellSlotTracker = () => {
     }
   };
 
+  const moveCharacter = (index, direction) => {
+    if (
+      (direction === "up" && index === 0) ||
+      (direction === "down" && index === characters.length - 1)
+    ) {
+      return;
+    }
+
+    const newCharacters = [...characters];
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    [newCharacters[index], newCharacters[newIndex]] = [
+      newCharacters[newIndex],
+      newCharacters[index],
+    ];
+
+    setCharacters(newCharacters);
+  };
+
   if (loading) {
     return <div className="spell-slot-container">Loading...</div>;
   }
@@ -289,15 +605,35 @@ const SpellSlotTracker = () => {
           <p>No characters found. Add your first character!</p>
         ) : (
           <div className="characters-grid">
-            {characters.map((character) => (
+            {characters.map((character, index) => (
               <div key={character.id} className="character-card">
-                <h3>{character.characterName}</h3>
-                <button
-                  className="delete-character-button"
-                  onClick={() => deleteCharacter(character.id)}
-                >
-                  ×
-                </button>
+                <div className="character-header">
+                  <h3>{character.characterName}</h3>
+                  <div className="character-controls">
+                    <button
+                      className="delete-character-button"
+                      onClick={() => deleteCharacter(character.id)}
+                    >
+                      ×
+                    </button>
+                    <div className="move-buttons">
+                      <button
+                        className="move-button"
+                        onClick={() => moveCharacter(index, "up")}
+                        disabled={index === 0}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        className="move-button"
+                        onClick={() => moveCharacter(index, "down")}
+                        disabled={index === characters.length - 1}
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <p className="character-info">
                   {character.characterType} - {character.characterClass} Level{" "}
                   {character.characterLevel}
@@ -305,25 +641,27 @@ const SpellSlotTracker = () => {
 
                 <div className="spell-slots">
                   <h4>Spell Slots</h4>
-                  {Object.entries(character.spellSlots).map(
+                  {Object.entries(character.spellSlots || {}).map(
                     ([level, slots]) => (
                       <div key={level} className="spell-slot-control">
-                        <span>Level {level}:</span>
+                        <span>Level {level}</span>
                         <div className="slot-controls">
                           <button
+                            className="slot-button"
                             onClick={() =>
                               handleSpellSlotChange(character.id, level, -1)
                             }
-                            className="slot-button"
                           >
                             -
                           </button>
-                          <span className="slot-count">{slots}</span>
+                          <span className="slot-count">
+                            {character.usedSpellSlots?.[level] || 0}/{slots}
+                          </span>
                           <button
+                            className="slot-button"
                             onClick={() =>
                               handleSpellSlotChange(character.id, level, 1)
                             }
-                            className="slot-button"
                           >
                             +
                           </button>
