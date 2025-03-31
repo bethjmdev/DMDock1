@@ -304,6 +304,7 @@ const SpellSlotTracker = () => {
   const [newSpell, setNewSpell] = useState("");
   const [editingNotes, setEditingNotes] = useState(null);
   const [notes, setNotes] = useState({});
+  const [spellsByLevel, setSpellsByLevel] = useState({});
 
   useEffect(() => {
     const fetchCharacters = async () => {
@@ -320,6 +321,14 @@ const SpellSlotTracker = () => {
           ...doc.data(),
         }));
 
+        // Initialize spellsByLevel from the fetched data
+        const initialSpellsByLevel = {};
+        charactersList.forEach((character) => {
+          if (character.spellsByLevel) {
+            initialSpellsByLevel[character.id] = character.spellsByLevel;
+          }
+        });
+        setSpellsByLevel(initialSpellsByLevel);
         setCharacters(charactersList);
       } catch (error) {
         console.error("Error fetching characters:", error);
@@ -642,6 +651,135 @@ const SpellSlotTracker = () => {
     }
   };
 
+  const handleSpellUsage = async (characterId, level, spellIndex, isUsed) => {
+    try {
+      const character = characters.find((c) => c.id === characterId);
+      const maxSlots = character.spellSlots[level];
+      const currentUsedSlots = character.usedSpellSlots?.[level] || 0;
+      const newUsedSlots = isUsed ? currentUsedSlots + 1 : currentUsedSlots - 1;
+
+      // Don't allow more used slots than available
+      if (newUsedSlots > maxSlots || newUsedSlots < 0) return;
+
+      // Initialize the spells array for this level if it doesn't exist
+      const currentSpells =
+        spellsByLevel[characterId]?.[level] ||
+        Array(maxSlots)
+          .fill()
+          .map(() => ({ name: "", used: false }));
+
+      // Create the updated spells array
+      const updatedSpells = [...currentSpells];
+      updatedSpells[spellIndex] = {
+        ...updatedSpells[spellIndex],
+        used: isUsed,
+      };
+
+      // Ensure we have a valid spellsByLevel structure
+      const updatedSpellsByLevel = {
+        ...(spellsByLevel[characterId] || {}),
+        [level]: updatedSpells,
+      };
+
+      const characterRef = doc(db, "SpellSlot", characterId);
+
+      // Prepare the update data
+      const updateData = {
+        [`usedSpellSlots.${level}`]: newUsedSlots,
+        spellsByLevel: updatedSpellsByLevel,
+      };
+
+      // Remove any undefined values
+      Object.keys(updateData).forEach((key) => {
+        if (updateData[key] === undefined) {
+          delete updateData[key];
+        }
+      });
+
+      await updateDoc(characterRef, updateData);
+
+      // Update local state
+      setSpellsByLevel((prev) => ({
+        ...prev,
+        [characterId]: updatedSpellsByLevel,
+      }));
+
+      setCharacters((prevCharacters) =>
+        prevCharacters.map((char) =>
+          char.id === characterId
+            ? {
+                ...char,
+                usedSpellSlots: {
+                  ...(char.usedSpellSlots || {}),
+                  [level]: newUsedSlots,
+                },
+              }
+            : char
+        )
+      );
+    } catch (error) {
+      console.error("Error updating spell usage:", error);
+      setError("Failed to update spell usage");
+    }
+  };
+
+  const handleSpellNameChange = async (
+    characterId,
+    level,
+    spellIndex,
+    name
+  ) => {
+    try {
+      const character = characters.find((c) => c.id === characterId);
+      const maxSlots = character.spellSlots[level];
+
+      // Initialize the spells array for this level if it doesn't exist
+      const currentSpells =
+        spellsByLevel[characterId]?.[level] ||
+        Array(maxSlots)
+          .fill()
+          .map(() => ({ name: "", used: false }));
+
+      // Create the updated spells array
+      const updatedSpells = [...currentSpells];
+      updatedSpells[spellIndex] = {
+        ...updatedSpells[spellIndex],
+        name: name || "", // Ensure name is never undefined
+      };
+
+      // Ensure we have a valid spellsByLevel structure
+      const updatedSpellsByLevel = {
+        ...(spellsByLevel[characterId] || {}),
+        [level]: updatedSpells,
+      };
+
+      const characterRef = doc(db, "SpellSlot", characterId);
+
+      // Prepare the update data
+      const updateData = {
+        spellsByLevel: updatedSpellsByLevel,
+      };
+
+      // Remove any undefined values
+      Object.keys(updateData).forEach((key) => {
+        if (updateData[key] === undefined) {
+          delete updateData[key];
+        }
+      });
+
+      await updateDoc(characterRef, updateData);
+
+      // Update local state
+      setSpellsByLevel((prev) => ({
+        ...prev,
+        [characterId]: updatedSpellsByLevel,
+      }));
+    } catch (error) {
+      console.error("Error updating spell name:", error);
+      setError("Failed to update spell name");
+    }
+  };
+
   if (loading) {
     return <div className="spell-slot-container">Loading...</div>;
   }
@@ -709,29 +847,75 @@ const SpellSlotTracker = () => {
                   <h4>Spell Slots</h4>
                   {Object.entries(character.spellSlots || {}).map(
                     ([level, slots]) => (
-                      <div key={level} className="spell-slot-control">
-                        <span>Level {level}</span>
-                        <div className="slot-controls">
-                          <button
-                            className="slot-button"
-                            onClick={() =>
-                              handleSpellSlotChange(character.id, level, -1)
-                            }
-                          >
-                            -
-                          </button>
-                          <span className="slot-count">
-                            {slots - (character.usedSpellSlots?.[level] || 0)}/
-                            {slots}
-                          </span>
-                          <button
-                            className="slot-button"
-                            onClick={() =>
-                              handleSpellSlotChange(character.id, level, 1)
-                            }
-                          >
-                            +
-                          </button>
+                      <div key={level} className="spell-level-section">
+                        <div className="spell-slot-control">
+                          <span>Level {level}</span>
+                          <div className="slot-controls">
+                            <button
+                              className="slot-button"
+                              onClick={() =>
+                                handleSpellSlotChange(character.id, level, -1)
+                              }
+                            >
+                              -
+                            </button>
+                            <span className="slot-count">
+                              {slots - (character.usedSpellSlots?.[level] || 0)}
+                              /{slots}
+                            </span>
+                            <button
+                              className="slot-button"
+                              onClick={() =>
+                                handleSpellSlotChange(character.id, level, 1)
+                              }
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="spell-inputs">
+                          {Array.from({ length: slots }).map((_, index) => {
+                            const spell = spellsByLevel[character.id]?.[
+                              level
+                            ]?.[index] || { name: "", used: false };
+                            return (
+                              <div
+                                key={index}
+                                className={`spell-input-row ${
+                                  spell.used ? "used" : ""
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={spell.used}
+                                  onChange={(e) =>
+                                    handleSpellUsage(
+                                      character.id,
+                                      level,
+                                      index,
+                                      e.target.checked
+                                    )
+                                  }
+                                  className="spell-checkbox"
+                                />
+                                <input
+                                  type="text"
+                                  value={spell.name || ""}
+                                  onChange={(e) =>
+                                    handleSpellNameChange(
+                                      character.id,
+                                      level,
+                                      index,
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={`Level ${level} spell`}
+                                  className="spell-name-input"
+                                />
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )
