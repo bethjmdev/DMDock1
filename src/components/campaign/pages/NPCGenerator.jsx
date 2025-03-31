@@ -31,6 +31,51 @@ const styles = `
 }
 `;
 
+const SPELLCASTING_CLASSES = [
+  "Arcane Trickster",
+  "Artificer",
+  "Bard",
+  "Cleric",
+  "Druid",
+  "Eldritch Knight",
+  "Paladin",
+  "Ranger",
+  "Sorcerer",
+  "Warlock",
+  "Wizard",
+];
+
+// Add spell slot progression data
+const SPELL_SLOT_PROGRESSION = {
+  // Standard Full Casters (all use the same progression)
+  Wizard: {
+    startLevel: 1,
+    slots: {
+      1: { 1: 2 },
+      2: { 1: 3 },
+      3: { 1: 4, 2: 2 },
+      4: { 1: 4, 2: 3 },
+      5: { 1: 4, 2: 3, 3: 2 },
+      6: { 1: 4, 2: 3, 3: 3 },
+      7: { 1: 4, 2: 3, 3: 3, 4: 1 },
+      8: { 1: 4, 2: 3, 3: 3, 4: 2 },
+      9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 },
+      10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 },
+      11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
+      13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
+      15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
+      17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
+      18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 },
+      19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+      20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
+    },
+  },
+  // Add other classes as needed...
+};
+
 const NPCGenerator = () => {
   const { campaignId } = useParams();
   const [formData, setFormData] = useState({
@@ -38,11 +83,18 @@ const NPCGenerator = () => {
     sex: "",
     alignment: "",
     occupation: "",
+    characterClass: "",
+    characterLevel: 1,
   });
 
   const [generatedNPC, setGeneratedNPC] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
+
+  // Sort races alphabetically
+  const sortedRaces = [...races].sort();
+  // Sort classes alphabetically
+  const sortedClasses = [...SPELLCASTING_CLASSES].sort();
 
   const pronouns = {
     Male: {
@@ -93,6 +145,9 @@ const NPCGenerator = () => {
           break;
         case "occupation":
           finalValue = getRandomOption(occupations);
+          break;
+        case "characterClass":
+          finalValue = getRandomOption(SPELLCASTING_CLASSES);
           break;
         default:
           break;
@@ -276,10 +331,38 @@ const NPCGenerator = () => {
     setGeneratedNPC(npc);
   };
 
+  const getSpellSlots = (characterClass, level) => {
+    const progression = SPELL_SLOT_PROGRESSION[characterClass];
+    if (!progression) return null;
+
+    // If level is below start level, return null
+    if (level < progression.startLevel) return null;
+
+    // Get the highest level that's not greater than the character's level
+    const availableLevels = Object.keys(progression.slots)
+      .map(Number)
+      .filter((l) => l <= level);
+
+    if (availableLevels.length === 0) return null;
+
+    const highestLevel = Math.max(...availableLevels);
+
+    // Special handling for Warlock's Pact Magic
+    if (progression.pactMagic) {
+      // Warlocks only get their highest level slots
+      const slots = progression.slots[highestLevel];
+      const slotLevel = Object.keys(slots)[0];
+      const slotCount = slots[slotLevel];
+      return { [slotLevel]: slotCount };
+    }
+
+    return progression.slots[highestLevel];
+  };
+
   const handleSaveNPC = async () => {
     if (!generatedNPC || !campaignId) return;
 
-    const npcName = prompt("Enter a name for this NPC:");
+    const npcName = prompt("Enter a name for this NPC:", generatedNPC.name);
     if (!npcName) return;
 
     setIsSaving(true);
@@ -309,9 +392,37 @@ const NPCGenerator = () => {
           rel_status: "unknown",
           sexual_orientation: "unknown",
         },
+        characterClass: generatedNPC.characterClass,
+        characterLevel: generatedNPC.characterLevel,
       };
 
       const docRef = await addDoc(collection(db, "NPC"), npcData);
+
+      // If NPC is a spellcaster, create spell slot entry
+      if (SPELLCASTING_CLASSES.includes(generatedNPC.characterClass)) {
+        const spellSlots = getSpellSlots(
+          generatedNPC.characterClass,
+          generatedNPC.characterLevel
+        );
+
+        if (spellSlots) {
+          const spellSlotData = {
+            characterName: npcName,
+            characterType: "NPC",
+            characterClass: generatedNPC.characterClass,
+            characterLevel: Number(generatedNPC.characterLevel),
+            spellSlots: spellSlots,
+            selectedSpells: [],
+            createdAt: new Date().toISOString(),
+            campaignId: campaignId,
+            dmId: auth.currentUser.uid,
+            npcId: docRef.id,
+          };
+
+          await addDoc(collection(db, "SpellSlot"), spellSlotData);
+        }
+      }
+
       alert("NPC saved successfully!");
       navigate(`/campaign/${campaignId}/npc`);
     } catch (error) {
@@ -343,12 +454,45 @@ const NPCGenerator = () => {
                 >
                   <option value="">Select a race</option>
                   <option value="random">Random</option>
-                  {races.map((race) => (
+                  {sortedRaces.map((race) => (
                     <option key={race} value={race}>
                       {race}
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Class</label>
+                <select
+                  name="characterClass"
+                  value={formData.characterClass}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select a class</option>
+                  <option value="random">Random</option>
+                  {sortedClasses.map((className) => (
+                    <option key={className} value={className}>
+                      {className}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Level</label>
+                <input
+                  type="number"
+                  name="characterLevel"
+                  value={formData.characterLevel}
+                  onChange={handleChange}
+                  min="1"
+                  max="20"
+                  className="form-input"
+                  required
+                />
               </div>
 
               <div className="form-group">
