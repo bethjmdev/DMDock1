@@ -104,7 +104,7 @@ const ViewTownDetails = () => {
 
       <div className="town-details-content">
         <section className="town-basic-info">
-          <h3>Basic Information PIIIIIZZZZAAA</h3>
+          <h3>Basic Information</h3>
           <p>Population: {town.population.toLocaleString()}</p>
           <p>Size: {town.acres} acres</p>
           <p>Total Wealth: {town.wealth.total.toLocaleString()} gp</p>

@@ -96,3 +96,12 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+.delete-campaign-button {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.delete-campaign-button:hover {
+  background-color: #c82333 !important;
+}
