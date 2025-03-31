@@ -590,168 +590,151 @@
   margin: 10px 0;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.shop-item h5 {
-  margin: 0 0 10px 0;
-  color: #2c3e50;
-  font-size: 1.2em;
-}
-
-.shop-item p {
-  margin: 5px 0;
-  color: #666;
+.shop-item > div {
+  width: 100%;
 }
 
 .shop-item ul {
   list-style: none;
-  padding-left: 20px;
-  margin: 5px 0;
+  padding-left: 0;
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .shop-item li {
-  margin: 3px 0;
-  color: #666;
-}
-
-.add-shop-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin: 10px 0;
-}
-
-.add-shop-button:hover {
-  background-color: #45a049;
-}
-
-.shops-list {
-  margin-top: 20px;
-}
-
-.shops-list h4 {
-  color: #2c3e50;
-  margin-bottom: 10px;
-}
-
-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  resize: vertical;
-}
-
-.form-section h4 {
-  color: #2c3e50;
-  margin: 15px 0 10px 0;
-  font-size: 1.1em;
-}
-
-/* Fix for organization form */
-.form-section form {
-  margin-bottom: 15px;
-}
-
-.form-section form .form-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.form-section form .form-group input {
-  flex: 1;
-}
-
-.form-section form .form-group button {
-  padding: 8px 16px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.form-section form .form-group button:hover {
-  background-color: #45a049;
-}
-
-/* Sub-form styles */
-.sub-form {
-  margin-bottom: 15px;
-  padding: 10px;
-  background: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.sub-form .form-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.sub-form .form-group input {
-  flex: 1;
-}
-
-.sub-form .form-group button {
-  padding: 8px 16px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.sub-form .form-group button:hover {
-  background-color: #45a049;
-}
-
-.remove-button {
-  padding: 4px 8px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9em;
-  margin-left: 10px;
-}
-
-.remove-button:hover {
-  background-color: #da190b;
-}
-
-/* Prevent form submission from scrolling to top */
-form {
-  scroll-behavior: smooth;
-}
-
-/* Ensure sub-forms don't trigger main form submission */
-.sub-form {
-  position: relative;
-  z-index: 1;
-}
-
-/* Style for organization list items */
-.form-section li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
-  padding: 8px 12px;
-  margin: 5px 0;
+  padding: 0.75rem;
+  background-color: var(--dnd-light);
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--dnd-gold);
+  transition: all 0.2s ease;
 }
 
-.form-section li span {
-  flex: 1;
-  margin-right: 10px;
+.shop-item li:hover {
+  background-color: var(--dnd-accent);
+  transform: translateX(4px);
+}
+
+.shop-item li button {
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.shop-item li .item-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shop-item li .patron-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.add-button {
+  background-color: var(--dnd-accent);
+  color: var(--dnd-light);
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Cinzel", serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.add-button:hover {
+  background-color: var(--dnd-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.add-button::before {
+  content: "+";
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.shop-item .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--dnd-gold);
+}
+
+.shop-item .section-header h4 {
+  margin: 0;
+  color: var(--dnd-dark);
+  font-family: "Cinzel", serif;
+}
+
+.editing-item,
+.editing-patron {
+  background-color: var(--dnd-light);
+  padding: 1rem;
+  border: 1px solid var(--dnd-gold);
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  width: 100%;
+}
+
+.editing-item .input-group,
+.editing-patron .input-group {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.editing-item .input-group {
+  grid-template-columns: 2fr 1fr;
+}
+
+.editing-patron .input-group {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.editing-item .button-group,
+.editing-patron .button-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.section-header {
+  margin: 1rem 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--dnd-gold);
+}
+
+.section-header h4 {
+  margin: 0;
+  color: var(--dnd-accent);
+}
+
+.item-info,
+.patron-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

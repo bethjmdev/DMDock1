@@ -33,6 +33,10 @@ const EditTown = () => {
     gender: "",
   });
 
+  const [editingShop, setEditingShop] = useState(null);
+  const [editingSpecialItem, setEditingSpecialItem] = useState(null);
+  const [editingPatron, setEditingPatron] = useState(null);
+
   useEffect(() => {
     const fetchTown = async () => {
       try {
@@ -435,24 +439,102 @@ const EditTown = () => {
               <ul>
                 {(newShop.specialItems || []).map((item, index) => (
                   <li key={index}>
-                    {item.name} - {item.price} gp
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNewShop({
-                          ...newShop,
-                          specialItems: newShop.specialItems.filter(
-                            (_, i) => i !== index
-                          ),
-                        });
-                      }}
-                      className="remove-button"
-                    >
-                      Remove
-                    </button>
+                    {editingSpecialItem === `${index}-${itemIndex}` ? (
+                      <div className="editing-item">
+                        <div className="input-group">
+                          <input
+                            type="text"
+                            value={item.name}
+                            onChange={(e) => {
+                              const updatedShops = [...town.shops];
+                              updatedShops[index].specialItems[itemIndex] = {
+                                ...item,
+                                name: e.target.value,
+                              };
+                              setTown({ ...town, shops: updatedShops });
+                            }}
+                            placeholder="Item name"
+                          />
+                          <input
+                            type="number"
+                            value={item.price}
+                            onChange={(e) => {
+                              const updatedShops = [...town.shops];
+                              updatedShops[index].specialItems[itemIndex] = {
+                                ...item,
+                                price: parseInt(e.target.value),
+                              };
+                              setTown({ ...town, shops: updatedShops });
+                            }}
+                            placeholder="Price in gp"
+                          />
+                        </div>
+                        <div className="button-group">
+                          <button
+                            type="button"
+                            onClick={() => setEditingSpecialItem(null)}
+                            className="save-button"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedShops = [...town.shops];
+                              updatedShops[index].specialItems.splice(
+                                itemIndex,
+                                1
+                              );
+                              setTown({ ...town, shops: updatedShops });
+                              setEditingSpecialItem(null);
+                            }}
+                            className="remove-button"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="item-info">
+                          <span>{item.name}</span>
+                          <span>-</span>
+                          <span>{item.price} gp</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingSpecialItem(`${index}-${itemIndex}`)
+                          }
+                          className="edit-button"
+                        >
+                          Edit
+                        </button>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
+              <button
+                type="button"
+                onClick={() => {
+                  const updatedShops = [...town.shops];
+                  if (!updatedShops[index].specialItems) {
+                    updatedShops[index].specialItems = [];
+                  }
+                  updatedShops[index].specialItems.push({
+                    name: "",
+                    price: 0,
+                  });
+                  setTown({ ...town, shops: updatedShops });
+                  setEditingSpecialItem(
+                    `${index}-${updatedShops[index].specialItems.length - 1}`
+                  );
+                }}
+                className="add-button"
+              >
+                Add Special Item
+              </button>
             </div>
 
             <div className="form-section">
@@ -491,24 +573,132 @@ const EditTown = () => {
               <ul>
                 {(newShop.currentPatrons || []).map((patron, index) => (
                   <li key={index}>
-                    {patron.name} ({patron.gender} {patron.race})
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNewShop({
-                          ...newShop,
-                          currentPatrons: newShop.currentPatrons.filter(
-                            (_, i) => i !== index
-                          ),
-                        });
-                      }}
-                      className="remove-button"
-                    >
-                      Remove
-                    </button>
+                    {editingPatron === `${index}-${patronIndex}` ? (
+                      <div className="editing-patron">
+                        <div className="input-group">
+                          <input
+                            type="text"
+                            value={patron.name}
+                            onChange={(e) => {
+                              const updatedShops = [...town.shops];
+                              updatedShops[index].currentPatrons[patronIndex] =
+                                {
+                                  ...patron,
+                                  name: e.target.value,
+                                };
+                              setTown({
+                                ...town,
+                                shops: updatedShops,
+                              });
+                            }}
+                            placeholder="Patron name"
+                          />
+                          <input
+                            type="text"
+                            value={patron.race}
+                            onChange={(e) => {
+                              const updatedShops = [...town.shops];
+                              updatedShops[index].currentPatrons[patronIndex] =
+                                {
+                                  ...patron,
+                                  race: e.target.value,
+                                };
+                              setTown({
+                                ...town,
+                                shops: updatedShops,
+                              });
+                            }}
+                            placeholder="Race"
+                          />
+                          <input
+                            type="text"
+                            value={patron.gender}
+                            onChange={(e) => {
+                              const updatedShops = [...town.shops];
+                              updatedShops[index].currentPatrons[patronIndex] =
+                                {
+                                  ...patron,
+                                  gender: e.target.value,
+                                };
+                              setTown({
+                                ...town,
+                                shops: updatedShops,
+                              });
+                            }}
+                            placeholder="Gender"
+                          />
+                        </div>
+                        <div className="button-group">
+                          <button
+                            type="button"
+                            onClick={() => setEditingPatron(null)}
+                            className="save-button"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedShops = [...town.shops];
+                              updatedShops[index].currentPatrons.splice(
+                                patronIndex,
+                                1
+                              );
+                              setTown({
+                                ...town,
+                                shops: updatedShops,
+                              });
+                              setEditingPatron(null);
+                            }}
+                            className="remove-button"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="patron-info">
+                          <span>{patron.name}</span>
+                          <span>
+                            ({patron.gender} {patron.race})
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingPatron(`${index}-${patronIndex}`)
+                          }
+                          className="edit-button"
+                        >
+                          Edit
+                        </button>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
+              <button
+                type="button"
+                onClick={() => {
+                  const updatedShops = [...town.shops];
+                  if (!updatedShops[index].currentPatrons) {
+                    updatedShops[index].currentPatrons = [];
+                  }
+                  updatedShops[index].currentPatrons.push({
+                    name: "",
+                    race: "",
+                    gender: "",
+                  });
+                  setTown({ ...town, shops: updatedShops });
+                  setEditingPatron(
+                    `${index}-${updatedShops[index].currentPatrons.length - 1}`
+                  );
+                }}
+                className="add-button"
+              >
+                Add Patron
+              </button>
             </div>
 
             <button
@@ -525,49 +715,423 @@ const EditTown = () => {
             <ul>
               {(town.shops || []).map((shop, index) => (
                 <li key={index} className="shop-item">
-                  <h5>
-                    {shop.name} ({shop.type})
-                  </h5>
-                  <p>
-                    Owner: {shop.owner.name} ({shop.owner.gender}{" "}
-                    {shop.owner.race})
-                  </p>
-                  <p>Location: {shop.location}</p>
-                  <p>Description: {shop.description}</p>
-                  <div>
-                    <strong>Special Items:</strong>
-                    <ul>
-                      {(shop.specialItems || []).map((item, itemIndex) => (
-                        <li key={itemIndex}>
-                          {item.name} - {item.price} gp
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <strong>Current Patrons:</strong>
-                    <ul>
-                      {(shop.currentPatrons || []).map(
-                        (patron, patronIndex) => (
-                          <li key={patronIndex}>
-                            {patron.name} ({patron.gender} {patron.race})
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTown({
-                        ...town,
-                        shops: town.shops.filter((_, i) => i !== index),
-                      });
-                    }}
-                    className="remove-button"
-                  >
-                    Remove Shop
-                  </button>
+                  {editingShop === index ? (
+                    <div className="editing-shop">
+                      <div className="form-group">
+                        <label>Shop Name:</label>
+                        <input
+                          type="text"
+                          value={shop.name}
+                          onChange={(e) => {
+                            const updatedShops = [...town.shops];
+                            updatedShops[index] = {
+                              ...shop,
+                              name: e.target.value,
+                            };
+                            setTown({ ...town, shops: updatedShops });
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Type:</label>
+                        <input
+                          type="text"
+                          value={shop.type}
+                          onChange={(e) => {
+                            const updatedShops = [...town.shops];
+                            updatedShops[index] = {
+                              ...shop,
+                              type: e.target.value,
+                            };
+                            setTown({ ...town, shops: updatedShops });
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Owner Name:</label>
+                        <input
+                          type="text"
+                          value={shop.owner.name}
+                          onChange={(e) => {
+                            const updatedShops = [...town.shops];
+                            updatedShops[index] = {
+                              ...shop,
+                              owner: { ...shop.owner, name: e.target.value },
+                            };
+                            setTown({ ...town, shops: updatedShops });
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Owner Race:</label>
+                        <input
+                          type="text"
+                          value={shop.owner.race}
+                          onChange={(e) => {
+                            const updatedShops = [...town.shops];
+                            updatedShops[index] = {
+                              ...shop,
+                              owner: { ...shop.owner, race: e.target.value },
+                            };
+                            setTown({ ...town, shops: updatedShops });
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Owner Gender:</label>
+                        <input
+                          type="text"
+                          value={shop.owner.gender}
+                          onChange={(e) => {
+                            const updatedShops = [...town.shops];
+                            updatedShops[index] = {
+                              ...shop,
+                              owner: { ...shop.owner, gender: e.target.value },
+                            };
+                            setTown({ ...town, shops: updatedShops });
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Location:</label>
+                        <input
+                          type="text"
+                          value={shop.location}
+                          onChange={(e) => {
+                            const updatedShops = [...town.shops];
+                            updatedShops[index] = {
+                              ...shop,
+                              location: e.target.value,
+                            };
+                            setTown({ ...town, shops: updatedShops });
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Description:</label>
+                        <textarea
+                          value={shop.description}
+                          onChange={(e) => {
+                            const updatedShops = [...town.shops];
+                            updatedShops[index] = {
+                              ...shop,
+                              description: e.target.value,
+                            };
+                            setTown({ ...town, shops: updatedShops });
+                          }}
+                        />
+                      </div>
+                      <div className="button-group">
+                        <button
+                          type="button"
+                          onClick={() => setEditingShop(null)}
+                          className="save-button"
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedShops = [...town.shops];
+                            updatedShops.splice(index, 1);
+                            setTown({ ...town, shops: updatedShops });
+                            setEditingShop(null);
+                          }}
+                          className="remove-button"
+                        >
+                          Remove Shop
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h5>
+                        {shop.name} ({shop.type})
+                      </h5>
+                      <p>
+                        Owner: {shop.owner.name} ({shop.owner.gender}{" "}
+                        {shop.owner.race})
+                      </p>
+                      <p>Location: {shop.location}</p>
+                      <p>Description: {shop.description}</p>
+                      <div>
+                        <div className="section-header">
+                          <h4>Special Items</h4>
+                        </div>
+                        <ul>
+                          {(shop.specialItems || []).map((item, itemIndex) => (
+                            <li key={itemIndex}>
+                              {editingSpecialItem ===
+                              `${index}-${itemIndex}` ? (
+                                <div className="editing-item">
+                                  <div className="input-group">
+                                    <input
+                                      type="text"
+                                      value={item.name}
+                                      onChange={(e) => {
+                                        const updatedShops = [...town.shops];
+                                        updatedShops[index].specialItems[
+                                          itemIndex
+                                        ] = {
+                                          ...item,
+                                          name: e.target.value,
+                                        };
+                                        setTown({
+                                          ...town,
+                                          shops: updatedShops,
+                                        });
+                                      }}
+                                      placeholder="Item name"
+                                    />
+                                    <input
+                                      type="number"
+                                      value={item.price}
+                                      onChange={(e) => {
+                                        const updatedShops = [...town.shops];
+                                        updatedShops[index].specialItems[
+                                          itemIndex
+                                        ] = {
+                                          ...item,
+                                          price: parseInt(e.target.value),
+                                        };
+                                        setTown({
+                                          ...town,
+                                          shops: updatedShops,
+                                        });
+                                      }}
+                                      placeholder="Price in gp"
+                                    />
+                                  </div>
+                                  <div className="button-group">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEditingSpecialItem(null)
+                                      }
+                                      className="save-button"
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updatedShops = [...town.shops];
+                                        updatedShops[index].specialItems.splice(
+                                          itemIndex,
+                                          1
+                                        );
+                                        setTown({
+                                          ...town,
+                                          shops: updatedShops,
+                                        });
+                                        setEditingSpecialItem(null);
+                                      }}
+                                      className="remove-button"
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="item-info">
+                                    <span>{item.name}</span>
+                                    <span>-</span>
+                                    <span>{item.price} gp</span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setEditingSpecialItem(
+                                        `${index}-${itemIndex}`
+                                      )
+                                    }
+                                    className="edit-button"
+                                  >
+                                    Edit
+                                  </button>
+                                </>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedShops = [...town.shops];
+                            if (!updatedShops[index].specialItems) {
+                              updatedShops[index].specialItems = [];
+                            }
+                            updatedShops[index].specialItems.push({
+                              name: "",
+                              price: 0,
+                            });
+                            setTown({ ...town, shops: updatedShops });
+                            setEditingSpecialItem(
+                              `${index}-${
+                                updatedShops[index].specialItems.length - 1
+                              }`
+                            );
+                          }}
+                          className="add-button"
+                        >
+                          Add Special Item
+                        </button>
+                      </div>
+                      <div>
+                        <div className="section-header">
+                          <h4>Current Patrons</h4>
+                        </div>
+                        <ul>
+                          {(shop.currentPatrons || []).map(
+                            (patron, patronIndex) => (
+                              <li key={patronIndex}>
+                                {editingPatron === `${index}-${patronIndex}` ? (
+                                  <div className="editing-patron">
+                                    <div className="input-group">
+                                      <input
+                                        type="text"
+                                        value={patron.name}
+                                        onChange={(e) => {
+                                          const updatedShops = [...town.shops];
+                                          updatedShops[index].currentPatrons[
+                                            patronIndex
+                                          ] = {
+                                            ...patron,
+                                            name: e.target.value,
+                                          };
+                                          setTown({
+                                            ...town,
+                                            shops: updatedShops,
+                                          });
+                                        }}
+                                        placeholder="Patron name"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={patron.race}
+                                        onChange={(e) => {
+                                          const updatedShops = [...town.shops];
+                                          updatedShops[index].currentPatrons[
+                                            patronIndex
+                                          ] = {
+                                            ...patron,
+                                            race: e.target.value,
+                                          };
+                                          setTown({
+                                            ...town,
+                                            shops: updatedShops,
+                                          });
+                                        }}
+                                        placeholder="Race"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={patron.gender}
+                                        onChange={(e) => {
+                                          const updatedShops = [...town.shops];
+                                          updatedShops[index].currentPatrons[
+                                            patronIndex
+                                          ] = {
+                                            ...patron,
+                                            gender: e.target.value,
+                                          };
+                                          setTown({
+                                            ...town,
+                                            shops: updatedShops,
+                                          });
+                                        }}
+                                        placeholder="Gender"
+                                      />
+                                    </div>
+                                    <div className="button-group">
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingPatron(null)}
+                                        className="save-button"
+                                      >
+                                        Save
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const updatedShops = [...town.shops];
+                                          updatedShops[
+                                            index
+                                          ].currentPatrons.splice(
+                                            patronIndex,
+                                            1
+                                          );
+                                          setTown({
+                                            ...town,
+                                            shops: updatedShops,
+                                          });
+                                          setEditingPatron(null);
+                                        }}
+                                        className="remove-button"
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="patron-info">
+                                      <span>{patron.name}</span>
+                                      <span>
+                                        ({patron.gender} {patron.race})
+                                      </span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEditingPatron(
+                                          `${index}-${patronIndex}`
+                                        )
+                                      }
+                                      className="edit-button"
+                                    >
+                                      Edit
+                                    </button>
+                                  </>
+                                )}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedShops = [...town.shops];
+                            if (!updatedShops[index].currentPatrons) {
+                              updatedShops[index].currentPatrons = [];
+                            }
+                            updatedShops[index].currentPatrons.push({
+                              name: "",
+                              race: "",
+                              gender: "",
+                            });
+                            setTown({ ...town, shops: updatedShops });
+                            setEditingPatron(
+                              `${index}-${
+                                updatedShops[index].currentPatrons.length - 1
+                              }`
+                            );
+                          }}
+                          className="add-button"
+                        >
+                          Add Patron
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditingShop(index)}
+                        className="edit-button"
+                      >
+                        Edit Shop
+                      </button>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
