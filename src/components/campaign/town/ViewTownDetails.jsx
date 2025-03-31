@@ -97,9 +97,9 @@ const ViewTownDetails = () => {
           <h3>Basic Information</h3>
           <p>Population: {town.population.toLocaleString()}</p>
           <p>Size: {town.acres} acres</p>
-          <p>Total Wealth: {town.wealth.total.toLocaleString()} gp</p>
-          <p>Max Sale Value: {town.wealth.maxSale.toLocaleString()} gp</p>
-          <p>Max Pawn Value: {town.wealth.maxPawn.toLocaleString()} gp</p>
+          <p>Total Wealth: {town.totalWealth.toLocaleString()} gp</p>
+          <p>Max Sale Value: {town.maxSaleValue.toLocaleString()} gp</p>
+          <p>Max Pawn Value: {town.maxPawnValue.toLocaleString()} gp</p>
         </section>
 
         <section className="town-demographics">
@@ -113,11 +113,9 @@ const ViewTownDetails = () => {
 
         <section className="town-defenses">
           <h3>Defenses</h3>
-          <ul>
-            {town.defenses.map((defense, index) => (
-              <li key={index}>{defense}</li>
-            ))}
-          </ul>
+          <p>Walls: {town.defenses.walls}</p>
+          <p>Trained Warriors: {town.defenses.trainedWarriors}</p>
+          <p>Militia: {town.defenses.militia}</p>
         </section>
 
         <section className="town-organizations">
@@ -147,28 +145,28 @@ const ViewTownDetails = () => {
                 <strong>Description:</strong> {shop.description}
               </p>
 
-              {shop.specials.length > 0 && (
+              {shop.specialItems && shop.specialItems.length > 0 && (
                 <>
                   <p>
                     <strong>Special Items:</strong>
                   </p>
                   <ul>
-                    {shop.specials.map((item, itemIndex) => (
+                    {shop.specialItems.map((item, itemIndex) => (
                       <li key={itemIndex}>
-                        {item.name} ({item.source}) - {item.price} gp
+                        {item.name} - {item.price} gp
                       </li>
                     ))}
                   </ul>
                 </>
               )}
 
-              {shop.patrons.length > 0 && (
+              {shop.currentPatrons && shop.currentPatrons.length > 0 && (
                 <>
                   <p>
                     <strong>Current Patrons:</strong>
                   </p>
                   <ul>
-                    {shop.patrons.map((patron, patronIndex) => (
+                    {shop.currentPatrons.map((patron, patronIndex) => (
                       <li key={patronIndex}>
                         {patron.name} ({patron.gender} {patron.race})
                       </li>

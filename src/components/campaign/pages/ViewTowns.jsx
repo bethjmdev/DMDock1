@@ -43,13 +43,22 @@ const ViewTowns = () => {
     navigate(`/campaign/${campaignId}/town-generator`);
   };
 
+  const handleAddTown = () => {
+    navigate(`/campaign/${campaignId}/add-town`);
+  };
+
   return (
     <div className="towns-container">
       <div className="towns-header">
         <h2>Your Towns</h2>
-        <button onClick={handleGenerateNew} className="generate-button">
-          Generate New Town
-        </button>
+        <div className="town-buttons">
+          <button onClick={handleGenerateNew} className="generate-town-button">
+            Generate New Town
+          </button>
+          <button onClick={handleAddTown} className="add-town-button">
+            Add Town
+          </button>
+        </div>
       </div>
 
       {loading ? (

@@ -1,0 +1,19 @@
+.towns-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.towns-title {
+  flex: 1;
+}
+
+.generate-button {
+  width: 10rem;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}

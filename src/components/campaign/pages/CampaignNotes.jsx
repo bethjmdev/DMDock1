@@ -1,4 +1,4 @@
-import BackToCampaignButton from "../components/BackToCampaignButton";
+import BackToCampaignButton from "../../BackToCampaignButton";
 
 function CampaignNotes() {
   return (

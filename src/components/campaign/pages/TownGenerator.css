@@ -77,26 +77,24 @@
   box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
-.generate-button {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background-color: #92400e;
+.generate-town-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 4px;
+  background-color: #4a5568;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1.125rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
+  transition: background-color 0.2s;
+  width: 10rem;
+  min-width: unset;
 }
 
-.generate-button:hover {
-  background-color: #78350f;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.generate-town-button:hover {
+  background-color: #2d3748;
 }
 
-.generate-button:disabled {
+.generate-town-button:disabled {
   background-color: #fbbf24;
   cursor: not-allowed;
 }
@@ -215,6 +213,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.towns-header h2 {
+  font-size: 2rem;
+  color: #2c3e50;
+  font-family: "Cinzel", serif;
+  margin: 0;
 }
 
 .towns-grid {
@@ -417,4 +422,291 @@
   text-align: center;
   color: #666;
   padding: 20px;
+}
+
+/* Add Town Form Styles */
+.add-town-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-section {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.form-group label {
+  min-width: 150px;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.form-group span {
+  margin-left: 5px;
+}
+
+.town-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.add-town-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-town-button:hover {
+  background-color: #45a049;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.submit-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+
+.cancel-button:hover {
+  background-color: #da190b;
+}
+
+/* Organization List Styles */
+.form-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.form-section li {
+  background: white;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Shop Form Styles */
+.shop-item {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shop-item h5 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1.2em;
+}
+
+.shop-item p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.shop-item ul {
+  list-style: none;
+  padding-left: 20px;
+  margin: 5px 0;
+}
+
+.shop-item li {
+  margin: 3px 0;
+  color: #666;
+}
+
+.add-shop-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 10px 0;
+}
+
+.add-shop-button:hover {
+  background-color: #45a049;
+}
+
+.shops-list {
+  margin-top: 20px;
+}
+
+.shops-list h4 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.form-section h4 {
+  color: #2c3e50;
+  margin: 15px 0 10px 0;
+  font-size: 1.1em;
+}
+
+/* Fix for organization form */
+.form-section form {
+  margin-bottom: 15px;
+}
+
+.form-section form .form-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-section form .form-group input {
+  flex: 1;
+}
+
+.form-section form .form-group button {
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-section form .form-group button:hover {
+  background-color: #45a049;
+}
+
+/* Sub-form styles */
+.sub-form {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sub-form .form-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sub-form .form-group input {
+  flex: 1;
+}
+
+.sub-form .form-group button {
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sub-form .form-group button:hover {
+  background-color: #45a049;
+}
+
+.remove-button {
+  padding: 4px 8px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 10px;
+}
+
+.remove-button:hover {
+  background-color: #da190b;
+}
+
+/* Prevent form submission from scrolling to top */
+form {
+  scroll-behavior: smooth;
+}
+
+/* Ensure sub-forms don't trigger main form submission */
+.sub-form {
+  position: relative;
+  z-index: 1;
+}
+
+/* Style for organization list items */
+.form-section li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-section li span {
+  flex: 1;
+  margin-right: 10px;
 }
