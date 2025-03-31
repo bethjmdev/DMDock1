@@ -847,12 +847,6 @@ const SpellSlotTracker = () => {
                 <div className="character-header">
                   <h3>{character.characterName}</h3>
                   <div className="character-controls">
-                    <button
-                      className="delete-character-button"
-                      onClick={() => deleteCharacter(character.id)}
-                    >
-                      ×
-                    </button>
                     <div className="move-buttons">
                       <button
                         className="move-button"
@@ -869,11 +863,25 @@ const SpellSlotTracker = () => {
                         ↓
                       </button>
                     </div>
+                    <button
+                      className="reset-all-button"
+                      onClick={() => resetAllSpells(character.id)}
+                    >
+                      Reset All
+                    </button>
+                    <button
+                      className="delete-character-button"
+                      onClick={() => deleteCharacter(character.id)}
+                    >
+                      ×
+                    </button>
                   </div>
                 </div>
-                <p className="character-info">
-                  {character.characterType} - {character.characterClass} Level{" "}
-                  {character.characterLevel}
+                <div className="character-info">
+                  <span>
+                    {character.characterType} - {character.characterClass} Level{" "}
+                    {character.characterLevel}
+                  </span>
                   <button
                     className="level-up-button"
                     onClick={() => handleLevelUp(character.id)}
@@ -881,17 +889,11 @@ const SpellSlotTracker = () => {
                   >
                     Level Up
                   </button>
-                </p>
+                </div>
 
                 <div className="spell-slots">
                   <div className="spell-slots-header">
                     <h4>Spell Slots</h4>
-                    <button
-                      className="reset-all-button"
-                      onClick={() => resetAllSpells(character.id)}
-                    >
-                      Reset All
-                    </button>
                   </div>
                   {Object.entries(character.spellSlots || {}).map(
                     ([level, slots]) => (

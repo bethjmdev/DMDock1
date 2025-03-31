@@ -137,99 +137,109 @@
 .character-card {
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(44, 27, 77, 0.1);
   padding: 20px;
-  transition: transform 0.2s;
-  position: relative;
-  border: 1px solid #d4b895;
-}
-
-.character-card:hover {
-  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .character-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-.character-controls {
-  display: flex;
-  gap: 8px;
   align-items: center;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
-.move-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-  z-index: 1;
-}
-
-.move-button {
-  background-color: #daa520; /* Goldenrod */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
-
-.move-button:hover:not(:disabled) {
-  background-color: #b8860b; /* Dark goldenrod */
-}
-
-.move-button:disabled {
-  background-color: #a9a9a9;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.character-card h3 {
+.character-header h3 {
   margin: 0;
-  color: #8b0000; /* Maroon */
-  padding-right: 30px;
-  flex: 1;
-}
-
-.delete-character-button {
-  position: relative;
-  background-color: #8b0000; /* Dark red */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-  z-index: 0;
-}
-
-.delete-character-button:hover {
-  background-color: #660000;
+  color: #8b0000;
+  font-size: 1.4rem;
 }
 
 .character-info {
   display: flex;
   align-items: center;
-  color: #b8860b;
-  margin-bottom: 15px;
-  font-size: 14px;
+  gap: 15px;
+  margin: 0 0 15px 0;
+  padding: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.character-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.move-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.move-button {
+  background-color: #f8f1e3;
+  border: 1px solid #d4b895;
+  color: #8b0000;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.move-button:hover:not(:disabled) {
+  background-color: #e8d5c4;
+}
+
+.move-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.delete-character-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background-color 0.2s;
+}
+
+.delete-character-button:hover {
+  background-color: #c82333;
+}
+
+.level-up-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  margin-left: auto;
+}
+
+.level-up-button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.level-up-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
 /* Spell Slots in Character Card */
@@ -480,28 +490,6 @@
   background-color: #600000;
 }
 
-.level-up-button {
-  background-color: #daa520; /* Goldenrod */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  margin-left: 10px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: background-color 0.3s;
-}
-
-.level-up-button:hover:not(:disabled) {
-  background-color: #b8860b; /* Dark goldenrod */
-}
-
-.level-up-button:disabled {
-  background-color: #a9a9a9;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
 .spell-level-section {
   margin-bottom: 20px;
 }
@@ -585,11 +573,15 @@
   background-color: #dc3545;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .reset-all-button:hover {
